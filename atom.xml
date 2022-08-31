@@ -165,9 +165,9 @@
     
     <category term="ssti" scheme="https://www.m0x01sery.com/tags/ssti/"/>
     
-    <category term="ssrf" scheme="https://www.m0x01sery.com/tags/ssrf/"/>
-    
     <category term="rce" scheme="https://www.m0x01sery.com/tags/rce/"/>
+    
+    <category term="ssrf" scheme="https://www.m0x01sery.com/tags/ssrf/"/>
     
   </entry>
   
