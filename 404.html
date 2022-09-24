@@ -68,8 +68,6 @@
 
 
 
-  <meta name="keywords" content="pwn," />
-
 
 
 
@@ -81,16 +79,19 @@
 
 
 
-<meta property="og:type" content="article">
-<meta property="og:title" content="php伪协议解析及适用场景总结">
-<meta property="og:url" content="https://www.m0x01sery.com/2021/12/21/pwn/index.html">
+<meta name="description" content="404 NOT FOUND!404页面是网站必备的一个页面，它承载着用户体验与SEO优化的重任。404页面通常为用户访问了网站上不存在或已删除的页面，服务器返回的404错误。如果站长没有设置404页面，会出现死链接，蜘蛛爬行这类网址时，不利于搜索引擎收录。 404 Not Found 由来据说在第三次科技革命之前，互联网的形态就是一个大型的中央数据库，这个数据库就设置在404房间里面。那时候所有的">
+<meta property="og:type" content="website">
+<meta property="og:title" content="M1seryの厨房">
+<meta property="og:url" content="https://www.m0x01sery.com/404.html">
 <meta property="og:site_name" content="M1seryの厨房">
+<meta property="og:description" content="404 NOT FOUND!404页面是网站必备的一个页面，它承载着用户体验与SEO优化的重任。404页面通常为用户访问了网站上不存在或已删除的页面，服务器返回的404错误。如果站长没有设置404页面，会出现死链接，蜘蛛爬行这类网址时，不利于搜索引擎收录。 404 Not Found 由来据说在第三次科技革命之前，互联网的形态就是一个大型的中央数据库，这个数据库就设置在404房间里面。那时候所有的">
 <meta property="og:locale">
-<meta property="article:published_time" content="2021-12-20T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-09-15T16:00:00.000Z">
+<meta property="og:image" content="https://www.m0x01sery.com/images/404.jpg">
+<meta property="article:published_time" content="2022-09-24T16:59:51.249Z">
+<meta property="article:modified_time" content="2022-08-31T03:19:32.854Z">
 <meta property="article:author" content="M1sery">
-<meta property="article:tag" content="pwn">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.m0x01sery.com/images/404.jpg">
 
 
 
@@ -120,13 +121,13 @@
 
 
 
-  <link rel="canonical" href="https://www.m0x01sery.com/2021/12/21/pwn/"/>
+  <link rel="canonical" href="https://www.m0x01sery.com/404.html"/>
 
 
 
 
 
-  <title>php伪协议解析及适用场景总结 | M1seryの厨房</title>
+  <title> | M1seryの厨房</title>
   
 
 
@@ -265,155 +266,44 @@
 
   <div id="posts" class="posts-expand">
     
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.m0x01sery.com/2021/12/21/pwn/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="M1sery">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/23333.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="M1seryの厨房">
-    </span>
-
     
+    
+    <div class="post-block page">
       <header class="post-header">
 
-        
-        
-          <h2 class="post-title" itemprop="name headline">php伪协议解析及适用场景总结</h2>
-        
+	<h2 class="post-title" itemprop="name headline"></h2>
 
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-21T00:00:00+08:00">
-                2021-12-21
-              </time>
-            
 
-            
-              <span class="post-meta-divider">|</span>
-            
 
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-check-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">更新于&#58;</span>
-              
-              <time title="更新于" itemprop="dateModified" datetime="2022-09-16T00:00:00+08:00">
-                2022-09-16
-              </time>
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+</header>
 
       
       
-
       
+      <div class="post-body">
         
+        
+          <h1 id="404-NOT-FOUND"><a href="#404-NOT-FOUND" class="headerlink" title="404 NOT FOUND!"></a>404 NOT FOUND!</h1><p>404页面是网站必备的一个页面，它承载着用户体验与SEO优化的重任。404页面通常为用户访问了网站上不存在或已删除的页面，服务器返回的404错误。如果站长没有设置404页面，会出现死链接，蜘蛛爬行这类网址时，不利于搜索引擎收录。</p>
+<h1 id="404-Not-Found-由来"><a href="#404-Not-Found-由来" class="headerlink" title="404 Not Found 由来"></a>404 Not Found 由来</h1><p>据说在第三次科技革命之前，互联网的形态就是一个大型的中央数据库，这个数据库就设置在404房间里面。那时候所有的请求都是由人工手动完成的，如果在数据库中没有找到请求者所需要的文件，或者由于请求者写错了文件编号，用户就会得到一个返回信息：room 404 : file not found。后来互联网兴起后，人们也就习惯了用404作为服务器未找到文件的错误代码了。当然实际考证传说中的room 404是不存在的。</p>
+<h1 id="设置404页面的两大好处"><a href="#设置404页面的两大好处" class="headerlink" title="设置404页面的两大好处"></a>设置404页面的两大好处</h1><ul>
+<li><p>引导用户不要关闭网站，增强用户体验。</p>
+</li>
+<li><p>防止网站出现死链接。</p>
+</li>
+</ul>
+<p>查看更多<a target="_blank" rel="noopener" href="https://www.runoob.com/http/http-status-codes.html">HTTP状态码介绍</a>。</p>
+<p><img src="/images/404.jpg"></p>
+<p>404页面搬运自<a target="_blank" rel="noopener" href="https://www.runoob.com/">菜鸟教程</a></p>
+
+        
+      </div>
+      
+      
       
     </div>
     
     
     
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/pwn/" rel="tag"># pwn</a>
-          
-        </div>
-      
-
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2021/12/21/php-pseudo-protocol/" rel="prev" title="php伪协议解析及适用场景总结">
-                php伪协议解析及适用场景总结 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-
-    <div class="post-spread">
-      
-    </div>
   </div>
 
 
@@ -451,8 +341,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -471,7 +370,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">归档</span>
                 </a>
               </div>
@@ -484,7 +383,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -574,6 +473,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#404-NOT-FOUND"><span class="nav-number">1.</span> <span class="nav-text">404 NOT FOUND!</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#404-Not-Found-%E7%94%B1%E6%9D%A5"><span class="nav-number">2.</span> <span class="nav-text">404 Not Found 由来</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE404%E9%A1%B5%E9%9D%A2%E7%9A%84%E4%B8%A4%E5%A4%A7%E5%A5%BD%E5%A4%84"><span class="nav-number">3.</span> <span class="nav-text">设置404页面的两大好处</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
