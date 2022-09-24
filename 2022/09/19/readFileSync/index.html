@@ -68,6 +68,8 @@
 
 
 
+  <meta name="keywords" content="node.js," />
+
 
 
 
@@ -79,13 +81,22 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="M1seryの厨房">
-<meta property="og:url" content="https://www.m0x01sery.com/archives/2022/04/index.html">
+<meta name="description" content="一个fs.readFileSync的trick浅析">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一个fs.readFileSync的trick浅析">
+<meta property="og:url" content="https://www.m0x01sery.com/2022/09/19/readFileSync/index.html">
 <meta property="og:site_name" content="M1seryの厨房">
+<meta property="og:description" content="一个fs.readFileSync的trick浅析">
 <meta property="og:locale">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20220923230858.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20220924233442.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20220925001928.png">
+<meta property="article:published_time" content="2022-09-18T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-09-18T16:00:00.000Z">
 <meta property="article:author" content="M1sery">
+<meta property="article:tag" content="node.js">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.m0x01sery.com/images/20220923230858.png">
 
 
 
@@ -115,13 +126,13 @@
 
 
 
-  <link rel="canonical" href="https://www.m0x01sery.com/archives/2022/04/"/>
+  <link rel="canonical" href="https://www.m0x01sery.com/2022/09/19/readFileSync/"/>
 
 
 
 
 
-  <title>归档 | M1seryの厨房</title>
+  <title>一个fs.readFileSync的trick浅析 | M1seryの厨房</title>
   
 
 
@@ -140,7 +151,7 @@
     
   
 
-  <div class="container sidebar-position-left page-archive">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -258,222 +269,202 @@
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block archive">
-    <div id="posts" class="posts-collapse">
-      <span class="archive-move-on"></span>
+  <div id="posts" class="posts-expand">
+    
 
-      <span class="archive-page-counter">
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.m0x01sery.com/2022/09/19/readFileSync/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="M1sery">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/23333.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="M1seryの厨房">
+    </span>
+
+    
+      <header class="post-header">
+
         
         
+          <h2 class="post-title" itemprop="name headline">一个fs.readFileSync的trick浅析</h2>
         
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-09-19T00:00:00+08:00">
+                2022-09-19
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2022-09-19T00:00:00+08:00">
+                2022-09-19
+              </time>
+            
+          </span>
+
           
-        
-        嗯..! 目前共计 14 篇日志。 继续努力。
-      </span>
 
-      
-
-        
-        
-        
-
-        
           
-          <div class="collection-title">
-            <h2 class="archive-year" id="archive-year-2022">2022</h2>
-          </div>
-        
-        
+            
+          
 
-        
+          
+          
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+          
 
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2022/04/28/DASCTF-FATE/" itemprop="url">
-              
-                <span itemprop="name">DASCTF X FATE 四月防疫挑战赛 web1 & web2</span>
-              
-            </a>
-        
-      </h3>
+          
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2022-04-28T00:00:00+08:00"
-              content="2022-04-28" >
-          04-28
-        </time>
-      </div>
+          
 
-    </header>
-  </article>
+        </div>
+      </header>
+    
 
-
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2022/04/28/%5BDASCTF-FATE%5Dweb-pwn/" itemprop="url">
-              
-                <span itemprop="name">DASCTF X FATE 四月防疫挑战赛 web1 & web2</span>
-              
-            </a>
-        
-      </h3>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2022-04-28T00:00:00+08:00"
-              content="2022-04-28" >
-          04-28
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
       
 
-        
-        
-        
+      
+        <p>一个<code>fs.readFileSync</code>的trick浅析</p>
+<span id="more"></span>
 
-        
-        
+<p>设想下面一个简单的代码片段：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">app.<span class="title function_">post</span>(<span class="string">&#x27;/getflag&#x27;</span>, <span class="keyword">function</span>(<span class="params">req, res</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="title class_">JSON</span>.<span class="title function_">stringify</span>(req.<span class="property">body</span>).<span class="title function_">includes</span>(<span class="string">&quot;flag&quot;</span>)) &#123;</span><br><span class="line">        <span class="keyword">return</span> res.<span class="title function_">send</span>(<span class="string">&quot;bad hacker!&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> res.<span class="title function_">send</span>(fs.<span class="title function_">readFileSync</span>(req.<span class="property">query</span>.<span class="property">file</span>).<span class="title function_">toString</span>());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 
-        
+<p>一个过滤了关键词<strong>flag</strong>的任意文件读取。</p>
+<p>payload如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line"> <span class="attr">&quot;file[href]&quot;</span><span class="punctuation">:</span><span class="string">&quot;a&quot;</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;file[origin]&quot;</span><span class="punctuation">:</span><span class="string">&quot;a&quot;</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;file[protocol]&quot;</span><span class="punctuation">:</span><span class="string">&quot;file:&quot;</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;file[pathname]&quot;</span><span class="punctuation">:</span><span class="string">&quot;/fl%61g&quot;</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;file[hostname]&quot;</span><span class="punctuation">:</span><span class="string">&quot;&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+<p>通过下面的源码分析，我们将得知这个trick的精彩之处。</p>
+<p>首先从文档入手，粗略认识一下<code>fs.readFileSync</code>方法</p>
+<p><img src="/images/20220923230858.png"></p>
+<p>我们注意到<code>path</code>参数可以是一个<code>URL</code>对象，payload中的flag关键字似乎也是利用了url解码的方法进行绕过的。但显然我们无法直接输入一个<code>URL</code>对象，难道还有其它方法能构造出<code>URL</code>对象吗？</p>
+<p><img src="/images/20220924233442.png"></p>
+<p>顺着这个思路，我们开始一步步地跟进源码。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">readFileSync</span>(<span class="params">path, options</span>) &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  <span class="keyword">const</span> isUserFd = <span class="title function_">isFd</span>(path); <span class="comment">// 判断是否为文件描述符</span></span><br><span class="line">  <span class="keyword">const</span> fd = isUserFd ? path : fs.<span class="title function_">openSync</span>(path, options.<span class="property">flag</span>, <span class="number">0o666</span>);</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2022/04/13/%5BDASCTF-SU%5Dall-web/" itemprop="url">
-              
-                <span itemprop="name">DASCTF X SU 三月春季挑战赛 web</span>
-              
-            </a>
-        
-      </h3>
+<p><code>path</code>如果不是文件描述符的话，将调用<code>fs.openSync</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">openSync</span>(<span class="params">path, flags, mode</span>) &#123;</span><br><span class="line">  path = <span class="title function_">getValidatedPath</span>(path);</span><br><span class="line">  <span class="keyword">const</span> flagsNumber = <span class="title function_">stringToFlags</span>(flags);</span><br><span class="line">  mode = <span class="title function_">parseFileMode</span>(mode, <span class="string">&#x27;mode&#x27;</span>, <span class="number">0o666</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> ctx = &#123; path &#125;;</span><br><span class="line">  <span class="keyword">const</span> result = binding.<span class="title function_">open</span>(pathModule.<span class="title function_">toNamespacedPath</span>(path),</span><br><span class="line">                              flagsNumber, mode,</span><br><span class="line">                              <span class="literal">undefined</span>, ctx);</span><br><span class="line">  <span class="title function_">handleErrorFromBinding</span>(ctx);</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2022-04-13T00:00:00+08:00"
-              content="2022-04-13" >
-          04-13
-        </time>
-      </div>
+<p>跟进<code>getValidatedPath</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> getValidatedPath = <span class="title function_">hideStackFrames</span>(<span class="function">(<span class="params">fileURLOrPath, propName = <span class="string">&#x27;path&#x27;</span></span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> path = <span class="title function_">toPathIfFileURL</span>(fileURLOrPath);</span><br><span class="line">  <span class="title function_">validatePath</span>(path, propName);</span><br><span class="line">  <span class="keyword">return</span> path;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 
-    </header>
-  </article>
+<p>跟进回调函数中的<code>toPathIfFileURL</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">toPathIfFileURL</span>(<span class="params">fileURLOrPath</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (!<span class="title function_">isURLInstance</span>(fileURLOrPath))</span><br><span class="line">    <span class="keyword">return</span> fileURLOrPath;</span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">fileURLToPath</span>(fileURLOrPath);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<p>跟进<code>isURLInstance</code>的真假判断</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">isURLInstance</span> = (<span class="params">input</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> input != <span class="literal">null</span> &amp;&amp; input.<span class="property">href</span> &amp;&amp; input.<span class="property">origin</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<p>如果输入存在<code>href</code>和<code>origin</code>属性将返回真，此时返回<code>fileURLToPath</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">fileURLToPath</span>(<span class="params">path</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> path === <span class="string">&#x27;string&#x27;</span>)</span><br><span class="line">    path = <span class="keyword">new</span> <span class="title function_">URL</span>(path);</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (!<span class="title function_">isURLInstance</span>(path))</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title function_">ERR_INVALID_ARG_TYPE</span>(<span class="string">&#x27;path&#x27;</span>, [<span class="string">&#x27;string&#x27;</span>, <span class="string">&#x27;URL&#x27;</span>], path);</span><br><span class="line">  <span class="keyword">if</span> (path.<span class="property">protocol</span> !== <span class="string">&#x27;file:&#x27;</span>)</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title function_">ERR_INVALID_URL_SCHEME</span>(<span class="string">&#x27;file&#x27;</span>);</span><br><span class="line">  <span class="keyword">return</span> isWindows ? <span class="title function_">getPathFromURLWin32</span>(path) : <span class="title function_">getPathFromURLPosix</span>(path);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在<code>fileURLToPath</code>函数内部终于出现了<code>new URL</code>，好耶</p>
+<p>第一个<code>if</code>要求参数对象属性必须得是字符串类型才给我们new，好在这个要求无伤大雅。</p>
+<p>此时它要求我们的<code>protocol</code>属性为<code>file:</code>，否则将会抛出一个错误。</p>
+<p>接下来判断运行系统是否为Windows系统，在环境是Linux的情况下，跟进<code>getPathFromURLPosix</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">getPathFromURLPosix</span>(<span class="params">url</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (url.<span class="property">hostname</span> !== <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title function_">ERR_INVALID_FILE_URL_HOST</span>(platform);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> pathname = url.<span class="property">pathname</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> n = <span class="number">0</span>; n &lt; pathname.<span class="property">length</span>; n++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (pathname[n] === <span class="string">&#x27;%&#x27;</span>) &#123;</span><br><span class="line">      <span class="keyword">const</span> third = pathname.<span class="title function_">codePointAt</span>(n + <span class="number">2</span>) | <span class="number">0x20</span>;</span><br><span class="line">      <span class="keyword">if</span> (pathname[n + <span class="number">1</span>] === <span class="string">&#x27;2&#x27;</span> &amp;&amp; third === <span class="number">102</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title function_">ERR_INVALID_FILE_URL_PATH</span>(</span><br><span class="line">          <span class="string">&#x27;must not include encoded / characters&#x27;</span></span><br><span class="line">        );</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">decodeURIComponent</span>(pathname);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果输入的<code>hostname</code>属性不为空的话将再次抛出一个错误，因此我们需要构造一个空的<code>hostname</code>属性，好让函数继续进行下去。</p>
+<p>而剩下的代码和<code>decodeURIComponent</code>就是在帮我们以url解码的方式转换<code>pathname</code>属性了。</p>
+<p><img src="/images/20220925001928.png"></p>
+<p>本地验证大成功。</p>
+<p>这个trick真的很有意思，因为它看似简单，但需要深入源码分析才能明白它的原理。 </p>
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2022/04/09/Intranet-penetration-0x01/" itemprop="url">
-              
-                <span itemprop="name">域肾透——从看懂到看开 0x01</span>
-              
-            </a>
-        
-      </h3>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2022-04-09T00:00:00+08:00"
-              content="2022-04-09" >
-          04-09
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h3 class="post-title">
-        
-            <a class="post-title-link" href="/2022/04/01/%5BNISA2022%5Dall-web/" itemprop="url">
-              
-                <span itemprop="name">NISACTF2022 web方向全复现</span>
-              
-            </a>
-        
-      </h3>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2022-04-01T00:00:00+08:00"
-              content="2022-04-01" >
-          04-01
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
     </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/node-js/" rel="tag"># node.js</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/03/28/rce-without-w-and-n/" rel="next" title="无字母数字RCE初探">
+                <i class="fa fa-chevron-left"></i> 无字母数字RCE初探
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
 
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -481,6 +472,13 @@
 
 
           
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
 
         </div>
         
@@ -523,7 +521,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">归档</span>
                 </a>
               </div>
@@ -536,7 +534,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -773,6 +771,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 

