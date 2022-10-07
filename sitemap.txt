@@ -1,3 +1,4 @@
+https://www.m0x01sery.com/2022/10/07/stack_balance/
 https://www.m0x01sery.com/2022/10/03/bottle_rce/
 https://www.m0x01sery.com/about/index.html
 https://www.m0x01sery.com/2022/09/19/readFileSync/
@@ -14,3 +15,4 @@ https://www.m0x01sery.com/tags/python-bottle/
 https://www.m0x01sery.com/tags/python-pickle/
 https://www.m0x01sery.com/tags/php-rce/
 https://www.m0x01sery.com/tags/php-wrappers/
+https://www.m0x01sery.com/tags/pwn-stackbalance/

