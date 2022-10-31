@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://www.m0x01sery.com/2022/10/31/php_carafeat/</loc>
+    
+    <lastmod>2022-10-30</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://www.m0x01sery.com/2022/10/07/stack_balance/</loc>
     
     <lastmod>2022-10-06</lastmod>
@@ -94,7 +103,7 @@
 
   <url>
     <loc>https://www.m0x01sery.com/</loc>
-    <lastmod>2022-10-17</lastmod>
+    <lastmod>2022-10-31</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -102,49 +111,56 @@
   
   <url>
     <loc>https://www.m0x01sery.com/tags/Computer-Networks/</loc>
-    <lastmod>2022-10-17</lastmod>
+    <lastmod>2022-10-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/tags/node-js/</loc>
-    <lastmod>2022-10-17</lastmod>
+    <lastmod>2022-10-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/tags/python-bottle/</loc>
-    <lastmod>2022-10-17</lastmod>
+    <lastmod>2022-10-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/tags/python-pickle/</loc>
-    <lastmod>2022-10-17</lastmod>
+    <lastmod>2022-10-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/tags/php-rce/</loc>
-    <lastmod>2022-10-17</lastmod>
+    <lastmod>2022-10-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/tags/php-wrappers/</loc>
-    <lastmod>2022-10-17</lastmod>
+    <lastmod>2022-10-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/tags/pwn-stackbalance/</loc>
-    <lastmod>2022-10-17</lastmod>
+    <lastmod>2022-10-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.m0x01sery.com/tags/php-feature/</loc>
+    <lastmod>2022-10-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
