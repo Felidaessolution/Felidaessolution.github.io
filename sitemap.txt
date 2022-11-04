@@ -1,3 +1,4 @@
+https://www.m0x01sery.com/2022/11/01/php74k1/
 https://www.m0x01sery.com/2022/10/31/php_carafeat/
 https://www.m0x01sery.com/2022/10/07/stack_balance/
 https://www.m0x01sery.com/2022/10/03/bottle_rce/
@@ -18,3 +19,4 @@ https://www.m0x01sery.com/tags/php-rce/
 https://www.m0x01sery.com/tags/php-wrappers/
 https://www.m0x01sery.com/tags/pwn-stackbalance/
 https://www.m0x01sery.com/tags/php-feature/
+https://www.m0x01sery.com/tags/php74-kernel/
