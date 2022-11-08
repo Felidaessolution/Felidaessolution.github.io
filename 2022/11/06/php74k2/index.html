@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="php-feature," />
+  <meta name="keywords" content="php74-kernel," />
 
 
 
@@ -86,21 +86,18 @@
 
 
 
-<meta name="description" content="上课时突然想起一个很久以前遇到过的php特性，估摸着也不算复杂，简单写个源码分析。环境是php-7.4.27。">
+<meta name="description" content="几个常见php变量结构体的浅析笔记">
 <meta property="og:type" content="article">
-<meta property="og:title" content="php传参特殊字符替换特性源码简析">
-<meta property="og:url" content="https://www.m0x01sery.com/2022/10/31/php_carafeat/index.html">
+<meta property="og:title" content="php74内核源码阅读——变量基本结构">
+<meta property="og:url" content="https://www.m0x01sery.com/2022/11/06/php74k2/index.html">
 <meta property="og:site_name" content="M1seryの厨房">
-<meta property="og:description" content="上课时突然想起一个很久以前遇到过的php特性，估摸着也不算复杂，简单写个源码分析。环境是php-7.4.27。">
+<meta property="og:description" content="几个常见php变量结构体的浅析笔记">
 <meta property="og:locale">
-<meta property="og:image" content="https://www.m0x01sery.com/images/20221031184604.png">
-<meta property="og:image" content="https://www.m0x01sery.com/images/20221031190650.png">
-<meta property="article:published_time" content="2022-10-30T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-10-30T16:00:00.000Z">
+<meta property="article:published_time" content="2022-11-05T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-11-05T16:00:00.000Z">
 <meta property="article:author" content="M1sery">
-<meta property="article:tag" content="php-feature">
+<meta property="article:tag" content="php74-kernel">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://www.m0x01sery.com/images/20221031184604.png">
 
 
 
@@ -130,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="https://www.m0x01sery.com/2022/10/31/php_carafeat/"/>
+  <link rel="canonical" href="https://www.m0x01sery.com/2022/11/06/php74k2/"/>
 
 
 
 
 
-  <title>php传参特殊字符替换特性源码简析 | M1seryの厨房</title>
+  <title>php74内核源码阅读——变量基本结构 | M1seryの厨房</title>
   
 
 
@@ -288,7 +285,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.m0x01sery.com/2022/10/31/php_carafeat/">
+    <link itemprop="mainEntityOfPage" href="https://www.m0x01sery.com/2022/11/06/php74k2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="M1sery">
@@ -305,7 +302,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">php传参特殊字符替换特性源码简析</h2>
+          <h2 class="post-title" itemprop="name headline">php74内核源码阅读——变量基本结构</h2>
         
 
         <div class="post-meta">
@@ -317,8 +314,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-10-31T00:00:00+08:00">
-                2022-10-31
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-11-06T00:00:00+08:00">
+                2022-11-06
               </time>
             
 
@@ -333,8 +330,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2022-10-31T00:00:00+08:00">
-                2022-10-31
+              <time title="更新于" itemprop="dateModified" datetime="2022-11-06T00:00:00+08:00">
+                2022-11-06
               </time>
             
           </span>
@@ -367,30 +364,58 @@
       
 
       
-        <p>上课时突然想起一个很久以前遇到过的php特性，估摸着也不算复杂，简单写个源码分析。环境是<code>php-7.4.27</code>。</p>
+        <p>几个常见php变量结构体的浅析笔记</p>
 <span id="more"></span>
 
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;aaa_bbb.cc&#x27;</span>])) &#123;</span><br><span class="line">    <span class="title function_ invoke__">system</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;aaa_bbb.cc&#x27;</span>]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1><span id="前置知识">前置知识</span></h1><p>php的所有变量类型（如数字、字符串、数组）都是用zval结构体来存储的，在Zend/zend_types.h头文件中可以看到定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">zval_struct</span> &#123;</span></span><br><span class="line">    zend_value        value;            <span class="comment">/* value */</span></span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">            ZEND_ENDIAN_LOHI_3(</span><br><span class="line">                zend_uchar    type,         <span class="comment">/* active type */</span></span><br><span class="line">                zend_uchar    type_flags,</span><br><span class="line">                <span class="keyword">union</span> &#123;</span><br><span class="line">                    <span class="type">uint16_t</span>  extra;        <span class="comment">/* not further specified */</span></span><br><span class="line">                &#125; u)</span><br><span class="line">        &#125; v;</span><br><span class="line">        <span class="type">uint32_t</span> type_info;</span><br><span class="line">    &#125; u1;</span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="type">uint32_t</span>     next;                 <span class="comment">/* hash collision chain */</span></span><br><span class="line">        <span class="type">uint32_t</span>     cache_slot;           <span class="comment">/* cache slot (for RECV_INIT) */</span></span><br><span class="line">        <span class="type">uint32_t</span>     opline_num;           <span class="comment">/* opline number (for FAST_CALL) */</span></span><br><span class="line">        <span class="type">uint32_t</span>     lineno;               <span class="comment">/* line number (for ast nodes) */</span></span><br><span class="line">        <span class="type">uint32_t</span>     num_args;             <span class="comment">/* arguments number for EX(This) */</span></span><br><span class="line">        <span class="type">uint32_t</span>     fe_pos;               <span class="comment">/* foreach position */</span></span><br><span class="line">        <span class="type">uint32_t</span>     fe_iter_idx;          <span class="comment">/* foreach iterator index */</span></span><br><span class="line">        <span class="type">uint32_t</span>     access_flags;         <span class="comment">/* class constant access flags */</span></span><br><span class="line">        <span class="type">uint32_t</span>     property_guard;       <span class="comment">/* single property guard */</span></span><br><span class="line">        <span class="type">uint32_t</span>     constant_flags;       <span class="comment">/* constant flags */</span></span><br><span class="line">        <span class="type">uint32_t</span>     extra;                <span class="comment">/* not further specified */</span></span><br><span class="line">    &#125; u2;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
-<p>我们先正常传参<code>whoami</code>，从空白的返回看来似乎并没有按照我们预想的那样执行系统命令。通过动态调试可以发现，传入的参数已不再带有<code>.</code>，而是被替换为了<code>_</code>。</p>
-<p><img src="/images/20221031184604.png"></p>
-<p>定位参数处理的C源码位置，发现在源代码main文件夹下的<code>php_variables.c</code>文件中对传入的参数进行了处理。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* ensure that we don&#x27;t have spaces or dots in the variable name (not binary safe) */</span></span><br><span class="line"><span class="keyword">for</span> (p = var; *p; p++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (*p == <span class="string">&#x27; &#x27;</span> || *p == <span class="string">&#x27;.&#x27;</span>) &#123;</span><br><span class="line">        *p=<span class="string">&#x27;_&#x27;</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (*p == <span class="string">&#x27;[&#x27;</span>) &#123;</span><br><span class="line">        is_array = <span class="number">1</span>;</span><br><span class="line">        ip = p;</span><br><span class="line">        *p = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中<code>value</code>是真正保存数据的字段。其类型<code>zend_value</code>定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">union</span> _<span class="title">zend_value</span> &#123;</span></span><br><span class="line">    zend_long         lval;             <span class="comment">/* long value */</span></span><br><span class="line">    <span class="type">double</span>            dval;             <span class="comment">/* double value */</span></span><br><span class="line">    zend_refcounted  *counted;</span><br><span class="line">    zend_string      *str;</span><br><span class="line">    zend_array       *arr;</span><br><span class="line">    zend_object      *obj;</span><br><span class="line">    zend_resource    *res;</span><br><span class="line">    zend_reference   *ref;</span><br><span class="line">    zend_ast_ref     *ast;</span><br><span class="line">    zval             *zv;</span><br><span class="line">    <span class="type">void</span>             *ptr;</span><br><span class="line">    zend_class_entry *ce;</span><br><span class="line">    zend_function    *func;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">        <span class="type">uint32_t</span> w1;</span><br><span class="line">        <span class="type">uint32_t</span> w2;</span><br><span class="line">    &#125; ww;</span><br><span class="line">&#125; zend_value;</span><br></pre></td></tr></table></figure>
 
-<p>这段代码将传入参数名中的空格和<code>.</code>全部替换为<code>_</code>，和调试显示的结果一致。</p>
-<p>注意后面紧跟着的判断语句，很明显这是在通过传入的参数名判断我们传入的参数是否是数组类型的数据。遇到参数名中的<code>[</code>后会直接break跳出匹配循环，这将有可能成为绕过的突破点。我们继续往下跟进代码执行流。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (is_array) &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        ip++;</span><br><span class="line">        index_s = ip;</span><br><span class="line">        <span class="keyword">if</span> (*ip==<span class="string">&#x27;]&#x27;</span>) &#123;</span><br><span class="line">            index_s = <span class="literal">NULL</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            ip = <span class="built_in">strchr</span>(ip, <span class="string">&#x27;]&#x27;</span>);</span><br><span class="line">            <span class="keyword">if</span> (!ip) &#123;</span><br><span class="line">                <span class="comment">/* PHP variables cannot contain &#x27;[&#x27; in their names, so we replace the character with a &#x27;_&#x27; */</span></span><br><span class="line">                *(index_s - <span class="number">1</span>) = <span class="string">&#x27;_&#x27;</span>;</span><br><span class="line">                <span class="comment">// ...</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>此时<code>is_array</code>被置<code>1</code>，进入<code>if</code>语句，分析这段代码可知参数名中的<code>[</code>将被替换为<code>_</code>，结合上一个代码块中的<code>break</code>，在这之后的<code>.</code>和空格也不会再进行解析替换了。</p>
-<p>所以我们若输入<code>aaa[bbb.cc</code>，则参数名将被解析为<code>aaa_bbb.cc</code>，成功传入正确的参数。</p>
-<p><img src="/images/20221031190650.png"></p>
-<p>经过测试后<code>$_POST</code>传参同理。</p>
+<p>正因为<code>_zend_value</code>是个联合体（union），php才在zend引擎的基础上实现了弱类型。</p>
 <blockquote>
-<p>Note: 這個部分在php8已經不會發生了<sup>[1]</sup>，因為在<code>*(index_s - 1) = &#39;_&#39;;</code>會再檢查一次是否有不符合的字元:</p>
-<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">*(index_s - <span class="number">1</span>) = <span class="string">&#x27;_&#x27;</span>;</span><br><span class="line">/* PHP variables cannot contain <span class="string">&#x27; &#x27;</span>, <span class="string">&#x27;.&#x27;</span>, <span class="string">&#x27;[&#x27;</span> <span class="keyword">in</span> their names, so we replace the characters <span class="keyword">with</span> a <span class="string">&#x27;_&#x27;</span> */</span><br><span class="line"><span class="keyword">for</span> (p = index_s; *p; p++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (*p == <span class="string">&#x27; &#x27;</span> || *p == <span class="string">&#x27;.&#x27;</span> || *p == <span class="string">&#x27;[&#x27;</span>) &#123;</span><br><span class="line">        *p = <span class="string">&#x27;_&#x27;</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>这里使用联合体而不是用结构体是出于空间利用率的考虑，因为一个变量同时只能属于一种类型。如果使用结构体的话将会不必要的浪费空间，而php中的所有逻辑都围绕变量来进行的，这样的话，内存浪费将是十分大的。这种做法成本小但收益非常大。</p>
 </blockquote>
-<p><del>（谁会在、写代码的时候、传这么奇怪的参数啊！）</del></p>
-<p>[1] <a target="_blank" rel="noopener" href="https://github.com/php/php-src/blob/33375e927c2cce8ca353d199a9d7275c60fb41e4/main/php_variables.c#L196-L201">php8参数名解析代码变动</a></p>
+<p>zend引擎根据zval结构体中的<code>type</code>字段来储存一个变量的真正类型，然后根据<code>type</code>来选择如何获取<code>value</code>的值。对应的不同类型定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* regular data types */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_UNDEF                    0</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_NULL                     1</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_FALSE                    2</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_TRUE                     3</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_LONG                     4</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_DOUBLE                   5</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_STRING                   6</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_ARRAY                    7</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_OBJECT                   8</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_RESOURCE                 9</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_REFERENCE                10</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* constant expressions */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_CONSTANT_AST             11</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* internal types */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_INDIRECT                 13</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_PTR                      14</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_ALIAS_PTR                15</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IS_ERROR                   15</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* fake types used only for type hinting (Z_TYPE(zv) can not use them) */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IS_BOOL                    16</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_CALLABLE                 17</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_ITERABLE                 18</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_VOID                     19</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IS_NUMBER                  20</span></span><br></pre></td></tr></table></figure>
+
+<p>例如对于整形数据，此时<code>zval.type = IS_LONG</code>，zend引擎就去取<code>zval.value.lval</code>。如果是双精度或float数据，此时<code>zval.type = IS_DOUBLE</code>，则会去取<code>zval.value</code>的<code>dval</code>。</p>
+<p>借用这样的机制，php就实现了弱类型，因为对于zend引擎来说，它所面对的永远都是同一种类型，那就是<code>zval</code>。</p>
+<p>下面列出一些常见php数据类型结构体进行分析。</p>
+<h1><span id="字符串">字符串</span></h1><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">zend_string</span> &#123;</span></span><br><span class="line">    zend_refcounted_h gc;</span><br><span class="line">    zend_ulong        h;                <span class="comment">/* hash value */</span></span><br><span class="line">    <span class="type">size_t</span>            len;</span><br><span class="line">    <span class="type">char</span>              val[<span class="number">1</span>];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>gc</strong>：变量的引用计数信息，用于内存管理（垃圾回收）</p>
+<p><strong>h</strong>：字符串通过Time33算法计算的到的hash值，避免了在数组操作中hash值的重复计算。据说提高了php7百分之5的性能（</p>
+<p><strong>len</strong>：字符串的长度。</p>
+<p><strong>val</strong>：字符串的内容。<code>val[1]</code>并不表示只能存储1个字节，在字符串分配时实际上是操作了<code>malloc(sizeof(zend_string) + 字符串长度)</code>，也就是会多分配一些内存，而多出来的内存起始位置就是val，这样就可以将字符串直接存储到val，并通过val进行读取。</p>
+<h1><span id="数组">数组</span></h1><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">zend_array</span> &#123;</span></span><br><span class="line">    zend_refcounted_h gc;</span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">            ZEND_ENDIAN_LOHI_4(</span><br><span class="line">                zend_uchar    flags,</span><br><span class="line">                zend_uchar    _unused,</span><br><span class="line">                zend_uchar    nIteratorsCount,</span><br><span class="line">                zend_uchar    _unused2)</span><br><span class="line">        &#125; v;</span><br><span class="line">        <span class="type">uint32_t</span> flags;</span><br><span class="line">    &#125; u;</span><br><span class="line">    <span class="type">uint32_t</span>          nTableMask;</span><br><span class="line">    Bucket           *arData;</span><br><span class="line">    <span class="type">uint32_t</span>          nNumUsed;</span><br><span class="line">    <span class="type">uint32_t</span>          nNumOfElements;</span><br><span class="line">    <span class="type">uint32_t</span>          nTableSize;</span><br><span class="line">    <span class="type">uint32_t</span>          nInternalPointer;</span><br><span class="line">    zend_long         nNextFreeElement;</span><br><span class="line">    <span class="type">dtor_func_t</span>       pDestructor;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>nTableMask</strong>：根据key的hash code映射元素存储位置时有用到，它的值是<code>nTableSize</code>的负数。</p>
+<p><strong>*arData</strong>：数组的每一个元素都保存在这里，默认指向第一个元素。其数据类型<code>Bucket</code>定义如下。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">Bucket</span> &#123;</span></span><br><span class="line">    zval              val;</span><br><span class="line">    zend_ulong        h;                <span class="comment">/* hash value (or numeric index)   */</span></span><br><span class="line">    zend_string      *key;              <span class="comment">/* string key or NULL for numerics */</span></span><br><span class="line">&#125; Bucket;</span><br></pre></td></tr></table></figure>
+
+<p><strong>nNumUsed</strong>：当前使用的Bucket数。</p>
+<blockquote>
+<p>但不都是有效的，因为有的Bucket虽然被unset了但是没有马上被删除，而是做了IS_UNDEF标记。</p>
+</blockquote>
+<p><strong>nNumOfElements</strong>：有效的Bucket数，这个与上面不同，这里记录的是真实有效的Bucket数量。</p>
+<p><strong>nTableSize</strong>：数组的总容量。</p>
+<p><strong>nIternalPointer</strong>：当前遍历的指针。</p>
+<p><strong>nNextFreeElement</strong>：下一个索引的值，比如每次给数组新增数据时，该值就会加一。</p>
+<p><strong>pDestructor</strong>：析构函数，在删除或覆盖某个元素时，调用该函数，可以对旧元素进行清理。</p>
+<p><strong>u</strong>：这里的u主要起到辅助作用。</p>
+<blockquote>
+<p>比如flags用来设置散列表的一些属性是否持久化、是否已经初始化等。</p>
+</blockquote>
+<h1><span id="对象">对象</span></h1><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">zend_object</span> &#123;</span></span><br><span class="line">    zend_refcounted_h gc;</span><br><span class="line">    <span class="type">uint32_t</span>          handle; <span class="comment">// <span class="doctag">TODO:</span> may be removed ???</span></span><br><span class="line">    zend_class_entry *ce;</span><br><span class="line">    <span class="type">const</span> zend_object_handlers *handlers;</span><br><span class="line">    HashTable        *properties;</span><br><span class="line">    zval              properties_table[<span class="number">1</span>];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>gc</strong>：引用计数。</p>
+<p><strong>handle</strong>：一次请求期间对象的编号，每一个对象都有一个唯一的编号，与创建的先后顺序有关，主要是在垃圾回收的时候使用。</p>
+<p><strong>ce</strong>：该对象所属的类。</p>
+<p><strong>handlers</strong>：对象操作的处理函数，比如成员属性的读写、成员方法的获取、对象的销毁克隆等。</p>
+<p><strong>properties</strong>：普通成员属性的哈希表，初始化对象时该值为NULL。</p>
+<p><strong>properties_table</strong>：用来存储普通成员的属性值，对象对非静态成员属性的操作就是通过这个数组。</p>
 
       
     </div>
@@ -408,7 +433,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/php-feature/" rel="tag"># php-feature</a>
+            <a href="/tags/php74-kernel/" rel="tag"># php74-kernel</a>
           
         </div>
       
@@ -421,8 +446,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2022/10/07/stack_balance/" rel="next" title="栈平衡详解">
-                <i class="fa fa-chevron-left"></i> 栈平衡详解
+              <a href="/2022/11/01/php74k1/" rel="next" title="php74内核源码阅读——开始之前">
+                <i class="fa fa-chevron-left"></i> php74内核源码阅读——开始之前
               </a>
             
           </div>
@@ -430,10 +455,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2022/11/01/php74k1/" rel="prev" title="php74内核源码阅读——开始之前">
-                php74内核源码阅读——开始之前 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -490,8 +511,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -630,6 +660,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">前置知识</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">字符串</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">3.</span> <span class="nav-text">数组</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">4.</span> <span class="nav-text">对象</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

@@ -1,8 +1,9 @@
+https://www.m0x01sery.com/about/index.html
+https://www.m0x01sery.com/2022/11/06/php74k2/
 https://www.m0x01sery.com/2022/11/01/php74k1/
 https://www.m0x01sery.com/2022/10/31/php_carafeat/
 https://www.m0x01sery.com/2022/10/07/stack_balance/
 https://www.m0x01sery.com/2022/10/03/bottle_rce/
-https://www.m0x01sery.com/about/index.html
 https://www.m0x01sery.com/2022/09/19/readFileSync/
 https://www.m0x01sery.com/2021/12/21/php_wrappers/
 https://www.m0x01sery.com/archives/index.html
