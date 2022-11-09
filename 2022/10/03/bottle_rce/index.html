@@ -2,10 +2,8 @@
 
 
 
-  
 
-
-<html class="theme-next pisces use-motion" lang="zh-Hans">
+<html class="theme-next pisces" lang="zh-Hans">
 <head>
   <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -120,7 +118,7 @@
     sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":true},
     fancybox: true,
     tabs: true,
-    motion: {"enable":true,"async":false,"transition":{"post_block":"slideDownIn","post_header":"fadeIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":null}},
+    motion: {"enable":false,"async":false,"transition":{"post_block":"slideDownIn","post_header":"fadeIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":null}},
     duoshuo: {
       userId: '0',
       author: '博主'
@@ -179,7 +177,7 @@
       </a>
     </div>
       
-        <h1 class="site-subtitle" itemprop="description"></h1>
+        <h1 class="site-subtitle" itemprop="description">愿你有一天能和你最重要的人重逢。</h1>
       
   </div>
 
@@ -227,6 +225,14 @@
           <a href="/archives/" rel="section">
             
             归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-友链">
+          <a href="/links/" rel="section">
+            
+            友链
           </a>
         </li>
       
@@ -377,7 +383,7 @@
         <p>昨天刚结束的<strong>SEKAI CTF</strong>上出现了一道<code>python-bottle</code>框架的题目，在没有找到漏洞相关文章或讨论之前（当然，赛后复盘找到了）成功从零开始拿到了flag，可喜可贺，可喜可贺。在寻找漏洞的过程中深感获益良多，以此文章记录之。跨出了源码审计技能的一大步口牙！</p>
 <span id="more"></span>
 
-<h1 id="开幕加食"><a href="#开幕加食" class="headerlink" title="开幕加食"></a>开幕加食</h1><p>题目环境能直接利用<code>os.path.join</code>的特性造成任意文件读取漏洞，但是不能直接读到flag文件。于是乎先读<code>/proc/self/cmdline</code>定位源码文件，把源码拿到本地分析。</p>
+<h1><span id="开幕加食">开幕加食</span></h1><p>题目环境能直接利用<code>os.path.join</code>的特性造成任意文件读取漏洞，但是不能直接读到flag文件。于是乎先读<code>/proc/self/cmdline</code>定位源码文件，把源码拿到本地分析。</p>
 <p>题目的关键代码片段如下：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> config.secret <span class="keyword">import</span> sekai</span><br><span class="line"></span><br><span class="line"><span class="meta">@route(<span class="params"><span class="string">&quot;/sign&quot;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">index</span>():</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        session = request.get_cookie(<span class="string">&quot;name&quot;</span>, secret=sekai)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> session <span class="keyword">or</span> session[<span class="string">&quot;name&quot;</span>] == <span class="string">&quot;guest&quot;</span>:</span><br><span class="line">            session = &#123;<span class="string">&quot;name&quot;</span>: <span class="string">&quot;guest&quot;</span>&#125;</span><br><span class="line">            response.set_cookie(<span class="string">&quot;name&quot;</span>, session, secret=sekai)</span><br><span class="line">            <span class="keyword">return</span> template(<span class="string">&quot;guest&quot;</span>, name=session[<span class="string">&quot;name&quot;</span>])</span><br><span class="line">        <span class="keyword">if</span> session[<span class="string">&quot;name&quot;</span>] == <span class="string">&quot;admin&quot;</span>:</span><br><span class="line">            <span class="keyword">return</span> template(<span class="string">&quot;admin&quot;</span>, name=session[<span class="string">&quot;name&quot;</span>])</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;pls no hax&quot;</span></span><br></pre></td></tr></table></figure>
 
@@ -392,7 +398,7 @@
 <p>痛，太痛了www</p>
 <p>仔细想想也是，目标模板文件就在<code>/app/views/admin.html</code>里躺着，要是flag就在html文件里的话，又能学到什么新姿势呢？</p>
 <p>半天寻觅无果后，决定直接分析框架源码。</p>
-<h1 id="静态分析"><a href="#静态分析" class="headerlink" title="静态分析"></a>静态分析</h1><p>首先进行静态分析，将重点目标放在了<code>request.get_cookie</code>上。一来要想构造复杂的payload，同时还要满足<code>if</code>语句大概率比较困难，而这是唯一一个无条件进入的函数。二是因为我们能控制的输入点貌似也只有这一处了。</p>
+<h1><span id="静态分析">静态分析</span></h1><p>首先进行静态分析，将重点目标放在了<code>request.get_cookie</code>上。一来要想构造复杂的payload，同时还要满足<code>if</code>语句大概率比较困难，而这是唯一一个无条件进入的函数。二是因为我们能控制的输入点貌似也只有这一处了。</p>
 <p>进入<code>request.get_cookie</code></p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">get_cookie</span>(<span class="params">self, key, default=<span class="literal">None</span>, secret=<span class="literal">None</span></span>):</span><br><span class="line">        value = self.cookies.get(key)</span><br><span class="line">        <span class="keyword">if</span> secret <span class="keyword">and</span> value:</span><br><span class="line">            dec = cookie_decode(value, secret) <span class="comment"># (key, value) tuple or None</span></span><br><span class="line">            <span class="keyword">return</span> dec[<span class="number">1</span>] <span class="keyword">if</span> dec <span class="keyword">and</span> dec[<span class="number">0</span>] == key <span class="keyword">else</span> default</span><br><span class="line">        <span class="keyword">return</span> value <span class="keyword">or</span> default</span><br></pre></td></tr></table></figure>
 
@@ -414,7 +420,7 @@
 
 <p><code>?</code>仅仅起了个分隔符的作用。这也意味着<code>sig</code>和<code>msg</code>参数很大可能就是被分隔开的两段数据。</p>
 <p>现在挡在我们面前的，只剩下<code>_lscmp</code>了。</p>
-<h1 id="动态调试"><a href="#动态调试" class="headerlink" title="动态调试"></a>动态调试</h1><p><code>_lscmp</code>实现如下</p>
+<h1><span id="动态调试">动态调试</span></h1><p><code>_lscmp</code>实现如下</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">_lscmp</span>(<span class="params">a, b</span>):</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">not</span> <span class="built_in">sum</span>(<span class="number">0</span> <span class="keyword">if</span> x==y <span class="keyword">else</span> <span class="number">1</span> <span class="keyword">for</span> x, y <span class="keyword">in</span> <span class="built_in">zip</span>(a, b)) <span class="keyword">and</span> <span class="built_in">len</span>(a) == <span class="built_in">len</span>(b)</span><br></pre></td></tr></table></figure>
 
 <p>进行到这一步，静态分析实在难以看清<code>sig</code>和<code>msg</code>两个值之间的联系。参数<code>a</code>好说，而参数<code>b</code>是经过HMAC的md5消息摘要再base64后的<code>msg</code>，并且<code>_lscmp</code>函数的具体流程跟踪也很麻烦。唯一欣慰的是我们拿到了泄漏的<code>key</code>。这种情况下，动态调试是验证之前的猜测和探寻下一步方向的最优解。</p>
@@ -439,7 +445,7 @@
 <p><img src="/images/20221002202950.png"></p>
 <p>可喜可贺，可喜可贺。</p>
 <p>最后flag是个可执行文件，将pickle中的命令执行部分替换为<code>/flag</code>就好。</p>
-<h1 id="来自2013的issue"><a href="#来自2013的issue" class="headerlink" title="来自2013的issue"></a>来自2013的issue</h1><p>赛后我终于反应过来，不再局限于试图查找此漏洞相关的完整分析文章，转而去查找github上的项目issue是否另有大佬向开发者反映过这种有风险的框架逻辑，终于找到了相关的讨论。</p>
+<h1><span id="来自2013的issue">来自2013的issue</span></h1><p>赛后我终于反应过来，不再局限于试图查找此漏洞相关的完整分析文章，转而去查找github上的项目issue是否另有大佬向开发者反映过这种有风险的框架逻辑，终于找到了相关的讨论。</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/bottlepy/bottle/issues/447">https://github.com/bottlepy/bottle/issues/447</a></p>
 <p><img src="/images/20221002204709.png"></p>
 <p><a target="_blank" rel="noopener" href="https://github.com/bottlepy/bottle/issues/900">https://github.com/bottlepy/bottle/issues/900</a></p>
@@ -566,7 +572,7 @@
                 alt="M1sery" />
             
               <p class="site-author-name" itemprop="name">M1sery</p>
-              <p class="site-description motion-element" itemprop="description">愿你有一天能和你最重要的人重逢。</p>
+              <p class="site-description motion-element" itemprop="description"></p>
           </div>
 
           <nav class="site-state motion-element">
@@ -620,6 +626,12 @@
                         <i class="fa fa-fw fa-feed"></i>RSS</a>
                   </span>
                 
+                  <span class="links-of-author-item">
+                    <a href="http://wpa.qq.com/msgrd?V=3&Uin=865730396" target="_blank" title="QQ">
+                      
+                        <i class="fa fa-fw fa-qq"></i>QQ</a>
+                  </span>
+                
             </div>
           
 
@@ -627,68 +639,6 @@
           
 
           
-          
-            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
-              <div class="links-of-blogroll-title">
-                <i class="fa  fa-fw fa-link"></i>
-                食物们
-              </div>
-              <ul class="links-of-blogroll-list">
-                
-                  <li class="links-of-blogroll-item">
-                    <a href="http://81.68.112.193/ltltlxey/" title="LTLT" target="_blank">LTLT</a>
-                  </li>
-                
-                  <li class="links-of-blogroll-item">
-                    <a href="https://www.pysnow.cn" title="Pysnow" target="_blank">Pysnow</a>
-                  </li>
-                
-                  <li class="links-of-blogroll-item">
-                    <a href="http://s0rry.cn" title="s0rry" target="_blank">s0rry</a>
-                  </li>
-                
-                  <li class="links-of-blogroll-item">
-                    <a href="http://jiangnaij.cn/" title="JiangnaiJ" target="_blank">JiangnaiJ</a>
-                  </li>
-                
-                  <li class="links-of-blogroll-item">
-                    <a href="https://arsenetang.github.io/" title="Arsene.Tang" target="_blank">Arsene.Tang</a>
-                  </li>
-                
-                  <li class="links-of-blogroll-item">
-                    <a href="https://zltt197.github.io" title="zltt" target="_blank">zltt</a>
-                  </li>
-                
-                  <li class="links-of-blogroll-item">
-                    <a href="https://csc8.github.io/" title="Csc8" target="_blank">Csc8</a>
-                  </li>
-                
-                  <li class="links-of-blogroll-item">
-                    <a href="https://jev0n.com/" title="jev0n" target="_blank">jev0n</a>
-                  </li>
-                
-                  <li class="links-of-blogroll-item">
-                    <a href="http://124.223.185.138/" title="noViC4" target="_blank">noViC4</a>
-                  </li>
-                
-                  <li class="links-of-blogroll-item">
-                    <a href="https://blog.ras-al-ghul.cn/" title="RasAlGhul" target="_blank">RasAlGhul</a>
-                  </li>
-                
-                  <li class="links-of-blogroll-item">
-                    <a href="https://www.cnblogs.com/yesec/" title="烨" target="_blank">烨</a>
-                  </li>
-                
-                  <li class="links-of-blogroll-item">
-                    <a href="http://eeeeeeeeeeeeeeeea.cn/" title="eeee" target="_blank">eeee</a>
-                  </li>
-                
-                  <li class="links-of-blogroll-item">
-                    <a href="https://amiaaaz.github.io/" title="Amiaaaz" target="_blank">Amiaaaz</a>
-                  </li>
-                
-              </ul>
-            </div>
           
 
           
@@ -706,7 +656,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%80%E5%B9%95%E5%8A%A0%E9%A3%9F"><span class="nav-number">1.</span> <span class="nav-text">开幕加食</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">静态分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95"><span class="nav-number">3.</span> <span class="nav-text">动态调试</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9D%A5%E8%87%AA2013%E7%9A%84issue"><span class="nav-number">4.</span> <span class="nav-text">来自2013的issue</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">开幕加食</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">静态分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">3.</span> <span class="nav-text">动态调试</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">4.</span> <span class="nav-text">来自2013的issue</span></a></li></ol></div>
             
 
           </div>
