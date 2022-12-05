@@ -1,5 +1,6 @@
-https://www.m0x01sery.com/links/index.html
+https://www.m0x01sery.com/2022/12/05/ayacms/
 https://www.m0x01sery.com/about/index.html
+https://www.m0x01sery.com/links/index.html
 https://www.m0x01sery.com/2022/11/06/php74k2/
 https://www.m0x01sery.com/2022/11/01/php74k1/
 https://www.m0x01sery.com/2022/10/31/php_carafeat/
@@ -19,6 +20,7 @@ https://www.m0x01sery.com/tags/Computer-Networks/
 https://www.m0x01sery.com/tags/php74-kernel/
 https://www.m0x01sery.com/tags/php-feature/
 https://www.m0x01sery.com/tags/php-wrappers/
+https://www.m0x01sery.com/tags/php-rce/
 https://www.m0x01sery.com/tags/node-js/
 https://www.m0x01sery.com/tags/pwn-stackbalance/
-https://www.m0x01sery.com/tags/php-rce/
+https://www.m0x01sery.com/tags/cms/
