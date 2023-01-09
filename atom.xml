@@ -30,6 +30,8 @@
     
     
     
+    <category term="php-cms" scheme="https://www.m0x01sery.com/categories/php-cms/"/>
+    
     
     <category term="cms" scheme="https://www.m0x01sery.com/tags/cms/"/>
     
@@ -48,6 +50,8 @@
     <summary type="html">&lt;p&gt;php变量内部实现分析&lt;/p&gt;</summary>
     
     
+    
+    <category term="php-kernel" scheme="https://www.m0x01sery.com/categories/php-kernel/"/>
     
     
     <category term="php74-kernel" scheme="https://www.m0x01sery.com/tags/php74-kernel/"/>
@@ -68,8 +72,10 @@
     
     
     
+    <category term="php-kernel" scheme="https://www.m0x01sery.com/categories/php-kernel/"/>
     
-    <category term="php74-kernel" scheme="https://www.m0x01sery.com/tags/php74-kernel/"/>
+    
+    <category term="php-kernel" scheme="https://www.m0x01sery.com/tags/php-kernel/"/>
     
   </entry>
   
@@ -86,6 +92,8 @@
     <summary type="html">&lt;p&gt;上课时突然想起一个很久以前遇到过的php特性，估摸着也不算复杂，简单写个源码分析。环境是&lt;code&gt;php-7.4.27&lt;/code&gt;。&lt;/p&gt;</summary>
     
     
+    
+    <category term="php-feature" scheme="https://www.m0x01sery.com/categories/php-feature/"/>
     
     
     <category term="php-feature" scheme="https://www.m0x01sery.com/tags/php-feature/"/>
@@ -106,8 +114,10 @@
     
     
     
+    <category term="pwn-feature" scheme="https://www.m0x01sery.com/categories/pwn-feature/"/>
     
-    <category term="pwn-stackbalance" scheme="https://www.m0x01sery.com/tags/pwn-stackbalance/"/>
+    
+    <category term="stackbalance" scheme="https://www.m0x01sery.com/tags/stackbalance/"/>
     
   </entry>
   
@@ -124,6 +134,8 @@
     <summary type="html">&lt;p&gt;昨天刚结束的&lt;strong&gt;SEKAI CTF&lt;/strong&gt;上出现了一道&lt;code&gt;python-bottle&lt;/code&gt;框架的题目，在没有找到漏洞相关文章或讨论之前（当然，赛后复盘找到了）成功从零开始拿到了flag，可喜可贺，可喜可贺。在寻找漏洞的过程中深感获益良多，以此文章记录之。跨出了源码审计技能的一大步口牙！&lt;/p&gt;</summary>
     
     
+    
+    <category term="python-web" scheme="https://www.m0x01sery.com/categories/python-web/"/>
     
     
     <category term="python-bottle" scheme="https://www.m0x01sery.com/tags/python-bottle/"/>
@@ -146,6 +158,8 @@
     
     
     
+    <category term="node.js-trick" scheme="https://www.m0x01sery.com/categories/node-js-trick/"/>
+    
     
     <category term="node.js" scheme="https://www.m0x01sery.com/tags/node-js/"/>
     
@@ -164,6 +178,8 @@
     <summary type="html">&lt;p&gt;没有blacklist的rce是没有灵魂的！&lt;/p&gt;</summary>
     
     
+    
+    <category term="rce-php" scheme="https://www.m0x01sery.com/categories/rce-php/"/>
     
     
     <category term="php-rce" scheme="https://www.m0x01sery.com/tags/php-rce/"/>
@@ -191,8 +207,8 @@
   
   <entry>
     <title>php伪协议解析及适用场景总结</title>
-    <link href="https://www.m0x01sery.com/2021/12/21/php_wrappers/"/>
-    <id>https://www.m0x01sery.com/2021/12/21/php_wrappers/</id>
+    <link href="https://www.m0x01sery.com/2021/12/21/php_protocols/"/>
+    <id>https://www.m0x01sery.com/2021/12/21/php_protocols/</id>
     <published>2021-12-20T16:00:00.000Z</published>
     <updated>2022-09-15T16:00:00.000Z</updated>
     
@@ -203,8 +219,10 @@
     
     
     
+    <category term="php-feature" scheme="https://www.m0x01sery.com/categories/php-feature/"/>
     
-    <category term="php-wrappers" scheme="https://www.m0x01sery.com/tags/php-wrappers/"/>
+    
+    <category term="php-protocols" scheme="https://www.m0x01sery.com/tags/php-protocols/"/>
     
   </entry>
   
