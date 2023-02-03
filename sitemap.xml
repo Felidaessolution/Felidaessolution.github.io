@@ -4,7 +4,16 @@
   <url>
     <loc>https://www.m0x01sery.com/about/index.html</loc>
     
-    <lastmod>2023-01-08</lastmod>
+    <lastmod>2023-02-03</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.m0x01sery.com/2023/02/02/xhlj2023/</loc>
+    
+    <lastmod>2023-02-01</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -119,15 +128,6 @@
   </url>
   
   <url>
-    <loc>https://www.m0x01sery.com/404.html</loc>
-    
-    <lastmod>2022-08-31</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://www.m0x01sery.com/2022/03/28/rce_without_w_and_n/</loc>
     
     <lastmod>2022-03-31</lastmod>
@@ -148,7 +148,7 @@
 
   <url>
     <loc>https://www.m0x01sery.com/</loc>
-    <lastmod>2023-01-09</lastmod>
+    <lastmod>2023-02-03</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -156,77 +156,84 @@
   
   <url>
     <loc>https://www.m0x01sery.com/tags/cms/</loc>
-    <lastmod>2023-01-09</lastmod>
+    <lastmod>2023-02-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/tags/python-bottle/</loc>
-    <lastmod>2023-01-09</lastmod>
+    <lastmod>2023-02-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/tags/python-pickle/</loc>
-    <lastmod>2023-01-09</lastmod>
+    <lastmod>2023-02-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/tags/Computer-Networks/</loc>
-    <lastmod>2023-01-09</lastmod>
+    <lastmod>2023-02-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/tags/php-kernel/</loc>
-    <lastmod>2023-01-09</lastmod>
+    <lastmod>2023-02-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/tags/php74-kernel/</loc>
-    <lastmod>2023-01-09</lastmod>
+    <lastmod>2023-02-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/tags/php-feature/</loc>
-    <lastmod>2023-01-09</lastmod>
+    <lastmod>2023-02-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/tags/php-protocols/</loc>
-    <lastmod>2023-01-09</lastmod>
+    <lastmod>2023-02-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/tags/php-rce/</loc>
-    <lastmod>2023-01-09</lastmod>
+    <lastmod>2023-02-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/tags/node-js/</loc>
-    <lastmod>2023-01-09</lastmod>
+    <lastmod>2023-02-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/tags/stackbalance/</loc>
-    <lastmod>2023-01-09</lastmod>
+    <lastmod>2023-02-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.m0x01sery.com/tags/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/</loc>
+    <lastmod>2023-02-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
@@ -235,49 +242,56 @@
   
   <url>
     <loc>https://www.m0x01sery.com/categories/pwn-feature/</loc>
-    <lastmod>2023-01-09</lastmod>
+    <lastmod>2023-02-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/categories/php-cms/</loc>
-    <lastmod>2023-01-09</lastmod>
+    <lastmod>2023-02-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/categories/python-web/</loc>
-    <lastmod>2023-01-09</lastmod>
+    <lastmod>2023-02-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/categories/php-kernel/</loc>
-    <lastmod>2023-01-09</lastmod>
+    <lastmod>2023-02-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/categories/php-feature/</loc>
-    <lastmod>2023-01-09</lastmod>
+    <lastmod>2023-02-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/categories/rce-php/</loc>
-    <lastmod>2023-01-09</lastmod>
+    <lastmod>2023-02-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://www.m0x01sery.com/categories/node-js-trick/</loc>
-    <lastmod>2023-01-09</lastmod>
+    <lastmod>2023-02-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.m0x01sery.com/categories/wp/</loc>
+    <lastmod>2023-02-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
