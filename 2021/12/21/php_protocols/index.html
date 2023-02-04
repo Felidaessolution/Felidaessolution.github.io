@@ -12,13 +12,6 @@
 
 
 
-  
-  
-    
-    
-  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
-  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
-
 
 
 
@@ -399,7 +392,7 @@
 <p>写这篇笔记的目的便是粗略地回顾一下有关php伪协议的知识，同时再加深一些对它的印象和理解了。</p>
 <p>希望自己以后不要再被这个考点麻住了的说</p>
 <p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1XM4y1c7Jp"><del>大学期末赛高考 下一篇又得拖到什么时候哦（瘫）</del></a></p>
-<h1><span id="食材准备">食材准备</span></h1><p>所谓php伪协议，其实就是<a target="_blank" rel="noopener" href="https://www.php.net/manual/zh/wrappers.php">php支持的协议和封装协议</a></p>
+<h1 id="食材准备"><a href="#食材准备" class="headerlink" title="食材准备"></a>食材准备</h1><p>所谓php伪协议，其实就是<a target="_blank" rel="noopener" href="https://www.php.net/manual/zh/wrappers.php">php支持的协议和封装协议</a></p>
 <p>支持的种类分为十二种：</p>
 <p>file:// — 访问本地文件系统</p>
 <p>http:// – https:// — 访问 HTTP(s) 网址</p>
@@ -415,7 +408,7 @@
 <p>expect:// — 处理交互式的流</p>
 <p>这里从练习考点出现的频率来看的话，我们先把重心放在 <strong>php:// file:// phar:// data:// glob://</strong> 这五个的用法上</p>
 <p>不能说其它的就可以晾在一边一点也不去学了 只是从现阶段能花的学习时间来看，暂时不应该对它们投入太多时间成本。</p>
-<h1><span id="厨房交响">厨房交响</span></h1><h2><span id="phpfilter-你吧来拿">php://filter — 你吧来拿</span></h2><p>可以说这是最常使用的一个伪协议，一般可以利用其造成文件源码泄露。</p>
+<h1 id="厨房交响"><a href="#厨房交响" class="headerlink" title="厨房交响"></a>厨房交响</h1><h2 id="phpfilter-你吧来拿"><a href="#php-filter-—-你吧来拿" class="headerlink" title="php://filter — 你吧来拿"></a>php://filter — 你吧来拿</h2><p>可以说这是最常使用的一个伪协议，一般可以利用其造成文件源码泄露。</p>
 <blockquote>
 <p>php://filter 是一种元封装器，设计用于数据流打开时的筛选过滤应用。</p>
 <p>这对于一体式（all-in-one）的文件函数非常有用，例如<code>readfile()</code>、<code>file()</code>和<code>file_get_contents()</code>。</p>
@@ -431,7 +424,7 @@
 <p>convert.base64-encode &amp; convert.base64-decode</p>
 <p>使用这两个过滤器等同于分别用<code>base64_encode()</code>和<code>base64_decode()</code>函数处理所有的流数据。</p>
 </blockquote>
-<h3><span id="本地试吃">本地试吃</span></h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// index.php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$file</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;file&#x27;</span>];</span><br><span class="line"><span class="keyword">echo</span> <span class="title function_ invoke__">file_get_contents</span>(<span class="variable">$file</span>);</span><br></pre></td></tr></table></figure>
+<h3 id="本地试吃"><a href="#本地试吃" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// index.php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$file</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;file&#x27;</span>];</span><br><span class="line"><span class="keyword">echo</span> <span class="title function_ invoke__">file_get_contents</span>(<span class="variable">$file</span>);</span><br></pre></td></tr></table></figure>
 
 <p>此时index.php的同级目录下有个叫做test.txt的文件。</p>
 <p>试图读取里面的信息</p>
@@ -442,11 +435,11 @@
 <p>然后编回来</p>
 <p><img src="/images/202112211711151.png"></p>
 <p>这样做的好处就是如果不进行编码，文件包含后就不会有输出结果，而是当做php文件执行了，通过编码后则可以读取文件源码。</p>
-<h2><span id="phpinput-这是替身攻击">php://input — 这是替身攻击</span></h2><blockquote>
+<h2 id="phpinput-这是替身攻击"><a href="#php-input-—-这是替身攻击" class="headerlink" title="php://input — 这是替身攻击"></a>php://input — 这是替身攻击</h2><blockquote>
 <p><strong>php://input</strong>是个可以访问请求的原始数据的只读流。POST请求少的情况下，最好使用<strong>php://input</strong>来代替 <strong>$HTTP_RAW_POST_DATA</strong>（原生的POST数据），因为它不依赖于特定的<strong>php.ini</strong>指令，内存消耗更少。</p>
 </blockquote>
 <p>那既然都提到POST了，能不带GET玩嘛~</p>
-<h3><span id="本地试吃">本地试吃</span></h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// index.php 典中典文件包含漏洞</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
+<h3 id="本地试吃"><a href="#本地试吃-1" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// index.php 典中典文件包含漏洞</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
 
 <p>试图搞事</p>
 <p><img src="/images/202112211942039.png"></p>
@@ -457,21 +450,21 @@
 <p>这是什么情况呢……简直<strong>就像是include了一个写着phpinfo()的文件一样</strong>的说</p>
 <p>某些情况下 绕过GET型传参的waf很好用。</p>
 <p>要说更底层的细节的话，本蒟蒻雀食暂时也还没搞懂，正在往死里补，求暂时放过&gt;_&lt;</p>
-<h2><span id="file-让我访问你网站正不正常啊">file:// — 让我访问你网站正不正常啊</span></h2><p>通过<strong>file</strong>协议可以访问本地文件系统。</p>
+<h2 id="file-让我访问你网站正不正常啊"><a href="#file-—-让我访问你网站正不正常啊" class="headerlink" title="file:// — 让我访问你网站正不正常啊"></a>file:// — 让我访问你网站正不正常啊</h2><p>通过<strong>file</strong>协议可以访问本地文件系统。</p>
 <p>在浏览器地址栏输入<strong>file</strong>协议可像资源管理器一样读取本地文件。（毕竟还是 <strong>浏览</strong> 器嘛~</p>
 <p><img src="/images/202112211522406.png"></p>
 <p>在建立了远程连接的情况下再通过php函数配合<strong>file</strong>协议读取文件，就能做到服务端任意文件读取。</p>
 <p><a target="_blank" rel="noopener" href="https://websec.readthedocs.io/zh/latest/vuln/ssrf.html"><strong>SSRF</strong></a>（服务端请求伪造，<strong>Server Side Request Forgery</strong>）常用手段。</p>
-<h3><span id="本地试吃">本地试吃</span></h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 梅开二度</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
+<h3 id="本地试吃"><a href="#本地试吃-2" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 梅开二度</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">//</span> payload</span><br><span class="line">?file=file:<span class="regexp">//</span>D:\phpStudy\PHPTutorial\WWW\l.txt</span><br></pre></td></tr></table></figure>
 
 <p>网上的其它演示都可以打开相对路径的文件 我这设置改来改去还是只能访问绝对路径文件 怪</p>
 <p><img src="/images/202112212116212.png"></p>
-<h2><span id="phar-有基佬开我裤链">phar:// — 有基佬开我裤链</span></h2><p><strong>phar</strong> (“Php ARchive”) 是php里类似于<strong>jar</strong>的一种打包文件</p>
+<h2 id="phar-有基佬开我裤链"><a href="#phar-—-有基佬开我裤链" class="headerlink" title="phar:// — 有基佬开我裤链"></a>phar:// — 有基佬开我裤链</h2><p><strong>phar</strong> (“Php ARchive”) 是php里类似于<strong>jar</strong>的一种打包文件</p>
 <p>在周大福里经常作为反序列化考点出现。</p>
 <p>此漏洞利用在Blackhat2018大会上首次提出（大佬们tql），利用这种方法可以在不使用<code>unserialize()</code>函数的情况下触发php反序列化漏洞。</p>
-<h3><span id="本地试吃">本地试吃</span></h3><p>我们先试着创建一个phar文件</p>
+<h3 id="本地试吃"><a href="#本地试吃-3" class="headerlink" title="本地试吃"></a>本地试吃</h3><p>我们先试着创建一个phar文件</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">aa</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$test</span> = <span class="string">&quot;test&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$phar</span> = <span class="keyword">new</span> <span class="title class_">Phar</span>(<span class="string">&quot;phar.phar&quot;</span>); <span class="comment">//后缀名必须为phar</span></span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">startBuffering</span>();</span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">setStub</span>(<span class="string">&quot;&lt;?php __HALT_COMPILER(); ?&gt;&quot;</span>); <span class="comment">//设置stub</span></span><br><span class="line"><span class="variable">$a</span> = <span class="keyword">new</span> <span class="title function_ invoke__">aa</span>();</span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">setMetadata</span>(<span class="variable">$a</span>); <span class="comment">//将自定义的meta-data存入manifest</span></span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">addFromString</span>(<span class="string">&quot;test.txt&quot;</span>, <span class="string">&quot;test&quot;</span>); <span class="comment">//添加要压缩的文件</span></span><br><span class="line"><span class="comment">//签名自动计算</span></span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">stopBuffering</span>();</span><br></pre></td></tr></table></figure>
 
 <p><strong>注意：要将php.ini中的phar.readonly选项设置为Off，否则无法生成phar文件</strong></p>
@@ -486,13 +479,13 @@
 <p>只要将phar文件中的<strong>meta-data</strong>换成恶意代码，即可触发反序列化漏洞。</p>
 <p><strong>一种经典周大福</strong></p>
 <p>我称之为<strong>文件查看器</strong>型，通常是有一个上传文件点，一个文件包含点。上传点<strong>一般限制得很死</strong>，图片马什么的想都不要想。phar后缀只要没被限制，就可以先上传有恶意代码的phar文件，再利用文件包含点将其反序列化的同时触发恶意代码。</p>
-<h2><span id="data-皇军托我给您带个话">data:// — 皇军托我给您带个话</span></h2><p>一种数据流封装器，用来传递相应格式的数据。通常可以用来执行php代码。</p>
+<h2 id="data-皇军托我给您带个话"><a href="#data-—-皇军托我给您带个话" class="headerlink" title="data:// — 皇军托我给您带个话"></a>data:// — 皇军托我给您带个话</h2><p>一种数据流封装器，用来传递相应格式的数据。通常可以用来执行php代码。</p>
 <p>data://协议必须在<strong>allow_url_fopen</strong>和<strong>allow_url_include</strong>双On才能使用。</p>
-<h3><span id="本地试吃">本地试吃</span></h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 帽子戏法</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
+<h3 id="本地试吃"><a href="#本地试吃-4" class="headerlink" title="本地试吃"></a>本地试吃</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 帽子戏法</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">include</span>(<span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>]);</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// payload <span class="number">1</span></span><br><span class="line">?file=data:<span class="regexp">//</span>text/plain,%<span class="number">3</span>C%3Fphp+phpinfo%28%29%3B // 防止特殊字符如<span class="string">&#x27;&lt;&gt;&#x27;</span>解析出错进行一次urlencode()</span><br><span class="line"></span><br><span class="line">// payload <span class="number">2</span></span><br><span class="line">?file=data:<span class="regexp">//</span>text/plain;base64,PD9waHAgcGhwaW5mbygpOyA/Pg== <span class="regexp">//</span> base64同理</span><br></pre></td></tr></table></figure>
 <p><img src="/images/202112212011428.png"></p>
-<h2><span id="glob-我来了就是查寝来了">glob:// — 我来了就是查寝来了</span></h2><p>php中的<code>DirectoryIterator</code>类提供了一个用于查看文件系统目录内容的简单接口。</p>
+<h2 id="glob-我来了就是查寝来了"><a href="#glob-—-我来了就是查寝来了" class="headerlink" title="glob:// — 我来了就是查寝来了"></a>glob:// — 我来了就是查寝来了</h2><p>php中的<code>DirectoryIterator</code>类提供了一个用于查看文件系统目录内容的简单接口。</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$it</span> = <span class="keyword">new</span> <span class="built_in">DirectoryIterator</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;file&#x27;</span>]);</span><br><span class="line"><span class="keyword">foreach</span>(<span class="variable">$it</span> <span class="keyword">as</span> <span class="variable">$f</span>) &#123;</span><br><span class="line">    <span class="title function_ invoke__">printf</span>(<span class="string">&quot;%s&quot;</span>, <span class="variable">$f</span>-&gt;<span class="title function_ invoke__">getFilename</span>());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>上面这段代码实现了一个简单的文件查看器的功能。</p>
@@ -703,7 +696,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">食材准备</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">厨房交响</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">2.1.</span> <span class="nav-text">php:&#x2F;&#x2F;filter — 你吧来拿</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.1.1.</span> <span class="nav-text">本地试吃</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">2.2.</span> <span class="nav-text">php:&#x2F;&#x2F;input — 这是替身攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.2.1.</span> <span class="nav-text">本地试吃</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">2.3.</span> <span class="nav-text">file:&#x2F;&#x2F; — 让我访问你网站正不正常啊</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.3.1.</span> <span class="nav-text">本地试吃</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">2.4.</span> <span class="nav-text">phar:&#x2F;&#x2F; — 有基佬开我裤链</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.4.1.</span> <span class="nav-text">本地试吃</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">2.5.</span> <span class="nav-text">data:&#x2F;&#x2F; — 皇军托我给您带个话</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.5.1.</span> <span class="nav-text">本地试吃</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">2.6.</span> <span class="nav-text">glob:&#x2F;&#x2F; — 我来了就是查寝来了</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A3%9F%E6%9D%90%E5%87%86%E5%A4%87"><span class="nav-number">1.</span> <span class="nav-text">食材准备</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8E%A8%E6%88%BF%E4%BA%A4%E5%93%8D"><span class="nav-number">2.</span> <span class="nav-text">厨房交响</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#phpfilter-%E4%BD%A0%E5%90%A7%E6%9D%A5%E6%8B%BF"><span class="nav-number">2.1.</span> <span class="nav-text">php:&#x2F;&#x2F;filter — 你吧来拿</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E8%AF%95%E5%90%83"><span class="nav-number">2.1.1.</span> <span class="nav-text">本地试吃</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#phpinput-%E8%BF%99%E6%98%AF%E6%9B%BF%E8%BA%AB%E6%94%BB%E5%87%BB"><span class="nav-number">2.2.</span> <span class="nav-text">php:&#x2F;&#x2F;input — 这是替身攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E8%AF%95%E5%90%83"><span class="nav-number">2.2.1.</span> <span class="nav-text">本地试吃</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#file-%E8%AE%A9%E6%88%91%E8%AE%BF%E9%97%AE%E4%BD%A0%E7%BD%91%E7%AB%99%E6%AD%A3%E4%B8%8D%E6%AD%A3%E5%B8%B8%E5%95%8A"><span class="nav-number">2.3.</span> <span class="nav-text">file:&#x2F;&#x2F; — 让我访问你网站正不正常啊</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E8%AF%95%E5%90%83"><span class="nav-number">2.3.1.</span> <span class="nav-text">本地试吃</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#phar-%E6%9C%89%E5%9F%BA%E4%BD%AC%E5%BC%80%E6%88%91%E8%A3%A4%E9%93%BE"><span class="nav-number">2.4.</span> <span class="nav-text">phar:&#x2F;&#x2F; — 有基佬开我裤链</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E8%AF%95%E5%90%83"><span class="nav-number">2.4.1.</span> <span class="nav-text">本地试吃</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#data-%E7%9A%87%E5%86%9B%E6%89%98%E6%88%91%E7%BB%99%E6%82%A8%E5%B8%A6%E4%B8%AA%E8%AF%9D"><span class="nav-number">2.5.</span> <span class="nav-text">data:&#x2F;&#x2F; — 皇军托我给您带个话</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E8%AF%95%E5%90%83"><span class="nav-number">2.5.1.</span> <span class="nav-text">本地试吃</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#glob-%E6%88%91%E6%9D%A5%E4%BA%86%E5%B0%B1%E6%98%AF%E6%9F%A5%E5%AF%9D%E6%9D%A5%E4%BA%86"><span class="nav-number">2.6.</span> <span class="nav-text">glob:&#x2F;&#x2F; — 我来了就是查寝来了</span></a></li></ol></li></ol></div>
             
 
           </div>
