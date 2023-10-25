@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="M1sery">
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://example.com/2023/10/24/php-minimum-compilation-extended-installation-debugging-guide/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+        <meta name="description" content="false">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux 平台 PHP 最小编译&#x2F;拓展安装&#x2F;调试 食用指北">
+<meta property="og:url" content="http://example.com/2023/10/24/PHP-minimum-compilation-extended-installation-debugging-guide/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="false">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/PHP-minimum-compilation-extended-installation-debugging-guide/1687860445539-c6d7fa69-05ab-47ae-a0bb-3475d4673190.png">
+<meta property="og:image" content="http://example.com/images/PHP-minimum-compilation-extended-installation-debugging-guide/1687862998629-48af8914-eca4-400e-8855-a578f792897a.png">
+<meta property="og:image" content="http://example.com/images/PHP-minimum-compilation-extended-installation-debugging-guide/1687862926629-e1ae2046-762f-4fe5-92c6-58d4f84f2382.png">
+<meta property="og:image" content="http://example.com/images/PHP-minimum-compilation-extended-installation-debugging-guide/1688049547078-775850d9-6210-4204-b75a-d7e86690ec42.png">
+<meta property="og:image" content="http://example.com/images/PHP-minimum-compilation-extended-installation-debugging-guide/1688048127689-2372154f-42f8-44e3-8c88-5d692c24d05b.png">
+<meta property="og:image" content="http://example.com/images/PHP-minimum-compilation-extended-installation-debugging-guide/1688048854497-d04d2f02-f32c-407f-a915-f110ad270ae4.png">
+<meta property="og:image" content="http://example.com/images/PHP-minimum-compilation-extended-installation-debugging-guide/20231024_223605.png">
+<meta property="article:published_time" content="2023-10-23T16:00:00.000Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/PHP-minimum-compilation-extended-installation-debugging-guide/1687860445539-c6d7fa69-05ab-47ae-a0bb-3475d4673190.png">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/avatar.jpg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+    <meta name="theme-color" content="#66CCFF">
+    <link rel="shortcut icon" href="/images/avatar.jpg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            Linux 平台 PHP 最小编译/拓展安装/调试 食用指北 -
+        
+        M1sery の 厨房
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/assets/build/styles.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/fonts.css">
+
+    
+<link rel="stylesheet" href="/fonts/Satoshi/satoshi.css">
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+    <!--- Font Part-->
+    
+    
+    
+    
+
+    <!--- Inject Part-->
+    
+    <script id="hexo-configurations">
+    window.config = {"hostname":"example.com","root":"/","language":"en"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"5px","image_alignment":"center","image_caption":false,"link_icon":true},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":false,"list":[]},"code_block":{"copy":true,"style":"simple","font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":5,"number":false,"expand":true,"init_open":true},"copyright":true,"lazyload":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#66CCFF","secondary":null},"global":{"fonts":{"chinese":{"enable":false,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":true,"percentage":false},"website_counter":{"url":"https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js","enable":true,"site_pv":true,"site_uv":true,"post_pv":false},"single_page":true,"open_graph":true,"google_analytics":{"enable":false,"id":null}},"home_banner":{"enable":true,"style":"static","image":{"light":"/images/banner.jpg","dark":"/images/banner.jpg"},"title":"M1sery の 厨房","subtitle":{"text":["愿你有一天能与你最重要的人重逢"],"hitokoto":{"enable":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":false,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"links":{"github":null,"instagram":null,"zhihu":null,"twitter":null,"email":null},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":true,"type":"atom","path":"atom.xml"},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":"她追逐着月光的尽头","artist":"46_P / 诗岸","url":"http://evan.beee.top/music/Imagine%20-%20John%20Lennon.mp3","cover":"https://p2.music.126.net/rUB1m-hqa-Jxb0CjBWpVhw==/109951165203538701.jpg?param=90y90"}]},"mermaid":{"enable":false,"version":"9.3.0"}},"version":"2.5.0","navbar":{"auto_hide":true,"color":{"left":"#f78736","right":"#367df7","transparency":35},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Friends":{"path":"/links","icon":"fa-regular fa-link"},"About-Me":{"path":"/about","icon":"fa-regular fa-user"}},"search":{"enable":false,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"links":{"RSS":{"path":"/atom.xml","icon":"fa-regular fa-rss"}}},"article_date_format":"auto","categories":{"enable":false,"limit":3},"tags":{"enable":false,"limit":3}},"footerStart":"2021/10/24 11:45:00"};
+    window.lang_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+        <span class="scroll-progress-bar"></span>
+    
+
+    
+        <span class="pjax-progress-bar"></span>
+        <span class="swup-progress-icon">
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+        </span>
+    
+</div>
+
+
+<main class="page-container" id="swup">
+
+    
+
+    <div class="main-content-container">
+
+
+        <div class="main-content-header">
+            <header class="navbar-container">
+    
+    <div class="navbar-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                M1sery の 厨房
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="" 
+                                    href="/"  >
+                                    
+                                        
+                                            <i class="fa-regular fa-house"></i>
+                                        
+                                        HOME
+                                    
+                                </a>
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="" 
+                                    href="/archives"  >
+                                    
+                                        
+                                            <i class="fa-regular fa-archive"></i>
+                                        
+                                        ARCHIVES
+                                    
+                                </a>
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="" 
+                                    href="/links"  >
+                                    
+                                        
+                                            <i class="fa-regular fa-link"></i>
+                                        
+                                        FRIENDS
+                                    
+                                </a>
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="" 
+                                    href="/about"  >
+                                    
+                                        
+                                            <i class="fa-regular fa-user"></i>
+                                        
+                                        ABOUT-ME
+                                    
+                                </a>
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile drawer -->
+    <div class="navbar-drawer w-full absolute top-0 left-0 bg-background-color">
+        <ul class="drawer-navbar-list flex flex-col justify-start items-center">
+            
+                
+                    <li class="drawer-navbar-item text-base my-1.5 flex justify-center items-center">
+                        <a class="rounded-3xl py-1.5 px-5 hover:border hover:!text-primary active:!text-primary group " 
+                        href="/"  >
+                             
+                                
+                                    <i class="fa-regular fa-house"></i>
+                                
+                                HOME
+                            
+                        </a>
+                    </li>
+                    <!-- Submenu -->
+                    
+            
+                
+                    <li class="drawer-navbar-item text-base my-1.5 flex justify-center items-center">
+                        <a class="rounded-3xl py-1.5 px-5 hover:border hover:!text-primary active:!text-primary group " 
+                        href="/archives"  >
+                             
+                                
+                                    <i class="fa-regular fa-archive"></i>
+                                
+                                ARCHIVES
+                            
+                        </a>
+                    </li>
+                    <!-- Submenu -->
+                    
+            
+                
+                    <li class="drawer-navbar-item text-base my-1.5 flex justify-center items-center">
+                        <a class="rounded-3xl py-1.5 px-5 hover:border hover:!text-primary active:!text-primary group " 
+                        href="/links"  >
+                             
+                                
+                                    <i class="fa-regular fa-link"></i>
+                                
+                                FRIENDS
+                            
+                        </a>
+                    </li>
+                    <!-- Submenu -->
+                    
+            
+                
+                    <li class="drawer-navbar-item text-base my-1.5 flex justify-center items-center">
+                        <a class="rounded-3xl py-1.5 px-5 hover:border hover:!text-primary active:!text-primary group " 
+                        href="/about"  >
+                             
+                                
+                                    <i class="fa-regular fa-user"></i>
+                                
+                                ABOUT-ME
+                            
+                        </a>
+                    </li>
+                    <!-- Submenu -->
+                    
+            
+
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="main-content-body">
+
+            
+
+            <div class="main-content">
+
+                
+                    <div class="post-page-container">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            
+                <h1 class="article-title-regular">Linux 平台 PHP 最小编译/拓展安装/调试 食用指北</h1>
+            
+            </div>
+            
+                    
+        
+        
+            <div class="article-header flex flex-row gap-2 items-center">
+                <div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+                    <img src="/images/avatar.jpg">
+                </div>
+                <div class="info flex flex-col justify-between">
+                    <div class="author flex items-center">
+                        <span class="name text-default-text-color text-lg font-semibold">M1sery</span>
+                        
+                            <span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">Lv1</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2023-10-24</span>
+        <span class="mobile">2023-10-24</span>
+        <span class="hover-info">Created</span>
+    </span>
+    
+
+    
+    
+
+    
+    
+        <span class="article-wordcount article-meta-item">
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>1.4k Words</span>
+        </span>
+    
+    
+        <span class="article-min2read article-meta-item">
+            <i class="fa-regular fa-clock"></i>&nbsp;<span>5 Mins</span>
+        </span>
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        
+
+
+        <div class="article-content markdown-body">
+            <p>Windows 平台的 php 的集成环境如 phpStudy 用过的都说好，它的开发者帮助我们完成了大量繁琐的配置工作。</p>
+<p>那么在 Linux 平台下进行环境搭建时，为什么不用包管理器直接安装 Apache&#x2F;Nginx&#x2F;phpStudy-linux 呢？</p>
+<p>很明显，默认的软件源只会提供生产环境所需的稳定版本，对于我们进行各个版本的漏洞复现以及漏洞研究肯定是不方便的。</p>
+<p>更重要的原因当然还是要保证工作环境干净啦<del>（系统洁癖</del></p>
+<h2 id="单-PHP-本机编译-源码调试"><a href="#单-PHP-本机编译-源码调试" class="headerlink" title="单 PHP 本机编译&#x2F;源码调试"></a>单 PHP 本机编译&#x2F;源码调试</h2><p>首先去 php 官网下载对应版本的 php 源码，这里以 php-7.4.33 为例</p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://www.php.net/releases/index.php" >https://www.php.net/releases/index.php <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p>下载完成并解压后进入源码文件夹，运行配置脚本</p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://www.php.net/manual/zh/configure.about.php" >https://www.php.net/manual/zh/configure.about.php <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./configure --prefix=/opt/php7.4.33 --disable-all --enable-debug</span><br></pre></td></tr></table></figure></div>
+
+<p>对于本机来说，我们的主要目的是对 php 本身进行源码级别的调试，因此<code>--disable-all</code>选项能让我们得到一个最精简的 php 可执行程序。<code>--enable-debug</code>选项则会在编译 php 时保留调试符号。</p>
+<p>运行 configure 脚本过程中可能会由于缺少工具链或某些依赖库而报错，这时候根据报错去安装对应的依赖库就好。</p>
+<p>个人习惯将安装路径手动指定在 &#x2F;opt 下。由于<code>make install</code>的默认安装路径是 &#x2F;usr&#x2F;local，一来由于 PATH 的搜索优先级，&#x2F;usr&#x2F;bin 中的环境（如包管理器安装的最新版本 php）会被 &#x2F;usr&#x2F;local&#x2F;bin 覆盖，二是相同程序编译的不同版本也无法共存，因此最好还是手动指定一个安装路径。</p>
+<p>接下来运行<code>make -jx</code>进行编译，<code>x</code>为指定的线程数，如<code>make -j4</code>，最高线程<code>make -j $(nproc)</code>。</p>
+<p>等待编译完成，显示 Build complete 就可以<code>sudo make install</code>了。</p>
+<p><img src="/images/PHP-minimum-compilation-extended-installation-debugging-guide/1687860445539-c6d7fa69-05ab-47ae-a0bb-3475d4673190.png" alt="img"></p>
+<p>可以看到成功安装于 &#x2F;opt 目录。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$&gt; /opt/php7.4.33/bin/php -v                                                  </span><br><span class="line">PHP 7.4.33 (cli) (built: Jun 27 2023 18:05:22) ( NTS DEBUG )</span><br><span class="line">Copyright (c) The PHP Group</span><br><span class="line">Zend Engine v3.4.0, Copyright (c) Zend Technologies</span><br></pre></td></tr></table></figure></div>
+
+<p>之后就能用编译出的 phpdbg 或者 gdb 来进行调试了。以 gdb + pwndbg 调试内置 Web 服务为例，运行<code>gdb /opt/php7.4.33/bin/php</code></p>
+<p><img src="/images/PHP-minimum-compilation-extended-installation-debugging-guide/1687862998629-48af8914-eca4-400e-8855-a578f792897a.png" alt="img"></p>
+<p>设置程序参数</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; set args -S 0.0.0.0:8888</span><br></pre></td></tr></table></figure></div>
+
+<p>之后用<code>start</code>命令启动 php，默认会在程序可断的第一处停下，输入<code>c</code>即可继续运行程序。</p>
+<p><img src="/images/PHP-minimum-compilation-extended-installation-debugging-guide/1687862926629-e1ae2046-762f-4fe5-92c6-58d4f84f2382.png" alt="img"></p>
+<p>然后就和调试其它程序差不太多了，打断点，步进步入，打印堆栈变量之类的。</p>
+<p>php 源码文件夹中还自带了一个<code>.gdbinit</code>文件，定义了几个方便调试和查看 php 变量或对象的外部命令，也挺实用的。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; source php-src/.gdbinit</span><br></pre></td></tr></table></figure></div>
+
+<p>关于 phpdbg 的使用可以参考官方过于简陋的手册。</p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://www.php.net/manual/zh/intro.phpdbg.php" >https://www.php.net/manual/zh/intro.phpdbg.php <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<h2 id="PHP-Apache-Docker-Xdebug-远程调试"><a href="#PHP-Apache-Docker-Xdebug-远程调试" class="headerlink" title="PHP + Apache Docker&#x2F;Xdebug 远程调试"></a>PHP + Apache Docker&#x2F;Xdebug 远程调试</h2><p>当 php 需要与 Apache&#x2F;Nginx 等中间件配合工作时，在本机进行配置反而更加麻烦。个人认为 Docker 才是 Linux 平台下最方便使用的隔离环境。</p>
+<p>同时推荐 VSCode 中的 Docker 和 Dev Containers 两个插件，前者可将 Docker 的镜像&#x2F;容器&#x2F;网络在 VSCode 界面中可视化，后者可 Attach 整个 VSCode 进入 Docker 环境，极大方便了我们调试容器中的环境。</p>
+<p><img src="/images/PHP-minimum-compilation-extended-installation-debugging-guide/1688049547078-775850d9-6210-4204-b75a-d7e86690ec42.png" alt="img"></p>
+<p>php Docker 仓库：</p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://hub.docker.com/_/php" >https://hub.docker.com/_/php <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p>以 php7.4.33 + apache2.4.54 环境为例，首先拉取基础镜像</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$&gt; docker pull php:7.4.33-apache</span><br></pre></td></tr></table></figure></div>
+
+<p>进入 Docker 环境，运行<code>php -m</code>命令，可以看到 Docker 版本的 php 已经预装了一些常用拓展。</p>
+<p>以安装 xdebug 拓展为例，我们只需复制 phpinfo 粘贴到 Installation Wizard 页面，就能找到合适的版本。</p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://xdebug.org/wizard" >https://xdebug.org/wizard <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p><img src="/images/PHP-minimum-compilation-extended-installation-debugging-guide/1688048127689-2372154f-42f8-44e3-8c88-5d692c24d05b.png" alt="img"></p>
+<p>用<code>pecl</code>即可下载源码并自动编译安装，最后运行<code>docker-php-ext-enable</code>脚本启用拓展。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$&gt; pecl install xdebug-3.1.6 &amp;&amp; docker-php-ext-enable xdebug</span><br></pre></td></tr></table></figure></div>
+
+<p>再次运行<code>php -m</code>命令，可以看到 xdebug 拓展已启用。</p>
+<p>使用<code>pecl</code>安装的拓展，对应的配置文件都会单独放在 &#x2F;usr&#x2F;local&#x2F;etc&#x2F;php&#x2F;conf.d&#x2F;docker-php-ext-xxx.ini 中。这种针对每个拓展单独设立配置文件的做法显然更加方便管理。</p>
+<p><img src="/images/PHP-minimum-compilation-extended-installation-debugging-guide/1688048854497-d04d2f02-f32c-407f-a915-f110ad270ae4.png" alt="img"></p>
+<p>网上能搜到乱七八糟的 xdebug 配置文件写法，其实三行足矣，其他配置对照官方手册按需添加即可。</p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://xdebug.org/docs/all_settings" >https://xdebug.org/docs/all_settings <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<div class="highlight-container" data-rel="Ini"><figure class="iseeu highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">zend_extension</span>=xdebug</span><br><span class="line"><span class="attr">xdebug.mode</span>=develop,gcstats,debug,trace</span><br><span class="line"><span class="attr">xdebug.discover_client_host</span>=<span class="number">1</span></span><br></pre></td></tr></table></figure></div>
+
+<p>最后重启容器即可完成配置。</p>
+<p>据此编写的 Dockerfile 和 docker-compose 配置文件如下：</p>
+<div class="highlight-container" data-rel="Dockerfile"><figure class="iseeu highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> php:<span class="number">7.4</span>.<span class="number">33</span>-apache</span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> pecl install xdebug-3.1.6 &amp;&amp; docker-php-ext-enable xdebug</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> <span class="built_in">echo</span> <span class="string">&#x27;xdebug.mode=develop,gcstats,debug,trace&#x27;</span> &gt;&gt; /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini &amp;&amp; \</span></span><br><span class="line"><span class="language-bash">    <span class="built_in">echo</span> <span class="string">&quot;xdebug.discover_client_host=1&quot;</span> &gt;&gt; /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini</span></span><br></pre></td></tr></table></figure></div>
+
+<div class="highlight-container" data-rel="Yaml"><figure class="iseeu highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&#x27;3&#x27;</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">php-apache-xdebug-9003:</span></span><br><span class="line">    <span class="attr">build:</span> <span class="string">.</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">$PWD/wwwroot:/var/www/html</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;8880:80&quot;</span></span><br></pre></td></tr></table></figure></div>
+
+<p>这将映射容器的 80 端口到本机的 8880 端口，并将当前目录的 wwwroot 文件夹映射到网站根目录中。</p>
+<p>这样只需在访问 php 页面时带上<code>?XDEBUG_SESSION_START</code>参数即可向本机的 9003 端口发送调试请求。如果没有触发调试，可以检查一下是不是本机的防火墙拦截了请求。</p>
+<p><img src="/images/PHP-minimum-compilation-extended-installation-debugging-guide/20231024_223605.png" alt="img"></p>
+
+        </div>
+
+        
+            <div class="post-copyright-info">
+                <div class="article-copyright-info-container">
+    <ul>
+        <li><strong>Title:</strong> Linux 平台 PHP 最小编译/拓展安装/调试 食用指北</li>
+        <li><strong>Author:</strong> M1sery</li>
+        <li><strong>Created at
+                :</strong> 2023-10-24 00:00:00</li>
+        
+        <li>
+            <strong>Link:</strong> https://hack.misery333.com/2023/10/24/PHP-minimum-compilation-extended-installation-debugging-guide/
+        </li>
+        <li>
+            <strong>
+                License:
+            </strong>
+            
+            This work is licensed under <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0</a>.
+            
+
+        </li>
+    </ul>
+</div>
+
+            </div>
+        
+
+        
+
+        
+
+        
+
+
+        
+    </div>
+
+    
+        <div class="toc-content-container">
+            <div class="post-toc-wrap">
+    <div class="post-toc">
+        <div class="toc-title">On this page</div>
+        <div class="page-title">Linux 平台 PHP 最小编译/拓展安装/调试 食用指北</div>
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95-PHP-%E6%9C%AC%E6%9C%BA%E7%BC%96%E8%AF%91-%E6%BA%90%E7%A0%81%E8%B0%83%E8%AF%95"><span class="nav-text">单 PHP 本机编译&#x2F;源码调试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PHP-Apache-Docker-Xdebug-%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95"><span class="nav-text">PHP + Apache Docker&#x2F;Xdebug 远程调试</span></a></li></ol>
+
+    </div>
+</div>
+        </div>
+    
+</div>
+
+
+
+                
+
+            </div>
+
+            
+
+        </div>
+
+        <div class="main-content-footer">
+            <footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2021</span>
+              -
+            
+            2023&nbsp;&nbsp;<i class="fa-solid fa-terminal fa-fade" style="--fa-animation-duration: 0.5s; color: #5745f5"></i>&nbsp;&nbsp;<a href="/">M1sery</a>
+        </div>
+        
+            <script data-swup-reload-script src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">VISITOR COUNT</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">TOTAL PAGE VIEWS</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">POWERED BY <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a></span>
+            <span class="text-sm lg:block">THEME&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.5.0</a></span>
+        </div>
+        
+        
+            <div>
+                Blog up for <span class="odometer" id="runtime_days" ></span> days <span class="odometer" id="runtime_hours"></span> hrs <span class="odometer" id="runtime_minutes"></span> Min <span class="odometer" id="runtime_seconds"></span> Sec
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="article-tools-list">
+        <!-- TOC aside toggle -->
+        
+            <li class="right-bottom-tools page-aside-toggle">
+                <i class="fa-regular fa-outdent"></i>
+            </li>
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-side-tools-container">
+        <div class="side-tools-container">
+    <ul class="hidden-tools-list">
+        <li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+            <i class="fa-regular fa-magnifying-glass-plus"></i>
+        </li>
+
+        <li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+            <i class="fa-regular fa-magnifying-glass-minus"></i>
+        </li>
+
+        <li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+            <i class="fa-regular fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+            <li class="right-bottom-tools rss flex justify-center items-center">
+                <a class="flex justify-center items-center"
+                   href="/atom.xml"
+                   target="_blank"
+                >
+                <i class="fa-regular fa-rss"></i>
+                </a>
+            </li>
+        
+
+        
+            <li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+                <i class="fa-regular fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+            <i class="fa-regular fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="visible-tools-list">
+        <li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+            <i class="fa-regular fa-cog fa-spin"></i>
+        </li>
+        
+        
+    </ul>
+</div>
+
+    </div>
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+    
+<script src="/js/libs/Swup.min.js"></script>
+
+<script src="/js/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+
+
+
+<script src="/js/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/utils.js" type="module"></script>
+
+<script src="/js/main.js" type="module"></script>
+
+<script src="/js/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/layouts/categoryList.js" type="module"></script>
+
+
+
+
+
+    
+<script src="/js/tools/codeBlock.js" type="module"></script>
+
+
+
+
+
+
+    
+<script src="/js/tools/runtime.js"></script>
+
+    
+<script src="/js/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/libs/Typed.min.js"></script>
+
+  
+<script src="/js/plugins/typed.js" type="module"></script>
+
+
+
+
+
+
+
+<div class="post-scripts" data-swup-reload-script>
+    
+        
+<script src="/js/libs/anime.min.js"></script>
+
+        
+<script src="/js/tools/tocToggle.js" type="module"></script>
+
+<script src="/js/layouts/toc.js" type="module"></script>
+
+<script src="/js/plugins/tabs.js" type="module"></script>
+
+    
+</div>
+
+
+</body>
+</html>
